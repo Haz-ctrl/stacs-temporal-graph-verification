@@ -32,7 +32,7 @@ The final version will serve as a higher-level project overview.
 
 ```
 
-root/
+stacs-temporal-graph-verification/
 ├── data/                  # JSONL datasets
 ├── outputs/               # Run artefacts (timestamped)
 │   └── runs/
@@ -98,7 +98,6 @@ pip install -r requirements.txt
 > The download links on the CS wiki are outdated.
 > This repository includes helper scripts to simplify installation.
 
----
 
 ## One-Time Install (per user)
 

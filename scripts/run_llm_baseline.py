@@ -1,4 +1,3 @@
-# scripts/run_llm_baseline.py
 from __future__ import annotations
 
 import argparse
@@ -8,9 +7,10 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from src.dataset import load_jsonl
+from src.temporal_graph import TemporalGraph
+from src.constraints import default_verifier
 from src.ollama_client import OllamaClient
 from src.ollama_predictor import OllamaPredictor
-
 
 def utc_stamp() -> str:
     """UTC timestamp suitable for folder names."""
@@ -45,6 +45,14 @@ def main() -> None:
     run_dir = Path("outputs") / "runs" / run_id
     ensure_dir(run_dir)
 
+    # TODO find a better place to put these counts
+    valid_count = 0
+    invalid_count = 0
+    violation_counts = {}  # Dict[str, int]
+    overcommit_task_count = 0      # number of tasks with empty gold_relations
+    overcommit_edge_count = 0      # number of predicted edges on those tasks
+    overcommit_hit_count = 0       # number of tasks where model predicted >=1 edge despite empty gold
+
     # Build predictor
     client = OllamaClient(base_url=args.base_url)
     predictor = OllamaPredictor(
@@ -53,6 +61,7 @@ def main() -> None:
         temperature=args.temperature,
         seed=args.seed,
     )
+    verifier = default_verifier()
 
     # Save config snapshot for reproducibility
     config = {
@@ -79,17 +88,53 @@ def main() -> None:
 
             try:
                 pred_edges = predictor.predict_edges(task)
+
+                gold = task.get("gold_relations", [])
+                if len(gold) == 0:
+                    overcommit_task_count += 1
+                    overcommit_edge_count += len(pred_edges)
+                    if len(pred_edges) > 0:
+                        overcommit_hit_count += 1
+
+                # Build temporal graph from predicted edges
+                tg = TemporalGraph()
+                allowed_events = task.get("events", [])
+                tg.add_events(allowed_events)
+                tg.add_edges(pred_edges)
+
+                # Compute violations
+                violations = verifier.verify(tg, allowed_events=allowed_events)
+                is_valid = (len(violations) == 0)
+
+                if is_valid:
+                    valid_count += 1
+                else:
+                    invalid_count += 1
+
+                for v in violations:
+                    violation_counts[v.type] = violation_counts.get(v.type, 0) + 1
+
                 rec = {
                     "id": task_id,
                     "question": task.get("question", ""),
-                    "events": task.get("events", []),
+                    "events": allowed_events,
                     "gold_relations": task.get("gold_relations", []),
                     "pred_edges": pred_edges,
+
+                    # New: graph + verification
+                    "graph": {
+                        "num_nodes": len(tg.nodes()),
+                        "num_edges": len(tg.edges()),
+                        # optional: include edges for debugging (you already store pred_edges)
+                    },
+                    "is_valid": is_valid,
+                    "violations": [v.__dict__ for v in violations],
                 }
+
                 f.write(json.dumps(rec) + "\n")
-                print(f"[{task_id}] edges={len(pred_edges)}")
+                print(f"[{task_id}] edges={len(pred_edges)} valid={is_valid} violations={len(violations)}")
+
             except Exception as e:
-                # Keep the run going and log failures
                 failures.append({"id": task_id, "error": repr(e)})
                 print(f"[{task_id}] ERROR: {e!r}")
 
@@ -100,6 +145,20 @@ def main() -> None:
         "num_failures": len(failures),
         "failures": failures,
         "predictions_file": str(preds_path),
+
+        # Verification aggregates
+        "valid_count": valid_count,
+        "invalid_count": invalid_count,
+        "validity_rate": (valid_count / len(tasks)) if tasks else 0.0,
+        "violation_counts": violation_counts,
+    }
+    report["overcommitment"] = {
+        "num_gold_empty_tasks": overcommit_task_count,
+        "num_overcommit_tasks": overcommit_hit_count,
+        "num_overcommit_edges": overcommit_edge_count,
+        # two useful rates:
+        "task_overcommit_rate": (overcommit_hit_count / overcommit_task_count) if overcommit_task_count else 0.0,
+        "avg_overcommit_edges_per_gold_empty_task": (overcommit_edge_count / overcommit_task_count) if overcommit_task_count else 0.0,
     }
     write_json(run_dir / "report.json", report)
 
