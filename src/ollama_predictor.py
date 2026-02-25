@@ -27,6 +27,7 @@ Rules:
 - Use only the event strings exactly as given in Events.
 - Only output relation "BEFORE".
 - If unsure, return {{"edges": []}}.
+- Do not infer ordering unless explicitly or logically entailed.
 """
 
 @dataclass
