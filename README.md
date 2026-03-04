@@ -239,9 +239,9 @@ Planned next components:
 ---
 
 # Running Tests
-
+*Once again from the repository root*
 ```bash
-pytest
+pytest -q
 ```
 
 ---

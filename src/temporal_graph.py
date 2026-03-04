@@ -1,10 +1,28 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Iterable, List, Optional, Tuple, Set
+from typing import Iterable, List, Optional, Tuple, Set, Sequence, Union
 import networkx as nx
 
 Relation = str
 Edge = Tuple[str, str, Relation]  # (source_event, target_event, relation)
+EdgeLike = Union[Edge, Sequence[str]] # accepts ("A", "B", "BEFORE") or ["A", "B", "BEFORE"]
+
+def _to_edge(e: EdgeLike) -> Edge:
+    """
+    Convert edge-like input into canonical Edge tuple.
+    Accepts tuple[str,str,str] or list/sequence[str] of length 3.
+    """
+    # tuple is already fine
+    if isinstance(e, tuple) and len(e) == 3:
+        a, b, r = e
+        return (str(a), str(b), str(r).strip().upper())
+
+    # list/sequence form
+    if isinstance(e, (list, tuple)) and len(e) == 3:
+        a, b, r = e[0], e[1], e[2]
+        return (str(a), str(b), str(r).strip().upper())
+
+    raise ValueError(f"Invalid edge format (expected 3 items): {e!r}")
 
 @dataclass
 class TemporalGraph:
@@ -48,8 +66,10 @@ class TemporalGraph:
 
         self.g.add_edge(source, target, relation=rel)
 
-    def add_edges(self, edges: Iterable[Edge]) -> None:
-        """Add multiple relation edges."""
+    def add_edges(self, edges: Iterable[EdgeLike]) -> None:
+        """
+        Add multiple relation edges.
+        """
         for a, b, rel in edges:
             self.add_relation(a, b, rel)
 
@@ -69,7 +89,6 @@ class TemporalGraph:
         return set(self.edges())
 
     def is_acyclic(self) -> bool:
-        """True if the directed graph is acyclic."""
         return nx.is_directed_acyclic_graph(self.g)
 
     def find_cycles(self) -> List[List[str]]:
@@ -81,8 +100,25 @@ class TemporalGraph:
             cycles = list(nx.simple_cycles(self.g))
             return cycles
         except Exception:
-            # In case of unexpected networkx issues, fail safe
             return []
+        
+    def transitive_closure_pairs(self) -> set[tuple[str, str]]:
+        """
+        Returns set of (u, v) pairs such that v is reachable from u (u != v).
+        """
+        closure = nx.transitive_closure(self.g)
+        return {(u, v) for (u, v) in closure.edges() if u != v}
+
+    def pairs_for_relation(self, relation: str = "BEFORE") -> set[tuple[str, str]]:
+        """
+        Returns set of (u, v) pairs for edges whose 'relation' matches.
+        """
+        rel = str(relation).strip().upper()
+        out = set()
+        for u, v, data in self.g.edges(data=True):
+            if str(data.get("relation", "")).upper() == rel:
+                out.add((u, v))
+        return out
 
     def has_direct_contradiction(self, relation: Relation = "BEFORE") -> bool:
         """
@@ -105,10 +141,6 @@ class TemporalGraph:
         return False
 
     def direct_contradictions(self, relation: Relation = "BEFORE") -> List[Tuple[str, str]]:
-        """
-        Return list of (A, B) pairs such that:
-          A --REL--> B and B --REL--> A
-        """
         rel = str(relation).strip().upper()
         if not rel:
             raise ValueError("Relation must be a non-empty string.")
@@ -122,10 +154,10 @@ class TemporalGraph:
             if self.g.has_edge(b, a):
                 r2 = str(self.g.edges[b, a].get("relation", "")).upper()
                 if r2 == rel:
-                    pair = tuple(sorted((a, b)))
+                    pair: Tuple[str, str] = (a, b) if a <= b else (b, a)
                     if pair not in seen:
                         seen.add(pair)
-                        contradictions.append((pair[0], pair[1]))
+                        contradictions.append(pair)
 
         return contradictions
 

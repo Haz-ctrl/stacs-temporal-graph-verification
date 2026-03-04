@@ -7,3 +7,4 @@ matplotlib
 # accelerate==0.34.2
 # bitsandbytes==0.44.1
 requests==2.32.3
+pytest
