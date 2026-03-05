@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Sets up PATH for lab install and checks Ollama server health.
-
-export PATH="$PATH:$HOME/opt/ollama/bin"
+export PATH="$HOME/opt/ollama/bin:$PATH"
+hash -r
 
 echo "==> ollama binary:"
 if command -v ollama >/dev/null 2>&1; then

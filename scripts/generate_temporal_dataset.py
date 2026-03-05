@@ -1,4 +1,3 @@
-# scripts/generate_temporal_dataset.py
 from __future__ import annotations
 
 import argparse

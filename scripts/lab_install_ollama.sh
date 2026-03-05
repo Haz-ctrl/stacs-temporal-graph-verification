@@ -1,53 +1,73 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Installs Ollama (and ROCm libs) into:
-#   ~/opt/ollama
-# Downloads go to:
-#   ~/src
+# Versioned Ollama install for lab machines.
+#
+# Installs into:
+#   ~/opt/ollama-vX.Y.Z
+# Updates symlink:
+#   ~/opt/ollama -> ~/opt/ollama-vX.Y.Z
+#
+# Downloads cached in:
+#   ~/src/ollama
 
-OLLAMA_DIR="$HOME/opt/ollama"
-SRC_DIR="$HOME/src"
+VERSION="${1:-0.17.6}"    # usage: ./lab_install_ollama.sh 0.17.6
+TAG="v${VERSION}"
 
-mkdir -p "$SRC_DIR" "$OLLAMA_DIR"
+BASE_OPT_DIR="$HOME/opt"
+INSTALL_DIR="$BASE_OPT_DIR/ollama-${TAG}"
+SYMLINK_DIR="$BASE_OPT_DIR/ollama"
+
+SRC_DIR="$HOME/src/ollama"
+mkdir -p "$SRC_DIR" "$INSTALL_DIR"
 cd "$SRC_DIR"
 
-echo "==> Downloading Ollama packages (.tar.zst)..."
-curl -fL --retry 5 --retry-delay 2 \
-  -o ollama-linux-amd64.tar.zst \
-  https://ollama.com/download/ollama-linux-amd64.tar.zst
+AMD64_URL="https://github.com/ollama/ollama/releases/download/${TAG}/ollama-linux-amd64.tar.zst"
+ROCM_URL="https://github.com/ollama/ollama/releases/download/${TAG}/ollama-linux-amd64-rocm.tar.zst"
 
-curl -fL --retry 5 --retry-delay 2 \
-  -o ollama-linux-amd64-rocm.tar.zst \
-  https://ollama.com/download/ollama-linux-amd64-rocm.tar.zst
+AMD64_TARBALL="ollama-linux-amd64.${TAG}.tar.zst"
+ROCM_TARBALL="ollama-linux-amd64-rocm.${TAG}.tar.zst"
+
+echo "==> Installing Ollama ${TAG}"
+echo "==> Downloading tarballs into: $SRC_DIR"
+
+curl -fL --retry 5 --retry-delay 2 -o "$AMD64_TARBALL" "$AMD64_URL"
+curl -fL --retry 5 --retry-delay 2 -o "$ROCM_TARBALL" "$ROCM_URL"
 
 echo
 echo "==> Downloaded files:"
-ls -lh ollama-linux-amd64.tar.zst ollama-linux-amd64-rocm.tar.zst
+ls -lh "$AMD64_TARBALL" "$ROCM_TARBALL"
 
 echo
-echo "==> Extracting to $OLLAMA_DIR ..."
+echo "==> Extracting into: $INSTALL_DIR"
 if tar --help 2>/dev/null | grep -q -- '--zstd'; then
-  tar --zstd -C "$OLLAMA_DIR" -xf ollama-linux-amd64.tar.zst
-  tar --zstd -C "$OLLAMA_DIR" -xf ollama-linux-amd64-rocm.tar.zst
+  tar --zstd -C "$INSTALL_DIR" -xf "$AMD64_TARBALL"
+  tar --zstd -C "$INSTALL_DIR" -xf "$ROCM_TARBALL"
 else
   if ! command -v zstd >/dev/null 2>&1; then
     echo "ERROR: tar has no --zstd support and 'zstd' is not installed."
-    echo "Ask CS support to install zstd or use a machine where it exists."
+    echo "Ask CS support to install zstd, or use a machine where it exists."
     exit 1
   fi
-  zstd -d -c ollama-linux-amd64.tar.zst | tar -C "$OLLAMA_DIR" -xf -
-  zstd -d -c ollama-linux-amd64-rocm.tar.zst | tar -C "$OLLAMA_DIR" -xf -
+  zstd -d -c "$AMD64_TARBALL" | tar -C "$INSTALL_DIR" -xf -
+  zstd -d -c "$ROCM_TARBALL"  | tar -C "$INSTALL_DIR" -xf -
 fi
 
 echo
-echo "==> Installation complete."
-echo "To use Ollama in your current shell:"
-echo '  export PATH="$PATH:$HOME/opt/ollama/bin"'
+echo "==> Pointing symlink: $SYMLINK_DIR -> $INSTALL_DIR"
+# If ~/opt/ollama exists as a real directory (not a symlink), move it aside
+if [ -e "$SYMLINK_DIR" ] && [ ! -L "$SYMLINK_DIR" ]; then
+  backup="$BASE_OPT_DIR/ollama-old-$(date +%Y%m%d-%H%M%S)"
+  echo "==> Detected existing directory at $SYMLINK_DIR; moving to $backup"
+  mv "$SYMLINK_DIR" "$backup"
+fi
+
+ln -sfn "$INSTALL_DIR" "$SYMLINK_DIR"
+
 echo
-echo "To start the server in the background:"
-echo '  nohup ollama serve > ~/ollama_serve.log 2>&1 &'
-echo
-echo "Verify:"
-echo '  ollama -v'
-echo '  curl -s http://localhost:11434/api/tags | head'
+echo "==> Done."
+echo "Next steps:"
+echo "  1) export PATH=\"$HOME/opt/ollama/bin:\$PATH\""
+echo "  2) hash -r"
+echo "  3) ollama -v"
+echo "  4) restart the server (see instructions below)"
