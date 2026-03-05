@@ -25,6 +25,8 @@ class Task(TypedDict):
     question: str
     events: List[str]
     gold_relations: List[List[str]]  # JSON-friendly: [a,b,"BEFORE"]
+    expected_consistent: bool
+    expected_valid: bool
 
 
 @dataclass(frozen=True)
@@ -170,6 +172,8 @@ def _linear_chain_task(rng: random.Random, idx: int) -> Task:
         "question": question,
         "events": events,
         "gold_relations": [_json_edge(e) for e in edges],
+        "expected_consistent": True,
+        "expected_valid": True
     }
 
 
@@ -192,6 +196,8 @@ def _transitive_reasoning_task(rng: random.Random, idx: int) -> Task:
         "question": question,
         "events": events,
         "gold_relations": [_json_edge(e) for e in closure_edges],
+        "expected_consistent": True,
+        "expected_valid": True,
     }
 
 
@@ -209,6 +215,8 @@ def _ambiguous_task(rng: random.Random, idx: int) -> Task:
         "question": question,
         "events": events,
         "gold_relations": [],
+        "expected_consistent": True,
+        "expected_valid": True
     }
 
 
@@ -227,6 +235,8 @@ def _contradiction_task(rng: random.Random, idx: int) -> Task:
         "question": question,
         "events": list(events),
         "gold_relations": [_json_edge(e) for e in edges],
+        "expected_consistent": False,
+        "expected_valid": False
     }
 
 
@@ -235,7 +245,7 @@ def _long_chain_task(rng: random.Random, idx: int) -> Task:
     events = _unique_events(rng, n_events)
     edges = _make_chain_edges(events)
 
-    # Narrative: more verbose, but still a straightforward chain
+    # More verbose but still a straightforward chain
     parts: List[str] = []
     parts.append(f"First, {events[0]}.")
     for i in range(1, len(events)):
@@ -249,6 +259,8 @@ def _long_chain_task(rng: random.Random, idx: int) -> Task:
         "question": question,
         "events": events,
         "gold_relations": [_json_edge(e) for e in edges],
+        "expected_consistent": True,
+        "expected_valid": True,
     }
 
 
@@ -271,7 +283,7 @@ def generate_dataset(cfg: Config) -> List[Task]:
     for i in range(1, cfg.n_long + 1):
         tasks.append(_long_chain_task(rng, i))
 
-    # Shuffle to avoid category blocks (but keep determinism)
+    # Shuffle to avoid category blocks
     rng.shuffle(tasks)
     return tasks
 
@@ -311,7 +323,7 @@ def main() -> None:
 
     _write_jsonl(cfg.out_path, tasks)
 
-    # Lightweight summary (stdout)
+    # Print summary
     counts: Dict[str, int] = {}
     for t in tasks:
         cat = t["category"]

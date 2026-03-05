@@ -2,27 +2,31 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Tuple, Iterable, Optional
 import random
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from src.dataset import load_jsonl
-from src.temporal_graph import TemporalGraph, Edge, EdgeLike, _to_edge
 from src.constraints import default_verifier
+from src.dataset import load_jsonl
+from src.dataset_validation import validate_tasks
 from src.ollama_client import OllamaClient
-from src.ollama_predictor import OllamaPredictor, PROMPT_TEMPLATE  # import template for raw logging
+from src.ollama_predictor import OllamaPredictor, PROMPT_TEMPLATE
+from src.temporal_graph import Edge, EdgeLike, TemporalGraph, _to_edge
 
 
 def edges_to_jsonl(edges: Iterable[EdgeLike]) -> List[List[str]]:
+    """Convert canonical edge-like triples into JSON-friendly list triples."""
     return [[a, b, r] for (a, b, r) in (_to_edge(e) for e in edges)]
 
 
 def edges_to_tuples(edges: Iterable[EdgeLike]) -> List[Edge]:
+    """Convert edge-like triples into canonical Edge tuples."""
     return [_to_edge(e) for e in edges]
 
 
 def utc_stamp() -> str:
+    """UTC timestamp suitable for folder names."""
     return datetime.now(timezone.utc).strftime("%Y-%m-%d_%H%M%SUTC")
 
 
@@ -47,10 +51,14 @@ def make_noisy_preds(
     gold_edges: List[Edge],
     seed: int,
 ) -> List[Edge]:
+    """
+    Deterministically generate "bad" predictions to trigger constraints.
+    Returns canonical Edge tuples.
+    """
     rng = random.Random(seed)
     pred: List[Edge] = list(gold_edges)
 
-    # spurious edge
+    # Spurious edge
     if len(allowed_events) >= 2:
         candidates: List[Tuple[str, str]] = []
         for i in range(len(allowed_events)):
@@ -64,7 +72,7 @@ def make_noisy_preds(
             a, b = rng.choice(spurious_candidates)
             pred.append((a, b, "BEFORE"))
 
-    # contradiction of first gold edge
+    # Contradiction of first gold edge
     if gold_edges:
         a, b, r = gold_edges[0]
         pred.append((b, a, r))
@@ -76,7 +84,7 @@ def make_noisy_preds(
         pred.append((b, c, "BEFORE"))
         pred.append((c, a, "BEFORE"))
 
-    # de-dup
+    # De-duplicate while preserving order
     seen: set[Edge] = set()
     deduped: List[Edge] = []
     for e in pred:
@@ -115,24 +123,55 @@ def main() -> None:
         action="store_true",
         help="Log raw LLM output in predictions.jsonl (debugging only).",
     )
+    ap.add_argument(
+        "--validate-data",
+        action="store_true",
+        help="Validate dataset before running (recommended).",
+    )
+    ap.add_argument(
+        "--strict-data",
+        action="store_true",
+        help="Stricter dataset validation (may error on minor issues).",
+    )
+    ap.set_defaults(validate_data=True)
     args = ap.parse_args()
 
+    # Load tasks
     tasks: List[Dict[str, Any]] = load_jsonl(args.data)
     if args.max_tasks and args.max_tasks > 0:
         tasks = tasks[: args.max_tasks]
 
+    # Validate dataset (recommended gate)
+    if args.validate_data:
+        rep = validate_tasks(tasks, strict=args.strict_data, require_expected_fields=False)
+        if rep.num_errors > 0:
+            print(f"❌ Dataset validation failed: errors={rep.num_errors} warnings={rep.num_warnings}")
+            for it in rep.issues[:20]:
+                if it.severity == "error":
+                    print(f"- [error] {it.task_id} {it.code}: {it.message}")
+            raise SystemExit(1)
+        print(f"✅ Dataset validation passed: errors=0 warnings={rep.num_warnings}")
+
+    # Prepare run directory
     run_id = utc_stamp()
     run_dir = Path("outputs") / "runs" / run_id
     ensure_dir(run_dir)
 
+    # Verification aggregates (all tasks)
     valid_count = 0
     invalid_count = 0
     violation_counts: Dict[str, int] = {}
 
+    # Dataset annotation counts
+    expected_valid_tasks = 0
+    expected_invalid_tasks = 0
+
+    # Overcommitment counters (metric over gold-empty tasks)
     overcommit_task_count = 0
     overcommit_edge_count = 0
     overcommit_hit_count = 0
 
+    # Metrics computed ONLY over expected_valid tasks (and only where gold is non-empty)
     direct_gold_total = 0
     direct_pred_total = 0
     direct_correct = 0
@@ -141,6 +180,7 @@ def main() -> None:
     closure_pred_total = 0
     closure_correct = 0
 
+    # Predictor setup
     client: Optional[OllamaClient] = None
     predictor: Optional[OllamaPredictor] = None
     if args.pred_source == "llm":
@@ -154,7 +194,8 @@ def main() -> None:
 
     verifier = default_verifier()
 
-    config = {
+    # Save config snapshot
+    config: Dict[str, Any] = {
         "run_id": run_id,
         "data_path": str(Path(args.data)),
         "num_tasks": len(tasks),
@@ -164,33 +205,43 @@ def main() -> None:
         "temperature": args.temperature,
         "seed": args.seed,
         "log_raw": args.log_raw,
+        "validate_data": args.validate_data,
+        "strict_data": args.strict_data,
     }
     write_json(run_dir / "config.json", config)
 
+    # Run predictions
     preds_path = run_dir / "predictions.jsonl"
     failures: List[Dict[str, Any]] = []
 
     with preds_path.open("w", encoding="utf-8") as f:
         for idx, task in enumerate(tasks, start=1):
-            task_id = task.get("id", f"task_{idx:03d}")
+            task_id = str(task.get("id", f"task_{idx:03d}"))
 
             try:
-                allowed_events: List[str] = task.get("events", [])
-                gold_raw: List[List[str]] = task.get("gold_relations", [])
+                allowed_events: List[str] = list(task.get("events", []))
+
+                gold_raw: List[List[str]] = list(task.get("gold_relations", []))
                 gold_edges: List[Edge] = edges_to_tuples(gold_raw)
+
+                # Expected fields (default to True if missing, for backwards compatibility)
+                expected_valid = bool(task.get("expected_valid", True))
+                expected_consistent = bool(task.get("expected_consistent", True))
+                if expected_valid:
+                    expected_valid_tasks += 1
+                else:
+                    expected_invalid_tasks += 1
 
                 raw_output: Optional[str] = None
 
                 # Select prediction source -> always produce List[Edge]
                 if args.pred_source == "llm":
                     assert predictor is not None
-                    assert client is not None
-
-                    # Primary call: parsed edges
                     pred_edges: List[Edge] = predictor.predict_edges(task)
 
-                    # Optional debug call: raw output
+                    # Optional raw logging (second call, but deterministic with temp=0 + seed)
                     if args.log_raw:
+                        assert client is not None
                         prompt = build_prompt(task)
                         raw_output = client.generate(
                             args.model,
@@ -224,7 +275,7 @@ def main() -> None:
                 tg.add_events(allowed_events)
                 tg.add_edges(pred_edges)
 
-                # Compute violations
+                # Compute violations (pass gold + pred for edge-based constraints)
                 violations = verifier.verify(
                     tg,
                     allowed_events=allowed_events,
@@ -241,11 +292,11 @@ def main() -> None:
                 for v in violations:
                     violation_counts[v.type] = violation_counts.get(v.type, 0) + 1
 
-                # Metrics (only for gold-nonempty)
-                gold_set = set(gold_edges)
-                pred_set = set(pred_edges)
+                # Metrics: ONLY on expected_valid tasks AND gold-nonempty
+                if expected_valid and len(gold_edges) > 0:
+                    gold_set = set(gold_edges)
+                    pred_set = set(pred_edges)
 
-                if len(gold_edges) > 0:
                     direct_gold_total += len(gold_set)
                     direct_pred_total += len(pred_set)
                     direct_correct += len(gold_set & pred_set)
@@ -263,6 +314,9 @@ def main() -> None:
 
                 rec: Dict[str, Any] = {
                     "id": task_id,
+                    "category": task.get("category", ""),
+                    "expected_valid": expected_valid,
+                    "expected_consistent": expected_consistent,
                     "question": task.get("question", ""),
                     "events": allowed_events,
                     "gold_relations": edges_to_jsonl(gold_edges),
@@ -288,6 +342,7 @@ def main() -> None:
                 failures.append({"id": task_id, "error": repr(e)})
                 print(f"[{task_id}] ERROR: {e!r}")
 
+    # Report summary
     report: Dict[str, Any] = {
         "run_id": run_id,
         "num_tasks": len(tasks),
@@ -299,14 +354,20 @@ def main() -> None:
         "invalid_count": invalid_count,
         "validity_rate": (valid_count / len(tasks)) if tasks else 0.0,
         "violation_counts": violation_counts,
+        "dataset": {
+            "expected_valid_tasks": expected_valid_tasks,
+            "expected_invalid_tasks": expected_invalid_tasks,
+        },
         "overcommitment": {
             "num_gold_empty_tasks": overcommit_task_count,
             "num_overcommit_tasks": overcommit_hit_count,
             "num_overcommit_edges": overcommit_edge_count,
             "task_overcommit_rate": (overcommit_hit_count / overcommit_task_count) if overcommit_task_count else 0.0,
-            "avg_overcommit_edges_per_gold_empty_task": (overcommit_edge_count / overcommit_task_count) if overcommit_task_count else 0.0,
+            "avg_overcommit_edges_per_gold_empty_task": (overcommit_edge_count / overcommit_task_count)
+            if overcommit_task_count
+            else 0.0,
         },
-        "metrics": {
+        "metrics_expected_valid_only": {
             "direct": {
                 **prf(direct_correct, direct_pred_total, direct_gold_total),
                 "correct": direct_correct,
