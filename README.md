@@ -96,23 +96,25 @@ pip install -r requirements.txt
 # Ollama Setup (Lab AMD GPU)
 
 > The download links on the CS wiki are outdated.
-> This repository includes helper scripts to simplify installation.
+> This repository includes helper scripts to simplify installation, and pulls releases from GitHub.
 
 
-## One-Time Install (per user)
+## User install (run once or everytime you want to upgrade)
 
-Run once on a lab machine:
+Run once on a lab machine, or everytime you need to upgrade the client
 
 ```bash
-./scripts/lab_install_ollama.sh
+./scripts/lab_install_ollama.sh 0.17.6
 ```
+You can specify a version *X.Y.Z* which will default to installing version 0.17.6 of the client.
 
 This:
 
 * Downloads Ollama binaries
 * Installs them into `~/opt/ollama`
 * Installs ROCm libraries for AMD GPUs
-* Avoids requiring sudo
+* Auto updates symlinks everytime a new version is installed
+
 
 ---
 
@@ -149,12 +151,10 @@ curl -s http://localhost:11434/api/tags | head
 
 ---
 
-## Pull a Model (First Time Only)
-
-Start with a smaller model (recommended for testing):
+## Pull a Model
 
 ```bash
-ollama pull deepseek-r1:7b
+ollama pull qwen3.5:9b
 ```
 
 List available models:
@@ -170,7 +170,7 @@ ollama list
 Always run from the **repository root**.
 
 ```bash
-python -m scripts.run_llm_baseline --model deepseek-r1:7b
+python -m scripts.run_llm_baseline --model qwen3.5:9b
 ```
 
 Optional arguments:
