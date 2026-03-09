@@ -1,0 +1,231 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pytest
+
+from scripts.run_llm_baseline import BaselineRunConfig, run_baseline
+
+
+def _write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row) + "\n")
+
+
+def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
+
+
+def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "amb_001",
+                "category": "ambiguous",
+                "question": "Sofia made tea in the classroom. Hana opened the door in the garden.",
+                "events": [
+                    "Sofia made tea in the classroom",
+                    "Hana opened the door in the garden",
+                ],
+                "gold_relations": [],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "lc_001",
+                "category": "linear_chain",
+                "question": "A happened. Afterwards, B happened. After that, C happened.",
+                "events": ["A happened", "B happened", "C happened"],
+                "gold_relations": [
+                    ["A happened", "B happened", "BEFORE"],
+                    ["B happened", "C happened", "BEFORE"],
+                ],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "con_001",
+                "category": "contradiction",
+                "question": "A happened before B, but B happened before A.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [
+                    ["A happened", "B happened", "BEFORE"],
+                    ["B happened", "A happened", "BEFORE"],
+                ],
+                "expected_consistent": False,
+                "expected_valid": False,
+            },
+        ],
+    )
+
+    result = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="gold",
+            output_root=tmp_path / "runs",
+        )
+    )
+
+    report = result.report
+    assert report["num_tasks"] == 3
+    assert report["num_failures"] == 0
+    assert report["valid_count"] == 2
+    assert report["invalid_count"] == 1
+
+    # Expected-valid tasks only: ambiguous + linear_chain
+    assert report["dataset"]["expected_valid_tasks"] == 2
+    assert report["dataset"]["expected_invalid_tasks"] == 1
+
+    direct = report["metrics_expected_valid_only"]["direct"]
+    closure = report["metrics_expected_valid_only"]["closure"]
+
+    assert direct["precision"] == 1.0
+    assert direct["recall"] == 1.0
+    assert direct["f1"] == 1.0
+
+    assert closure["precision"] == 1.0
+    assert closure["recall"] == 1.0
+    assert closure["f1"] == 1.0
+
+    records = _read_jsonl(result.predictions_path)
+    assert len(records) == 3
+    assert records[0]["id"] == "amb_001"
+    assert records[1]["id"] == "lc_001"
+    assert records[2]["id"] == "con_001"
+
+
+def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "amb_001",
+                "category": "ambiguous",
+                "question": "Sofia made tea in the classroom. Hana opened the door in the garden.",
+                "events": [
+                    "Sofia made tea in the classroom",
+                    "Hana opened the door in the garden",
+                ],
+                "gold_relations": [],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "lc_001",
+                "category": "linear_chain",
+                "question": "A happened. Afterwards, B happened. After that, C happened.",
+                "events": ["A happened", "B happened", "C happened"],
+                "gold_relations": [
+                    ["A happened", "B happened", "BEFORE"],
+                    ["B happened", "C happened", "BEFORE"],
+                ],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+        ],
+    )
+
+    result = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="noisy",
+            output_root=tmp_path / "runs",
+            seed=7,
+        )
+    )
+
+    report = result.report
+    assert report["num_tasks"] == 2
+    assert report["num_failures"] == 0
+    assert report["invalid_count"] >= 1
+    assert report["violation_counts"] != {}
+    assert report["taxonomy_counts"] != {}
+
+    # Ambiguous gold-empty task should overcommit under noisy mode.
+    assert report["overcommitment"]["num_gold_empty_tasks"] == 1
+    assert report["overcommitment"]["num_overcommit_tasks"] == 1
+
+
+class FakeOllamaClient:
+    def __init__(self, base_url: str) -> None:
+        self.base_url = base_url
+
+    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+        return """
+        {
+          "answer": "A happened before B.",
+          "events": ["A happened", "B happened"],
+          "relations": [["A happened", "B happened", "BEFORE"]],
+          "reasoning_steps": [
+            {
+              "step_id": 1,
+              "text": "The question states A happened before B.",
+              "supports": [["A happened", "B happened", "BEFORE"]]
+            }
+          ]
+        }
+        """
+
+    def tags_snapshot(self) -> list[str]:
+        return ["fake-model:latest"]
+
+
+def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import scripts.run_llm_baseline as baseline_module
+
+    monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClient)
+
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "lc_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            }
+        ],
+    )
+
+    result = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="llm",
+            output_root=tmp_path / "runs",
+            model="fake-model",
+            log_raw=True,
+        )
+    )
+
+    report = result.report
+    assert report["num_tasks"] == 1
+    assert report["num_failures"] == 0
+    assert report["valid_count"] == 1
+    assert report["invalid_count"] == 0
+
+    records = _read_jsonl(result.predictions_path)
+    assert len(records) == 1
+    record = records[0]
+
+    assert record["answer"] == "A happened before B."
+    assert record["pred_events"] == ["A happened", "B happened"]
+    assert record["pred_edges"] == [["A happened", "B happened", "BEFORE"]]
+    assert len(record["reasoning_steps"]) == 1
+    assert record["reasoning_steps"][0]["step_id"] == 1
+    assert "raw_output" in record
