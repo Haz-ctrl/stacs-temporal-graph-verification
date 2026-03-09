@@ -11,12 +11,11 @@ Edge3 = Tuple[str, str, str]
 def _edge_set(relations: Iterable[EdgeLike]) -> Set[Edge3]:
     """
     Convert edge-like triples into a set of canonical (a, b, REL) tuples.
-    Normalises relation to uppercase via _to_edge.
+    Normalises relation labels via _to_edge.
     """
     out: Set[Edge3] = set()
-    for e in relations:
-        a, b, r = _to_edge(e)
-        out.add((a, b, r))
+    for relation in relations:
+        out.add(_to_edge(relation))
     return out
 
 
@@ -39,6 +38,7 @@ class Constraint(Protocol):
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         ...
@@ -55,6 +55,7 @@ class AcyclicityConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         if graph.is_acyclic():
@@ -81,6 +82,7 @@ class NoDirectContradictionsConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         contradictions = graph.direct_contradictions(self.relation)
@@ -96,6 +98,41 @@ class NoDirectContradictionsConstraint:
 
 
 @dataclass
+class TemporalConsistencyConstraint:
+    """
+    Detect global inconsistency using graph reachability.
+
+    Example:
+        A BEFORE B, B BEFORE C, C BEFORE A
+    may imply mutually inconsistent temporal orderings even when the issue
+    is not framed purely as a direct symmetric contradiction.
+    """
+    relation: str = "BEFORE"
+    name: str = "temporal_consistency"
+
+    def check(
+        self,
+        graph: TemporalGraph,
+        *,
+        allowed_events: Optional[Sequence[str]] = None,
+        gold_relations: Optional[Iterable[EdgeLike]] = None,
+        pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
+        **kwargs: Any,
+    ) -> List[Violation]:
+        inconsistencies = graph.temporal_inconsistencies(self.relation)
+        if not inconsistencies:
+            return []
+        return [
+            Violation(
+                type="temporal_inconsistency",
+                message="Temporal graph contains globally inconsistent ordering constraints.",
+                details={"relation": self.relation, "pairs": inconsistencies},
+            )
+        ]
+
+
+@dataclass
 class NoHallucinatedNodesConstraint:
     name: str = "no_hallucinated_nodes"
 
@@ -106,6 +143,7 @@ class NoHallucinatedNodesConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         if allowed_events is None:
@@ -137,6 +175,7 @@ class OvercommitmentConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         gold_list = list(gold_relations or [])
@@ -164,6 +203,7 @@ class MissingEdgeConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         gold_list = list(gold_relations or [])
@@ -197,6 +237,7 @@ class SpuriousEdgeConstraint:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
         **kwargs: Any,
     ) -> List[Violation]:
         gold_list = list(gold_relations or [])
@@ -220,6 +261,94 @@ class SpuriousEdgeConstraint:
 
 
 @dataclass
+class DuplicateEdgeConstraint:
+    """
+    Detect duplicate predicted edge triples before graph insertion collapses them.
+    """
+    name: str = "duplicate_edge"
+
+    def check(
+        self,
+        graph: TemporalGraph,
+        *,
+        allowed_events: Optional[Sequence[str]] = None,
+        gold_relations: Optional[Iterable[EdgeLike]] = None,
+        pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
+        **kwargs: Any,
+    ) -> List[Violation]:
+        pred_list = [_to_edge(edge) for edge in (pred_edges or [])]
+        unique = set(pred_list)
+
+        if len(pred_list) == len(unique):
+            return []
+
+        return [
+            Violation(
+                type="duplicate_edge",
+                message="Predicted output contains duplicate relation triples.",
+                details={
+                    "num_edges": len(pred_list),
+                    "num_unique_edges": len(unique),
+                },
+            )
+        ]
+
+
+@dataclass
+class ReasoningSupportConstraint:
+    """
+    Check that edges cited in reasoning steps are present in the final predicted relations.
+
+    This is a deliberately simple first trace-verification rule:
+    if a reasoning step claims support for an edge, that edge should appear
+    in the final predicted relation set.
+    """
+    name: str = "reasoning_support"
+
+    def check(
+        self,
+        graph: TemporalGraph,
+        *,
+        allowed_events: Optional[Sequence[str]] = None,
+        gold_relations: Optional[Iterable[EdgeLike]] = None,
+        pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
+        **kwargs: Any,
+    ) -> List[Violation]:
+        if not reasoning_steps:
+            return []
+
+        pred_set = _edge_set(pred_edges or [])
+        unsupported: List[Dict[str, Any]] = []
+
+        for step in reasoning_steps:
+            step_id = getattr(step, "step_id", None)
+            supports = getattr(step, "supports", [])
+
+            for edge in supports:
+                canonical_edge = _to_edge(edge)
+                if canonical_edge not in pred_set:
+                    unsupported.append(
+                        {
+                            "step_id": step_id,
+                            "edge": canonical_edge,
+                        }
+                    )
+
+        if not unsupported:
+            return []
+
+        return [
+            Violation(
+                type="unsupported_reasoning_step",
+                message="One or more reasoning steps cite relations not present in final predicted relations.",
+                details={"unsupported_supports": unsupported},
+            )
+        ]
+
+
+@dataclass
 class Verifier:
     constraints: List[Constraint]
 
@@ -230,15 +359,17 @@ class Verifier:
         allowed_events: Optional[Sequence[str]] = None,
         gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
         violations: List[Violation] = []
-        for c in self.constraints:
+        for constraint in self.constraints:
             violations.extend(
-                c.check(
+                constraint.check(
                     graph,
                     allowed_events=allowed_events,
                     gold_relations=gold_relations,
                     pred_edges=pred_edges,
+                    reasoning_steps=reasoning_steps,
                 )
             )
         return violations
@@ -249,9 +380,12 @@ def default_verifier() -> Verifier:
         constraints=[
             AcyclicityConstraint(),
             NoDirectContradictionsConstraint(relation="BEFORE"),
+            TemporalConsistencyConstraint(relation="BEFORE"),
             NoHallucinatedNodesConstraint(),
             OvercommitmentConstraint(),
             MissingEdgeConstraint(),
             SpuriousEdgeConstraint(),
+            DuplicateEdgeConstraint(),
+            ReasoningSupportConstraint(),
         ]
     )
