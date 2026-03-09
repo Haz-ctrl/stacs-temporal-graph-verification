@@ -39,12 +39,18 @@ stacs-temporal-graph-verification/
 ├── scripts/
 │   ├── lab_install_ollama.sh
 │   ├── ollama_env.sh
+|   ├── generate_temporal_dataset.py
+|   ├── validate_dataset.py
 │   └── run_llm_baseline.py
 ├── src/
 │   ├── dataset.py
+|   ├── dataset_validation.py
+|   ├── constraints.py
+|   ├── temporal_graph.py
 │   ├── ollama_client.py
 │   └── ollama_predictor.py
 ├── tests/
+|   ├── test_constraints.py
 ├── requirements.txt
 └── README.md
 
