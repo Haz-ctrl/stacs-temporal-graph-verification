@@ -40,6 +40,8 @@ def parse_temporal_task(obj: Dict[str, Any]) -> TemporalTask:
     question_raw = obj.get("question")
     events_raw = obj.get("events")
     gold_raw = obj.get("gold_relations", [])
+    expected_valid_raw = obj.get("expected_valid", True)
+    expected_consistent_raw = obj.get("expected_consistent", True)
 
     if not isinstance(task_id_raw, str) or not task_id_raw.strip():
         raise ValueError("Task field 'id' must be a non-empty string.")
@@ -49,6 +51,10 @@ def parse_temporal_task(obj: Dict[str, Any]) -> TemporalTask:
         raise ValueError(f"Task {task_id_raw}: field 'events' must be a list of strings.")
     if not isinstance(gold_raw, list):
         raise ValueError(f"Task {task_id_raw}: field 'gold_relations' must be a list.")
+    if not isinstance(expected_valid_raw, bool):
+        raise ValueError(f"Task {task_id_raw}: field 'expected_valid' must be a bool.")
+    if not isinstance(expected_consistent_raw, bool):
+        raise ValueError(f"Task {task_id_raw}: field 'expected_consistent' must be a bool.")
 
     gold_edges: List[Edge] = [_to_edge(edge) for edge in gold_raw]
 
@@ -58,8 +64,8 @@ def parse_temporal_task(obj: Dict[str, Any]) -> TemporalTask:
         events=list(events_raw),
         gold_relations=gold_edges,
         category=str(obj.get("category", "")),
-        expected_valid=bool(obj.get("expected_valid", True)),
-        expected_consistent=bool(obj.get("expected_consistent", True)),
+        expected_valid=expected_valid_raw,
+        expected_consistent=expected_consistent_raw,
     )
 
 

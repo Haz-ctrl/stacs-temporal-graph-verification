@@ -4,19 +4,18 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Dict, Iterable
 
-from src.constraints import Violation
+from src.results import Violation
 
 
 VIOLATION_TO_CATEGORY: Dict[str, str] = {
     "cycle": "structural",
     "contradiction": "structural",
+    "simultaneous_order_conflict": "structural",
     "temporal_inconsistency": "structural",
     "hallucinated_node": "grounding",
-    "missing_edge": "prediction",
-    "spurious_edge": "prediction",
-    "overcommitment": "prediction",
     "duplicate_edge": "format",
     "unsupported_reasoning_step": "reasoning_trace",
+    "unsupported_reasoning_reference": "grounding",
 }
 
 

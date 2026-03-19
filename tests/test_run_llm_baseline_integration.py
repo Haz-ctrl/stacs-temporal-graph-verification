@@ -78,17 +78,15 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     )
 
     report = result.report
-    assert report["num_tasks"] == 3
-    assert report["num_failures"] == 0
-    assert report["valid_count"] == 2
-    assert report["invalid_count"] == 1
+    assert report.num_tasks == 3
+    assert report.num_failures == 0
+    assert report.valid_count == 2
+    assert report.invalid_count == 1
+    assert report.dataset.expected_valid_tasks == 2
+    assert report.dataset.expected_invalid_tasks == 1
 
-    # Expected-valid tasks only: ambiguous + linear_chain
-    assert report["dataset"]["expected_valid_tasks"] == 2
-    assert report["dataset"]["expected_invalid_tasks"] == 1
-
-    direct = report["metrics_expected_valid_only"]["direct"]
-    closure = report["metrics_expected_valid_only"]["closure"]
+    direct = report.metrics_expected_valid_only["direct"]
+    closure = report.metrics_expected_valid_only["closure"]
 
     assert direct["precision"] == 1.0
     assert direct["recall"] == 1.0
@@ -103,6 +101,8 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert records[0]["id"] == "amb_001"
     assert records[1]["id"] == "lc_001"
     assert records[2]["id"] == "con_001"
+    assert records[1]["verification"]["is_valid"] is True
+    assert records[1]["score"]["preserves_ordering_closure"] is True
 
 
 def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
@@ -147,15 +147,17 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     )
 
     report = result.report
-    assert report["num_tasks"] == 2
-    assert report["num_failures"] == 0
-    assert report["invalid_count"] >= 1
-    assert report["violation_counts"] != {}
-    assert report["taxonomy_counts"] != {}
+    assert report.num_tasks == 2
+    assert report.num_failures == 0
+    assert report.invalid_count >= 1
+    assert report.violation_counts != {}
+    assert report.taxonomy_counts != {}
+    assert report.overcommitment["num_gold_empty_tasks"] == 1
+    assert report.overcommitment["num_overcommit_tasks"] == 1
 
-    # Ambiguous gold-empty task should overcommit under noisy mode.
-    assert report["overcommitment"]["num_gold_empty_tasks"] == 1
-    assert report["overcommitment"]["num_overcommit_tasks"] == 1
+    records = _read_jsonl(result.predictions_path)
+    amb_record = next(record for record in records if record["id"] == "amb_001")
+    assert amb_record["score"]["has_overcommitment"] is True
 
 
 class FakeOllamaClient:
@@ -214,18 +216,19 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     )
 
     report = result.report
-    assert report["num_tasks"] == 1
-    assert report["num_failures"] == 0
-    assert report["valid_count"] == 1
-    assert report["invalid_count"] == 0
+    assert report.num_tasks == 1
+    assert report.num_failures == 0
+    assert report.valid_count == 1
+    assert report.invalid_count == 0
+    assert report.model_metadata["prediction_mode"] == "structured_json"
 
     records = _read_jsonl(result.predictions_path)
     assert len(records) == 1
     record = records[0]
-
     assert record["answer"] == "A happened before B."
     assert record["pred_events"] == ["A happened", "B happened"]
     assert record["pred_edges"] == [["A happened", "B happened", "BEFORE"]]
     assert len(record["reasoning_steps"]) == 1
     assert record["reasoning_steps"][0]["step_id"] == 1
     assert "raw_output" in record
+    assert record["verification"]["is_valid"] is True

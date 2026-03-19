@@ -165,6 +165,42 @@ def test_transitive_closure_pairs_returns_reachable_pairs() -> None:
     }
 
 
+def test_after_edges_are_normalised_for_ordering_pairs() -> None:
+    graph = TemporalGraph()
+    graph.add_edges([("A", "B", "AFTER"), ("B", "C", "BEFORE")])
+
+    assert graph.transitive_closure_pairs() == {
+        ("B", "A"),
+        ("B", "C"),
+    }
+
+
+def test_simultaneous_groups_collapse_before_closure() -> None:
+    graph = TemporalGraph()
+    graph.add_edges(
+        [
+            ("A", "B", "SIMULTANEOUS"),
+            ("B", "C", "BEFORE"),
+        ]
+    )
+
+    assert graph.simultaneous_groups() == [["A", "B"], ["C"]]
+    assert graph.transitive_closure_pairs() == {
+        ("A", "C"),
+        ("B", "C"),
+    }
+
+
+def test_graph_keeps_multiple_labels_for_same_pair() -> None:
+    graph = TemporalGraph()
+    graph.add_edges([("A", "B", "BEFORE"), ("A", "B", "SIMULTANEOUS")])
+
+    assert set(graph.edges()) == {
+        ("A", "B", "BEFORE"),
+        ("A", "B", "SIMULTANEOUS"),
+    }
+
+
 def test_implied_before_pairs_matches_transitive_closure() -> None:
     graph = TemporalGraph()
     graph.add_edges([("A", "B", "BEFORE"), ("B", "C", "BEFORE")])

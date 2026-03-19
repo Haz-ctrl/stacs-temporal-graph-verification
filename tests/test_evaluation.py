@@ -6,6 +6,7 @@ from src.evaluation import (
     closure_prf,
     compute_prf,
     direct_edge_prf,
+    score_prediction,
 )
 
 
@@ -179,6 +180,45 @@ def test_closure_prf_handles_empty_gold_and_predictions() -> None:
     assert result.precision == 0.0
     assert result.recall == 0.0
     assert result.f1 == 0.0
+
+
+def test_closure_prf_respects_after_directionality() -> None:
+    allowed = ["A", "B"]
+    gold = [("A", "B", "BEFORE")]
+    pred = [("A", "B", "AFTER")]
+
+    result = closure_prf(allowed, gold, pred)
+
+    assert result.correct == 0
+    assert result.pred_total == 1
+    assert result.gold_total == 1
+    assert result.precision == 0.0
+    assert result.recall == 0.0
+    assert result.f1 == 0.0
+
+
+def test_score_prediction_reports_closure_equivalent_extra_edge_without_invalidating() -> None:
+    allowed = ["A", "B", "C"]
+    gold = [("A", "B", "BEFORE"), ("B", "C", "BEFORE")]
+    pred = [("A", "B", "BEFORE"), ("B", "C", "BEFORE"), ("A", "C", "BEFORE")]
+
+    score = score_prediction(allowed_events=allowed, gold_edges=gold, pred_edges=pred)
+
+    assert score.direct.f1 < 1.0
+    assert score.closure.f1 == 1.0
+    assert score.preserves_ordering_closure is True
+    assert score.spurious_direct_edges == [("A", "C", "BEFORE")]
+
+
+def test_score_prediction_marks_overcommitment_on_gold_empty_prediction() -> None:
+    score = score_prediction(
+        allowed_events=["A", "B"],
+        gold_edges=[],
+        pred_edges=[("A", "B", "BEFORE")],
+    )
+
+    assert score.has_overcommitment is True
+    assert score.abstained is False
 
 
 def test_aggregate_prf_matches_compute_prf() -> None:

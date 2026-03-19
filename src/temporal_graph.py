@@ -1,56 +1,30 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Final, Iterable, List, Sequence, Set, Tuple, Union
+from typing import Final, Dict, Iterable, List, Sequence, Set, Tuple, Union
 
 import networkx as nx
 
+from src.schemas import TemporalRelation
+
 Relation = str
-Edge = Tuple[str, str, Relation]  # (source_event, target_event, relation)
-EdgeLike = Union[Edge, Sequence[str]]  # accepts ("A", "B", "BEFORE") or ["A", "B", "BEFORE"]
+Edge = Tuple[str, str, Relation]
+EdgeLike = Union[Edge, Sequence[str]]
 
 ALLOWED_RELATIONS: Final[frozenset[str]] = frozenset(
-    {"BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"}
+    relation.value for relation in TemporalRelation
 )
 
 
 def canonicalise_relation(value: str) -> str:
-    """
-    Normalise and validate a relation label.
-
-    Raises:
-        ValueError: if the relation is empty or unsupported.
-    """
-    rel = str(value).strip().upper()
-    if not rel:
-        raise ValueError("Relation must be a non-empty string.")
-    if rel not in ALLOWED_RELATIONS:
-        raise ValueError(
-            f"Unsupported relation label: {value!r}. "
-            f"Allowed relations: {sorted(ALLOWED_RELATIONS)}"
-        )
-    return rel
+    return TemporalRelation.canonicalise(value).value
 
 
 def _to_edge(edge_like: EdgeLike) -> Edge:
-    """
-    Convert edge-like input into a canonical Edge tuple.
-
-    Accepts:
-      - tuple[str, str, str]
-      - list[str] / other sequence[str] of length 3
-
-    Returns:
-        A canonical (source, target, RELATION) tuple.
-
-    Raises:
-        ValueError: if the input is malformed or the relation is invalid.
-    """
     if not isinstance(edge_like, (list, tuple)) or len(edge_like) != 3:
         raise ValueError(f"Invalid edge format (expected 3 items): {edge_like!r}")
 
     source_raw, target_raw, relation_raw = edge_like
-
     source = str(source_raw)
     target = str(target_raw)
     relation = canonicalise_relation(str(relation_raw))
@@ -63,212 +37,187 @@ def _to_edge(edge_like: EdgeLike) -> Edge:
     return (source, target, relation)
 
 
+class _DisjointSet:
+    def __init__(self, items: Iterable[str]) -> None:
+        self._parent: Dict[str, str] = {item: item for item in items}
+
+    def find(self, item: str) -> str:
+        parent = self._parent[item]
+        if parent != item:
+            self._parent[item] = self.find(parent)
+        return self._parent[item]
+
+    def union(self, left: str, right: str) -> None:
+        left_root = self.find(left)
+        right_root = self.find(right)
+        if left_root != right_root:
+            self._parent[right_root] = left_root
+
+
 @dataclass
 class TemporalGraph:
-    """
-    Minimal temporal graph wrapper around a directed graph.
-
-    Nodes:
-        Event strings (must match task events exactly if used with grounding checks)
-
-    Edges:
-        Directed temporal relations, e.g. A --BEFORE--> B
-
-    Notes:
-        - Uses networkx.DiGraph (simple directed graph)
-        - Edge attribute: relation=<Relation>
-    """
-
-    g: nx.DiGraph = field(default_factory=nx.DiGraph)
+    _nodes: List[str] = field(default_factory=list)
+    _node_set: Set[str] = field(default_factory=set)
+    _edges: List[Edge] = field(default_factory=list)
+    _edge_set: Set[Edge] = field(default_factory=set)
 
     def add_event(self, event: str) -> None:
-        """
-        Add a single event node to the graph.
-
-        Raises:
-            ValueError: if the event is not a non-empty string.
-        """
         if not isinstance(event, str) or not event.strip():
             raise ValueError("Event must be a non-empty string.")
-        self.g.add_node(event)
+        if event not in self._node_set:
+            self._node_set.add(event)
+            self._nodes.append(event)
 
     def add_events(self, events: Iterable[str]) -> None:
-        """Add multiple event nodes."""
         for event in events:
             self.add_event(event)
 
     def add_relation(self, source: str, target: str, relation: Relation) -> None:
-        """
-        Add a directed temporal relation edge source -> target.
-
-        Example:
-            add_relation("A", "B", "BEFORE")
-        """
-        if source not in self.g:
-            self.add_event(source)
-        if target not in self.g:
-            self.add_event(target)
-
-        rel = canonicalise_relation(relation)
-        self.g.add_edge(source, target, relation=rel)
+        edge = _to_edge((source, target, relation))
+        self.add_event(edge[0])
+        self.add_event(edge[1])
+        if edge not in self._edge_set:
+            self._edge_set.add(edge)
+            self._edges.append(edge)
 
     def add_edges(self, edges: Iterable[EdgeLike]) -> None:
-        """
-        Add multiple relation edges from edge-like triples.
-        """
         for edge_like in edges:
             source, target, relation = _to_edge(edge_like)
             self.add_relation(source, target, relation)
 
     def nodes(self) -> List[str]:
-        """Return graph nodes as a list."""
-        return list(self.g.nodes)
+        return list(self._nodes)
 
     def edges(self) -> List[Edge]:
-        """Return graph edges as canonical (src, dst, relation) tuples."""
-        out: List[Edge] = []
-        for source, target, data in self.g.edges(data=True):
-            relation = canonicalise_relation(str(data.get("relation", "")))
-            out.append((source, target, relation))
-        return out
-
-    def edges_for_relation(self, relation: str) -> List[Edge]:
-        """
-        Return edges whose relation matches the given label.
-        """
-        rel = canonicalise_relation(relation)
-        return [(u, v, r) for (u, v, r) in self.edges() if r == rel]
+        return list(self._edges)
 
     def relations_set(self) -> Set[Edge]:
-        """Return a set of canonical edges for fast lookup."""
-        return set(self.edges())
+        return set(self._edge_set)
 
-    def is_acyclic(self) -> bool:
-        """Return True if the directed graph is acyclic."""
-        return nx.is_directed_acyclic_graph(self.g)
-
-    def find_cycles(self) -> List[List[str]]:
-        """
-        Return a list of directed cycles.
-
-        Each cycle is represented as a list of node strings.
-        Returns an empty list if no cycles are present.
-        """
-        try:
-            return list(nx.simple_cycles(self.g))
-        except Exception:
-            return []
-
-    def transitive_closure_pairs(self) -> Set[Tuple[str, str]]:
-        """
-        Return the set of reachable ordered pairs (u, v) such that u != v.
-
-        This is graph reachability over the current directed graph.
-        """
-        closure = nx.transitive_closure(self.g)
-        return {(u, v) for (u, v) in closure.edges() if u != v}
-
-    def implied_before_pairs(self) -> Set[Tuple[str, str]]:
-        """
-        Return the implied BEFORE reachability pairs.
-
-        At present, this is the transitive closure over the directed graph.
-        This assumes the graph is being used primarily for BEFORE-style edges.
-        """
-        return self.transitive_closure_pairs()
+    def edges_for_relation(self, relation: str) -> List[Edge]:
+        rel = canonicalise_relation(relation)
+        return [edge for edge in self._edges if edge[2] == rel]
 
     def pairs_for_relation(self, relation: str = "BEFORE") -> Set[Tuple[str, str]]:
-        """
-        Return (u, v) pairs for edges whose relation matches the given label.
-        """
         rel = canonicalise_relation(relation)
-        out: Set[Tuple[str, str]] = set()
-        for source, target, data in self.g.edges(data=True):
-            edge_rel = canonicalise_relation(str(data.get("relation", "")))
-            if edge_rel == rel:
-                out.add((source, target))
-        return out
+        return {(source, target) for (source, target, edge_rel) in self._edges if edge_rel == rel}
+
+    def _simultaneous_sets(self) -> Tuple[_DisjointSet, Dict[str, List[str]]]:
+        ds = _DisjointSet(self._nodes)
+        for source, target, relation in self._edges:
+            if TemporalRelation.canonicalise(relation).is_equivalence():
+                ds.union(source, target)
+        groups: Dict[str, List[str]] = {}
+        for node in self._nodes:
+            root = ds.find(node)
+            groups.setdefault(root, []).append(node)
+        for members in groups.values():
+            members.sort()
+        return ds, groups
+
+    def simultaneous_groups(self) -> List[List[str]]:
+        _, groups = self._simultaneous_sets()
+        return sorted(groups.values(), key=lambda members: (members[0], len(members)))
+
+    def direct_order_pairs(self) -> Set[Tuple[str, str]]:
+        order_pairs: Set[Tuple[str, str]] = set()
+        for source, target, relation in self._edges:
+            rel = TemporalRelation.canonicalise(relation)
+            if rel is TemporalRelation.BEFORE:
+                order_pairs.add((source, target))
+            elif rel is TemporalRelation.AFTER:
+                order_pairs.add((target, source))
+        return order_pairs
+
+    def _collapsed_ordering_graph(self) -> Tuple[nx.DiGraph, Dict[str, List[str]]]:
+        ds, groups = self._simultaneous_sets()
+        graph = nx.DiGraph()
+        for root in groups:
+            graph.add_node(root)
+
+        for source, target in self.direct_order_pairs():
+            source_root = ds.find(source)
+            target_root = ds.find(target)
+            graph.add_edge(source_root, target_root)
+
+        return graph, groups
+
+    def ordering_pairs(self) -> Set[Tuple[str, str]]:
+        graph, groups = self._collapsed_ordering_graph()
+        closure = nx.transitive_closure(graph)
+        pairs: Set[Tuple[str, str]] = set()
+
+        for source_root, target_root in closure.edges():
+            if source_root == target_root:
+                continue
+            for source in groups[source_root]:
+                for target in groups[target_root]:
+                    if source != target:
+                        pairs.add((source, target))
+
+        return pairs
+
+    def transitive_closure_pairs(self) -> Set[Tuple[str, str]]:
+        return self.ordering_pairs()
+
+    def implied_before_pairs(self) -> Set[Tuple[str, str]]:
+        return self.ordering_pairs()
+
+    def is_acyclic(self) -> bool:
+        graph, _ = self._collapsed_ordering_graph()
+        if any(source == target for (source, target) in graph.edges()):
+            return False
+        return nx.is_directed_acyclic_graph(graph)
+
+    def find_cycles(self) -> List[List[str]]:
+        graph, groups = self._collapsed_ordering_graph()
+        cycles: List[List[str]] = []
+        try:
+            for cycle in nx.simple_cycles(graph):
+                if not cycle:
+                    continue
+                cycles.append([groups[node][0] for node in cycle])
+        except Exception:
+            return []
+        return cycles
 
     def has_direct_contradiction(self, relation: Relation = "BEFORE") -> bool:
-        """
-        Detect direct contradictions of the form:
-            A --REL--> B and B --REL--> A
-
-        Default relation is BEFORE.
-        """
-        rel = canonicalise_relation(relation)
-
-        for source, target, edge_rel in self.edges():
-            if edge_rel != rel:
-                continue
-            if self.g.has_edge(target, source):
-                reverse_rel = canonicalise_relation(str(self.g.edges[target, source].get("relation", "")))
-                if reverse_rel == rel:
-                    return True
-
-        return False
+        return len(self.direct_contradictions(relation)) > 0
 
     def direct_contradictions(self, relation: Relation = "BEFORE") -> List[Tuple[str, str]]:
-        """
-        Return sorted unique contradictory node pairs for the given relation.
-        """
-        rel = canonicalise_relation(relation)
+        rel = TemporalRelation.canonicalise(relation)
+        if rel is not TemporalRelation.BEFORE:
+            raise ValueError("direct_contradictions currently supports BEFORE only.")
 
-        seen: Set[Tuple[str, str]] = set()
-        contradictions: List[Tuple[str, str]] = []
+        contradictions: Set[Tuple[str, str]] = set()
+        pairs = self.direct_order_pairs()
+        for source, target in pairs:
+            if (target, source) in pairs:
+                contradictions.add((source, target) if source <= target else (target, source))
+        return sorted(contradictions)
 
-        for source, target, edge_rel in self.edges():
-            if edge_rel != rel:
-                continue
-            if self.g.has_edge(target, source):
-                reverse_rel = canonicalise_relation(str(self.g.edges[target, source].get("relation", "")))
-                if reverse_rel == rel:
-                    pair = (source, target) if source <= target else (target, source)
-                    if pair not in seen:
-                        seen.add(pair)
-                        contradictions.append(pair)
-
-        contradictions.sort()
-        return contradictions
+    def simultaneous_order_conflicts(self) -> List[Tuple[str, str]]:
+        ds, _ = self._simultaneous_sets()
+        conflicts: Set[Tuple[str, str]] = set()
+        for source, target in self.direct_order_pairs():
+            if ds.find(source) == ds.find(target):
+                conflicts.add((source, target) if source <= target else (target, source))
+        return sorted(conflicts)
 
     def temporal_inconsistencies(self, relation: Relation = "BEFORE") -> List[Tuple[str, str]]:
-        """
-        Detect global temporal inconsistencies using transitive reachability.
-
-        For now this only supports BEFORE. It flags pairs where both:
-            A reaches B, and
-            B reaches A
-
-        which indicates a global ordering inconsistency.
-
-        Returns:
-            Sorted unique contradictory pairs.
-        """
-        rel = canonicalise_relation(relation)
-        if rel != "BEFORE":
+        rel = TemporalRelation.canonicalise(relation)
+        if rel is not TemporalRelation.BEFORE:
             raise ValueError("temporal_inconsistencies currently supports BEFORE only.")
 
-        closure = self.transitive_closure_pairs()
-        inconsistencies: List[Tuple[str, str]] = []
-        seen: Set[Tuple[str, str]] = set()
-
+        inconsistencies: Set[Tuple[str, str]] = set(self.simultaneous_order_conflicts())
+        closure = self.ordering_pairs()
         for source, target in closure:
-            if source == target:
-                continue
             if (target, source) in closure:
-                pair = (source, target) if source <= target else (target, source)
-                if pair not in seen:
-                    seen.add(pair)
-                    inconsistencies.append(pair)
-
-        inconsistencies.sort()
-        return inconsistencies
+                inconsistencies.add((source, target) if source <= target else (target, source))
+        return sorted(inconsistencies)
 
     def unknown_nodes(self, allowed_events: Iterable[str]) -> List[str]:
-        """
-        Return graph nodes that are not present in allowed_events.
-        """
         allowed = set(allowed_events)
-        unknown = [node for node in self.g.nodes if node not in allowed]
+        unknown = [node for node in self._nodes if node not in allowed]
         unknown.sort()
         return unknown
