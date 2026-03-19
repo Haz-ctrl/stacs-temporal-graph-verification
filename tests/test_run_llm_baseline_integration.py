@@ -82,6 +82,7 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert report.num_failures == 0
     assert report.valid_count == 2
     assert report.invalid_count == 1
+    assert report.run_config["specification_name"] == "default_temporal_spec"
     assert report.dataset.expected_valid_tasks == 2
     assert report.dataset.expected_invalid_tasks == 1
 
@@ -101,6 +102,7 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert records[0]["id"] == "amb_001"
     assert records[1]["id"] == "lc_001"
     assert records[2]["id"] == "con_001"
+    assert records[0]["verification"]["specification_name"] == "default_temporal_spec"
     assert records[1]["verification"]["is_valid"] is True
     assert records[1]["score"]["preserves_ordering_closure"] is True
 
