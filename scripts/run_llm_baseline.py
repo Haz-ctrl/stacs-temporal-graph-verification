@@ -14,7 +14,7 @@ from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
 from src.evaluation import aggregate_prf, score_prediction, task_score_to_json
 from src.ollama_client import OllamaClient
-from src.results import DatasetMetadata, RunArtifacts, RunReport, VerificationResult
+from src.results import DatasetMetadata, RunReport, VerificationResult
 from src.schemas import ParsedPrediction, ReasoningStep, TemporalTask
 from src.structured_predictor import StructuredOllamaPredictor
 from src.taxonomy import map_violation_to_category
@@ -233,6 +233,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         "strict_data": config.strict_data,
         "dataset_version": dataset_metadata.dataset_version,
         "code_version": git_revision(),
+        "specification_name": verifier.specification.name,
     }
     write_json(run_dir / "config.json", config_snapshot)
 
@@ -330,6 +331,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                         "simultaneous_groups": graph.simultaneous_groups(),
                     },
                     "verification": {
+                        "specification_name": verifier.specification.name,
                         "is_valid": verification.is_valid,
                         "violations": [asdict(violation) for violation in verification.violations],
                         "violation_counts": verification.violation_counts,
@@ -396,13 +398,6 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     if failures:
         print(f"⚠️  Some tasks failed ({len(failures)}). See report.json for details.")
 
-    _ = RunArtifacts(
-        run_id=run_id,
-        run_dir=run_dir,
-        predictions_path=preds_path,
-        report_path=report_path,
-        report=report,
-    )
     return BaselineRunResult(
         run_id=run_id,
         run_dir=run_dir,

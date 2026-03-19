@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.constraints import default_verifier
+from src.constraints import default_temporal_specification, default_verifier
 from src.schemas import ReasoningStep
 from src.temporal_graph import TemporalGraph
 
@@ -20,6 +20,22 @@ def test_cycle_violation() -> None:
     result = default_verifier().verify(tg, allowed_events=allowed, pred_edges=pred_edges)
     assert result.is_valid is False
     assert "cycle" in _types(result)
+
+
+def test_default_specification_exposes_named_invariants() -> None:
+    specification = default_temporal_specification()
+
+    assert specification.name == "default_temporal_spec"
+    assert [invariant.name for invariant in specification.invariants] == [
+        "duplicate_edge",
+        "no_hallucinated_nodes",
+        "reasoning_grounding",
+        "antisymmetry",
+        "simultaneity_consistency",
+        "acyclicity",
+        "temporal_consistency",
+        "reasoning_support",
+    ]
 
 
 def test_direct_contradiction_violation() -> None:

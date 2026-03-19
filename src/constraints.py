@@ -4,14 +4,11 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
 
-from src.results import Counterexample, VerificationResult, Violation
+from src.results import VerificationResult, Violation
+from src.specs import BaseInvariant, InvariantSpec, SpecContext, TemporalSpecification
 from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
 
 Edge3 = Tuple[str, str, str]
-
-
-def _edge_set(relations: Iterable[EdgeLike]) -> Set[Edge3]:
-    return {_to_edge(relation) for relation in relations}
 
 
 class Constraint(Protocol):
@@ -31,10 +28,24 @@ class Constraint(Protocol):
 
 
 @dataclass(frozen=True)
-class AcyclicityConstraint:
-    name: str = "acyclicity"
-    layer: str = "intrinsic_temporal"
-    description: str = "Ordering edges must not induce a directed cycle."
+class AcyclicityConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="acyclicity",
+        layer="intrinsic_temporal",
+        description="Ordering edges must not induce a directed cycle.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -44,29 +55,48 @@ class AcyclicityConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        if graph.is_acyclic():
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        if context.graph.is_acyclic():
             return []
-        cycles = graph.find_cycles()
+        cycles = context.graph.find_cycles()
         return [
-            Violation(
+            self.violation(
                 type="cycle",
                 message="Temporal graph contains at least one directed cycle.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"cycles": cycles},
-                counterexample=Counterexample(
-                    relation_edges=[],
-                    notes=["Detected cycle in normalised ordering graph."],
-                ),
+                notes=["Detected cycle in normalised ordering graph."],
             )
         ]
 
 
 @dataclass(frozen=True)
-class NoDirectContradictionsConstraint:
-    name: str = "antisymmetry"
-    layer: str = "intrinsic_temporal"
-    description: str = "No event pair may be asserted in both temporal directions."
+class NoDirectContradictionsConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="antisymmetry",
+        layer="intrinsic_temporal",
+        description="No event pair may be asserted in both temporal directions.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -76,29 +106,48 @@ class NoDirectContradictionsConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        contradictions = graph.direct_contradictions("BEFORE")
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        contradictions = context.graph.direct_contradictions("BEFORE")
         if not contradictions:
             return []
         return [
-            Violation(
+            self.violation(
                 type="contradiction",
                 message="Temporal graph contains directly contradictory ordering relations.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"pairs": contradictions},
-                counterexample=Counterexample(
-                    relation_edges=[],
-                    notes=["Contradictory direct order pair detected after AFTER normalisation."],
-                ),
+                notes=["Contradictory direct order pair detected after AFTER normalisation."],
             )
         ]
 
 
 @dataclass(frozen=True)
-class SimultaneityConsistencyConstraint:
-    name: str = "simultaneity_consistency"
-    layer: str = "intrinsic_temporal"
-    description: str = "SIMULTANEOUS groups must not also contain ordering edges."
+class SimultaneityConsistencyConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="simultaneity_consistency",
+        layer="intrinsic_temporal",
+        description="SIMULTANEOUS groups must not also contain ordering edges.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -108,29 +157,48 @@ class SimultaneityConsistencyConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        conflicts = graph.simultaneous_order_conflicts()
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        conflicts = context.graph.simultaneous_order_conflicts()
         if not conflicts:
             return []
         return [
-            Violation(
+            self.violation(
                 type="simultaneous_order_conflict",
                 message="A SIMULTANEOUS group also contains an ordering relation.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"pairs": conflicts},
-                counterexample=Counterexample(
-                    relation_edges=[],
-                    notes=["Ordering inside a simultaneous equivalence class is inconsistent."],
-                ),
+                notes=["Ordering inside a simultaneous equivalence class is inconsistent."],
             )
         ]
 
 
 @dataclass(frozen=True)
-class TemporalConsistencyConstraint:
-    name: str = "temporal_consistency"
-    layer: str = "intrinsic_temporal"
-    description: str = "Ordering closure must remain globally consistent."
+class TemporalConsistencyConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="temporal_consistency",
+        layer="intrinsic_temporal",
+        description="Ordering closure must remain globally consistent.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -140,29 +208,48 @@ class TemporalConsistencyConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        inconsistencies = graph.temporal_inconsistencies("BEFORE")
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        inconsistencies = context.graph.temporal_inconsistencies("BEFORE")
         if not inconsistencies:
             return []
         return [
-            Violation(
+            self.violation(
                 type="temporal_inconsistency",
                 message="Temporal graph contains globally inconsistent ordering constraints.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"pairs": inconsistencies},
-                counterexample=Counterexample(
-                    relation_edges=[],
-                    notes=["Bidirectional reachability detected in the ordering closure."],
-                ),
+                notes=["Bidirectional reachability detected in the ordering closure."],
             )
         ]
 
 
 @dataclass(frozen=True)
-class NoHallucinatedNodesConstraint:
-    name: str = "no_hallucinated_nodes"
-    layer: str = "grounding"
-    description: str = "Predicted events must be drawn from the task event inventory."
+class NoHallucinatedNodesConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="no_hallucinated_nodes",
+        layer="grounding",
+        description="Predicted events must be drawn from the task event inventory.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -172,28 +259,50 @@ class NoHallucinatedNodesConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        if allowed_events is None:
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        if context.allowed_events is None:
             raise ValueError("NoHallucinatedNodesConstraint requires allowed_events to be provided.")
-        unknown = graph.unknown_nodes(allowed_events)
+        unknown = context.graph.unknown_nodes(context.allowed_events)
         if not unknown:
             return []
         return [
-            Violation(
+            self.violation(
                 type="hallucinated_node",
                 message="Graph contains node(s) not present in the allowed event list.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"unknown_nodes": unknown},
-                counterexample=Counterexample(notes=["Prediction introduced unsupported event nodes."]),
+                notes=["Prediction introduced unsupported event nodes."],
             )
         ]
 
 
 @dataclass(frozen=True)
-class DuplicateEdgeConstraint:
-    name: str = "duplicate_edge"
-    layer: str = "format"
-    description: str = "Predicted edge triples should not repeat."
+class DuplicateEdgeConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="duplicate_edge",
+        layer="format",
+        description="Predicted edge triples should not repeat.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -203,27 +312,49 @@ class DuplicateEdgeConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        pred_list = [_to_edge(edge) for edge in (pred_edges or [])]
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        pred_list = list(context.pred_edges)
         unique = set(pred_list)
         if len(pred_list) == len(unique):
             return []
         return [
-            Violation(
+            self.violation(
                 type="duplicate_edge",
                 message="Predicted output contains duplicate relation triples.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"num_edges": len(pred_list), "num_unique_edges": len(unique)},
-                counterexample=Counterexample(relation_edges=pred_list),
+                relation_edges=pred_list,
             )
         ]
 
 
 @dataclass(frozen=True)
-class ReasoningSupportConstraint:
-    name: str = "reasoning_support"
-    layer: str = "trace"
-    description: str = "Reasoning supports should be grounded in final predicted relations."
+class ReasoningSupportConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="reasoning_support",
+        layer="trace",
+        description="Reasoning supports should be grounded in final predicted relations.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -233,14 +364,24 @@ class ReasoningSupportConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        if not reasoning_steps:
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        if not context.reasoning_steps:
             return []
 
-        pred_set = _edge_set(pred_edges or [])
+        pred_set = set(context.pred_edges)
         unsupported: List[dict[str, Any]] = []
         step_ids: Set[int] = set()
 
-        for step in reasoning_steps:
+        for step in context.reasoning_steps:
             step_id = getattr(step, "step_id", None)
             supports = getattr(step, "supports", [])
             for edge in supports:
@@ -254,25 +395,35 @@ class ReasoningSupportConstraint:
             return []
 
         return [
-            Violation(
+            self.violation(
                 type="unsupported_reasoning_step",
                 message="One or more reasoning steps cite relations not present in final predicted relations.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"unsupported_supports": unsupported},
-                counterexample=Counterexample(
-                    relation_edges=[item["edge"] for item in unsupported],
-                    step_ids=sorted(step_ids),
-                ),
+                relation_edges=(item["edge"] for item in unsupported),
+                step_ids=step_ids,
             )
         ]
 
 
 @dataclass(frozen=True)
-class ReasoningGroundingConstraint:
-    name: str = "reasoning_grounding"
-    layer: str = "grounding"
-    description: str = "Reasoning supports should only reference allowed events."
+class ReasoningGroundingConstraint(BaseInvariant):
+    spec: InvariantSpec = InvariantSpec(
+        name="reasoning_grounding",
+        layer="grounding",
+        description="Reasoning supports should only reference allowed events.",
+    )
+
+    @property
+    def name(self) -> str:
+        return self.spec.name
+
+    @property
+    def layer(self) -> str:
+        return self.spec.layer
+
+    @property
+    def description(self) -> str:
+        return self.spec.description
 
     def check(
         self,
@@ -282,14 +433,24 @@ class ReasoningGroundingConstraint:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
-        if allowed_events is None or not reasoning_steps:
+        return self.evaluate(
+            SpecContext(
+                graph=graph,
+                allowed_events=allowed_events,
+                pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+                reasoning_steps=tuple(reasoning_steps or ()),
+            )
+        )
+
+    def evaluate(self, context: SpecContext) -> List[Violation]:
+        if context.allowed_events is None or not context.reasoning_steps:
             return []
 
-        allowed_set = set(allowed_events)
+        allowed_set = set(context.allowed_events)
         unsupported_refs: List[dict[str, Any]] = []
         step_ids: Set[int] = set()
 
-        for step in reasoning_steps:
+        for step in context.reasoning_steps:
             step_id = getattr(step, "step_id", None)
             supports = getattr(step, "supports", [])
             for edge in supports:
@@ -305,16 +466,12 @@ class ReasoningGroundingConstraint:
             return []
 
         return [
-            Violation(
+            self.violation(
                 type="unsupported_reasoning_reference",
                 message="A reasoning step references event names outside the task event set.",
-                layer=self.layer,
-                constraint=self.name,
                 details={"unsupported_references": unsupported_refs},
-                counterexample=Counterexample(
-                    relation_edges=[item["edge"] for item in unsupported_refs],
-                    step_ids=sorted(step_ids),
-                ),
+                relation_edges=(item["edge"] for item in unsupported_refs),
+                step_ids=step_ids,
             )
         ]
 
@@ -322,6 +479,7 @@ class ReasoningGroundingConstraint:
 @dataclass
 class Verifier:
     constraints: List[Constraint]
+    specification: TemporalSpecification
 
     def verify(
         self,
@@ -352,16 +510,20 @@ class Verifier:
         )
 
 
-def default_verifier() -> Verifier:
-    return Verifier(
-        constraints=[
-            DuplicateEdgeConstraint(),
-            NoHallucinatedNodesConstraint(),
-            ReasoningGroundingConstraint(),
-            NoDirectContradictionsConstraint(),
-            SimultaneityConsistencyConstraint(),
-            AcyclicityConstraint(),
-            TemporalConsistencyConstraint(),
-            ReasoningSupportConstraint(),
-        ]
+def default_temporal_specification() -> TemporalSpecification:
+    invariants = (
+        DuplicateEdgeConstraint(),
+        NoHallucinatedNodesConstraint(),
+        ReasoningGroundingConstraint(),
+        NoDirectContradictionsConstraint(),
+        SimultaneityConsistencyConstraint(),
+        AcyclicityConstraint(),
+        TemporalConsistencyConstraint(),
+        ReasoningSupportConstraint(),
     )
+    return TemporalSpecification(name="default_temporal_spec", invariants=invariants)
+
+
+def default_verifier() -> Verifier:
+    specification = default_temporal_specification()
+    return Verifier(constraints=list(specification.invariants), specification=specification)
