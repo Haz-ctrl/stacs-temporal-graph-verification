@@ -1,276 +1,153 @@
 # stacs-temporal-graph-verification
-**Author: Hashim Iqbal**
 
-This repository contains the primary software artefact developed during my MSci Dissertation.
+**Author:** Hashim Iqbal
+
+**MSci Dissertation Artefact**
 
 **Dissertation Title:**  
 *"Verifying Language Model Reasoning Using Temporal Graph Constraints: A Structured Evaluation Approach"*
 
----
-
 ## Overview
 
-This project investigates whether Large Language Model (LLM) reasoning can be:
+This repository evaluates temporal reasoning outputs from language models by converting structured predictions into temporal graphs, checking intrinsic consistency constraints, and scoring predictions against gold temporal relations.
 
-1. Represented as a temporal graph
-2. Verified against structural constraints (e.g. acyclicity, contradiction detection)
-3. Evaluated using structured metrics beyond surface-level correctness
+The current implementation is designed around four explicit layers:
 
-The repository contains:
+1. `prediction`: parse structured model output into typed events, relations, and reasoning steps
+2. `verification`: check intrinsic validity without consulting gold labels
+3. `scoring`: compare predicted relations against gold direct edges and ordering closure
+4. `reporting`: write reproducible run artefacts with metadata, per-task records, and aggregate metrics
 
-- A JSONL task format for temporal reasoning problems
-- An Ollama-based LLM integration (lab GPU compatible)
-- A reproducible experiment runner
-- Structured run outputs under `outputs/runs/`
+This repo currently supports relation labels `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`. Ordering evaluation normalises `AFTER`, collapses `SIMULTANEOUS` groups before closure, and treats `UNKNOWN` as abstention rather than an ordering edge.
 
-This README focuses on **minimal setup and usage**.  
-The final version will serve as a higher-level project overview.
+## Research Scope
 
----
+The implementation is aimed at:
 
-# Project Structure (Current)
+- structured temporal reasoning evaluation
+- temporal graph verification with interpretable failure analysis
+- direct-edge and closure-level scoring
+- reproducible experiment runs for dissertation reporting and demos
 
-```
+It is not yet a full general LTL model checker. The current verifier is a typed constraint library with a lightweight formal-spec direction, which is documented in [evaluation_design.md](docs/evaluation_design.md) and [literature_alignment.md](docs/literature_alignment.md).
 
+## Repository Layout
+
+```text
 stacs-temporal-graph-verification/
-├── data/                  # JSONL datasets
-├── outputs/               # Run artefacts (timestamped)
+├── data/
+├── docs/
+├── outputs/
 │   └── runs/
 ├── scripts/
-│   ├── lab_install_ollama.sh
-│   ├── ollama_env.sh
-|   ├── generate_temporal_dataset.py
-|   ├── validate_dataset.py
-│   └── run_llm_baseline.py
+│   ├── generate_temporal_dataset.py
+│   ├── run_llm_baseline.py
+│   └── validate_dataset.py
 ├── src/
+│   ├── constraints.py
 │   ├── dataset.py
-|   ├── dataset_validation.py
-|   ├── constraints.py
-|   ├── temporal_graph.py
+│   ├── dataset_validation.py
+│   ├── evaluation.py
 │   ├── ollama_client.py
-│   └── ollama_predictor.py
+│   ├── prediction_schema.py
+│   ├── results.py
+│   ├── schemas.py
+│   ├── structured_predictor.py
+│   ├── taxonomy.py
+│   └── temporal_graph.py
 ├── tests/
-|   ├── test_constraints.py
 ├── requirements.txt
 └── README.md
-
-````
-
----
-
-# Quickstart (Environment Setup)
-
-## 1. SSH into a Lab GPU machine
-
-```bash
-ssh <username>@<lab-machine>
-````
-
-Confirm GPU availability:
-
-```bash
-nvidia-smi
 ```
 
----
+## Quickstart
 
-## 2. Navigate to repository root
-
-```bash
-cd /path/to/stacs-temporal-graph-verification
-```
-
----
-
-## 3. Create and activate virtual environment
+Create a virtual environment and install dependencies:
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-```
-
----
-
-## 4. Install Python dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
----
+Run the test suite:
 
-# Ollama Setup (Lab AMD GPU)
-
-> The download links on the CS wiki are outdated.
-> This repository includes helper scripts to simplify installation, and pulls releases from GitHub.
-
-
-## User install (run once or everytime you want to upgrade)
-
-Run once on a lab machine, or everytime you need to upgrade the client
-
-```bash
-./scripts/lab_install_ollama.sh 0.17.6
-```
-You can specify a version *X.Y.Z* which will default to installing version 0.17.6 of the client.
-
-This:
-
-* Downloads Ollama binaries
-* Installs them into `~/opt/ollama`
-* Installs ROCm libraries for AMD GPUs
-* Auto updates symlinks everytime a new version is installed
-
-
----
-
-## Per-Shell Setup
-
-Each new shell session:
-
-```bash
-source scripts/ollama_env.sh
-```
-
-This:
-
-* Adds Ollama to PATH
-* Verifies installation
-* Checks server health
-* Displays available models
-
----
-
-## Start Ollama Server
-
-If not already running:
-
-```bash
-nohup ollama serve > ~/ollama_serve.log 2>&1 &
-```
-
-Sanity check:
-
-```bash
-curl -s http://localhost:11434/api/tags | head
-```
-
----
-
-## Pull a Model
-
-```bash
-ollama pull qwen3.5:9b
-```
-
-List available models:
-
-```bash
-ollama list
-```
-
----
-
-# Running the LLM Baseline
-
-Always run from the **repository root**.
-
-```bash
-python -m scripts.run_llm_baseline --model qwen3.5:9b
-```
-
-Optional arguments:
-
-```bash
---data data/sample_tasks.jsonl
---temperature 0.0
---seed 42
---max-tasks 5
-```
-
----
-
-# Output Structure
-
-Each run creates:
-
-```
-outputs/runs/<timestamp>/
-├── config.json          # Reproducibility snapshot
-├── predictions.jsonl    # Model outputs
-└── report.json          # Summary metadata
-```
-
-Runs are timestamped in UTC to ensure reproducibility and traceability.
-
----
-
-# Dataset Format (JSONL)
-
-Each line in `data/*.jsonl` must be a single JSON object:
-
-```json
-{
-  "id": "t001",
-  "question": "...",
-  "events": ["Event A", "Event B"],
-  "gold_relations": [
-    ["Event A", "Event B", "BEFORE"]
-  ]
-}
-```
-
-One object per line.
-
----
-
-# Development Notes
-
-Current implemented components:
-
-* JSONL dataset loader
-* Ollama client wrapper
-* Strict JSON edge extraction
-* Reproducible run script
-* Timestamped experiment artefacts
-
-Planned next components:
-
-* Temporal graph construction (NetworkX)
-* Constraint verification (acyclicity, contradictions, hallucinated nodes)
-* Edge-level evaluation metrics (precision / recall / F1)
-* Multi-model benchmarking
-* Benchmark dataset adapters
-
----
-
-# Running Tests
-*Once again from the repository root*
 ```bash
 pytest -q
 ```
 
----
+Validate the canonical synthetic dataset:
 
-# Notes on Reproducibility
+```bash
+python -m scripts.validate_dataset --data data/temporal_reasoning_eval.jsonl
+```
 
-Each run records:
+Run the baseline pipeline with gold labels as predictions:
 
-* Model tag
-* Temperature
-* Seed
-* Ollama server metadata
-* Dataset path
-* Timestamp (UTC)
+```bash
+python -m scripts.run_llm_baseline --pred-source gold
+```
 
-This ensures experiments can be reproduced or audited later.
+Run the structured Ollama pipeline:
 
----
+```bash
+python -m scripts.run_llm_baseline --model qwen3.5:9b --pred-source llm
+```
 
-# Important
+Important defaults:
 
-* Always run scripts using `python -m scripts.<script_name>` from the repo root.
-* Do not store model binaries in the repository.
-* Do not commit contents of `outputs/runs/`.
+- default dataset: `data/temporal_reasoning_eval.jsonl`
+- default output root: `outputs/runs/`
+- dataset validation is enabled by default
 
----
+## Run Outputs
+
+Each run writes a timestamped directory under `outputs/runs/<timestamp>/` containing:
+
+- `config.json`: run config, dataset version, and code revision
+- `predictions.jsonl`: per-task records with prediction, verification, and scoring outputs
+- `report.json`: aggregate metrics and run metadata
+
+Per-task records now separate:
+
+- `verification`: intrinsic validity and violation details
+- `score`: direct metrics, closure metrics, closure preservation, abstention, and overcommitment
+
+## Datasets
+
+Current dataset files have different roles:
+
+- `data/temporal_reasoning_eval.jsonl`: canonical runnable synthetic evaluation set
+- `data/sample_tasks.jsonl`: small quickstart example set using the same schema
+- `data/synthetic_v2.jsonl`: legacy exploratory dataset with older category naming
+- `data/constraint_fixtures.jsonl`: fixture-style examples for verifier-oriented checks
+
+See [dataset_schema.md](docs/dataset_schema.md) for the canonical schema and current scope boundaries.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Evaluation Design](docs/evaluation_design.md)
+- [Dataset Schema](docs/dataset_schema.md)
+- [Reproducibility](docs/reproducibility.md)
+- [Limitations](docs/limitations.md)
+- [Literature Alignment](docs/literature_alignment.md)
+
+## Current Status
+
+Implemented:
+
+- typed task, prediction, verification, scoring, and report models
+- temporal graph handling for `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`
+- intrinsic constraint verification separated from gold scoring
+- label-aware direct metrics and ordering-closure metrics
+- overcommitment and abstention reporting
+- reproducible run artefacts with dataset and code metadata
+- unit and integration tests for graph semantics, scoring, verification, parsing, and the runner
+
+Still future work:
+
+- external benchmark adapters such as TORQUE- or TempEval-style imports
+- richer visualisation and counterexample playback
+- confidence calibration analysis
+- a broader formal specification interface beyond the current constraint library

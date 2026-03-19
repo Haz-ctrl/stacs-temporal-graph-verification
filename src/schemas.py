@@ -1,7 +1,41 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal, Optional, Sequence, Tuple, List
+from enum import Enum
+from typing import Literal, Optional, Tuple, List
+
+
+class TemporalRelation(str, Enum):
+    BEFORE = "BEFORE"
+    AFTER = "AFTER"
+    SIMULTANEOUS = "SIMULTANEOUS"
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def canonicalise(cls, value: str) -> "TemporalRelation":
+        rel = str(value).strip().upper()
+        if not rel:
+            raise ValueError("Relation must be a non-empty string.")
+        try:
+            return cls(rel)
+        except ValueError as exc:
+            allowed = sorted(member.value for member in cls)
+            raise ValueError(
+                f"Unsupported relation label: {value!r}. Allowed relations: {allowed}"
+            ) from exc
+
+    def reverses_order(self) -> bool:
+        return self is TemporalRelation.AFTER
+
+    def contributes_to_order(self) -> bool:
+        return self in {TemporalRelation.BEFORE, TemporalRelation.AFTER}
+
+    def is_equivalence(self) -> bool:
+        return self is TemporalRelation.SIMULTANEOUS
+
+    def is_abstention(self) -> bool:
+        return self is TemporalRelation.UNKNOWN
+
 
 RelationLabel = Literal["BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"]
 CanonicalRelationLabel = Literal["BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"]

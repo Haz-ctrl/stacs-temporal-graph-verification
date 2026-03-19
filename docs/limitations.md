@@ -1,0 +1,29 @@
+# Limitations and Known Issues
+
+## Current Formal Scope
+
+The verifier is a typed constraint library, not a full general-purpose LTL model checker.
+
+It provides a practical formal-spec direction for:
+
+- antisymmetry
+- cycle detection
+- simultaneity consistency
+- grounding constraints
+- reasoning-support consistency
+
+## Dataset Coverage
+
+The canonical synthetic dataset is still dominated by `BEFORE` relations. The code now supports richer relation semantics than the default dataset exercises.
+
+## Benchmark Breadth
+
+The repo does not yet include production-ready dataset adapters for external benchmarks such as TORQUE or TempEval.
+
+## Visualisation
+
+The dissertation survey emphasises visualisation and step-localised counterexamples. The current code returns structured counterexample metadata, but there is not yet a dedicated visual playback or graph-rendering module in the repo.
+
+## Confidence Analysis
+
+The survey also mentions confidence and calibration analysis. That is not yet implemented in the current pipeline.

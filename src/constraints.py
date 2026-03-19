@@ -1,62 +1,48 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
+from typing import Any, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
 
-from src.temporal_graph import TemporalGraph, EdgeLike, _to_edge
+from src.results import Counterexample, VerificationResult, Violation
+from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
 
 Edge3 = Tuple[str, str, str]
 
 
 def _edge_set(relations: Iterable[EdgeLike]) -> Set[Edge3]:
-    """
-    Convert edge-like triples into a set of canonical (a, b, REL) tuples.
-    Normalises relation labels via _to_edge.
-    """
-    out: Set[Edge3] = set()
-    for relation in relations:
-        out.add(_to_edge(relation))
-    return out
-
-
-@dataclass
-class Violation:
-    """A structured record describing a constraint failure."""
-    type: str
-    message: str
-    details: Dict[str, Any]
+    return {_to_edge(relation) for relation in relations}
 
 
 class Constraint(Protocol):
-    """Interface for all constraints."""
     name: str
+    layer: str
+    description: str
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
         ...
 
 
-@dataclass
+@dataclass(frozen=True)
 class AcyclicityConstraint:
     name: str = "acyclicity"
+    layer: str = "intrinsic_temporal"
+    description: str = "Ordering edges must not induce a directed cycle."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
         if graph.is_acyclic():
             return []
@@ -65,86 +51,126 @@ class AcyclicityConstraint:
             Violation(
                 type="cycle",
                 message="Temporal graph contains at least one directed cycle.",
+                layer=self.layer,
+                constraint=self.name,
                 details={"cycles": cycles},
+                counterexample=Counterexample(
+                    relation_edges=[],
+                    notes=["Detected cycle in normalised ordering graph."],
+                ),
             )
         ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class NoDirectContradictionsConstraint:
-    relation: str = "BEFORE"
-    name: str = "no_direct_contradictions"
+    name: str = "antisymmetry"
+    layer: str = "intrinsic_temporal"
+    description: str = "No event pair may be asserted in both temporal directions."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
-        contradictions = graph.direct_contradictions(self.relation)
+        contradictions = graph.direct_contradictions("BEFORE")
         if not contradictions:
             return []
         return [
             Violation(
                 type="contradiction",
-                message=f"Temporal graph contains direct contradictory '{self.relation}' relations.",
-                details={"relation": self.relation, "pairs": contradictions},
+                message="Temporal graph contains directly contradictory ordering relations.",
+                layer=self.layer,
+                constraint=self.name,
+                details={"pairs": contradictions},
+                counterexample=Counterexample(
+                    relation_edges=[],
+                    notes=["Contradictory direct order pair detected after AFTER normalisation."],
+                ),
             )
         ]
 
 
-@dataclass
-class TemporalConsistencyConstraint:
-    """
-    Detect global inconsistency using graph reachability.
-
-    Example:
-        A BEFORE B, B BEFORE C, C BEFORE A
-    may imply mutually inconsistent temporal orderings even when the issue
-    is not framed purely as a direct symmetric contradiction.
-    """
-    relation: str = "BEFORE"
-    name: str = "temporal_consistency"
+@dataclass(frozen=True)
+class SimultaneityConsistencyConstraint:
+    name: str = "simultaneity_consistency"
+    layer: str = "intrinsic_temporal"
+    description: str = "SIMULTANEOUS groups must not also contain ordering edges."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
-        inconsistencies = graph.temporal_inconsistencies(self.relation)
+        conflicts = graph.simultaneous_order_conflicts()
+        if not conflicts:
+            return []
+        return [
+            Violation(
+                type="simultaneous_order_conflict",
+                message="A SIMULTANEOUS group also contains an ordering relation.",
+                layer=self.layer,
+                constraint=self.name,
+                details={"pairs": conflicts},
+                counterexample=Counterexample(
+                    relation_edges=[],
+                    notes=["Ordering inside a simultaneous equivalence class is inconsistent."],
+                ),
+            )
+        ]
+
+
+@dataclass(frozen=True)
+class TemporalConsistencyConstraint:
+    name: str = "temporal_consistency"
+    layer: str = "intrinsic_temporal"
+    description: str = "Ordering closure must remain globally consistent."
+
+    def check(
+        self,
+        graph: TemporalGraph,
+        *,
+        allowed_events: Optional[Sequence[str]] = None,
+        pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
+    ) -> List[Violation]:
+        inconsistencies = graph.temporal_inconsistencies("BEFORE")
         if not inconsistencies:
             return []
         return [
             Violation(
                 type="temporal_inconsistency",
                 message="Temporal graph contains globally inconsistent ordering constraints.",
-                details={"relation": self.relation, "pairs": inconsistencies},
+                layer=self.layer,
+                constraint=self.name,
+                details={"pairs": inconsistencies},
+                counterexample=Counterexample(
+                    relation_edges=[],
+                    notes=["Bidirectional reachability detected in the ordering closure."],
+                ),
             )
         ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class NoHallucinatedNodesConstraint:
     name: str = "no_hallucinated_nodes"
+    layer: str = "grounding"
+    description: str = "Predicted events must be drawn from the task event inventory."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
         if allowed_events is None:
             raise ValueError("NoHallucinatedNodesConstraint requires allowed_events to be provided.")
@@ -155,186 +181,74 @@ class NoHallucinatedNodesConstraint:
             Violation(
                 type="hallucinated_node",
                 message="Graph contains node(s) not present in the allowed event list.",
+                layer=self.layer,
+                constraint=self.name,
                 details={"unknown_nodes": unknown},
+                counterexample=Counterexample(notes=["Prediction introduced unsupported event nodes."]),
             )
         ]
 
 
-@dataclass
-class OvercommitmentConstraint:
-    """
-    If gold_relations is empty but the model predicts at least one edge,
-    mark as overcommitment.
-    """
-    name: str = "overcommitment"
-
-    def check(
-        self,
-        graph: TemporalGraph,
-        *,
-        allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
-        pred_edges: Optional[Iterable[EdgeLike]] = None,
-        reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
-    ) -> List[Violation]:
-        gold_list = list(gold_relations or [])
-        pred_list = list(pred_edges or [])
-
-        if len(gold_list) == 0 and len(pred_list) > 0:
-            return [
-                Violation(
-                    type="overcommitment",
-                    message="Predicted temporal relations despite gold specifying no entailed relations (ambiguous/unknown).",
-                    details={"num_pred_edges": len(pred_list)},
-                )
-            ]
-        return []
-
-
-@dataclass
-class MissingEdgeConstraint:
-    name: str = "missing_edge"
-
-    def check(
-        self,
-        graph: TemporalGraph,
-        *,
-        allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
-        pred_edges: Optional[Iterable[EdgeLike]] = None,
-        reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
-    ) -> List[Violation]:
-        gold_list = list(gold_relations or [])
-        pred_list = list(pred_edges or [])
-        if not gold_list:
-            return []
-
-        gold_set = _edge_set(gold_list)
-        pred_set = _edge_set(pred_list)
-
-        missing = sorted(gold_set - pred_set)
-        if not missing:
-            return []
-        return [
-            Violation(
-                type="missing_edge",
-                message="One or more gold temporal relations were not predicted.",
-                details={"missing": missing},
-            )
-        ]
-
-
-@dataclass
-class SpuriousEdgeConstraint:
-    name: str = "spurious_edge"
-
-    def check(
-        self,
-        graph: TemporalGraph,
-        *,
-        allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
-        pred_edges: Optional[Iterable[EdgeLike]] = None,
-        reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
-    ) -> List[Violation]:
-        gold_list = list(gold_relations or [])
-        pred_list = list(pred_edges or [])
-        if not gold_list:
-            return []
-
-        gold_set = _edge_set(gold_list)
-        pred_set = _edge_set(pred_list)
-
-        spurious = sorted(pred_set - gold_set)
-        if not spurious:
-            return []
-        return [
-            Violation(
-                type="spurious_edge",
-                message="One or more predicted temporal relations are not present in gold.",
-                details={"spurious": spurious},
-            )
-        ]
-
-
-@dataclass
+@dataclass(frozen=True)
 class DuplicateEdgeConstraint:
-    """
-    Detect duplicate predicted edge triples before graph insertion collapses them.
-    """
     name: str = "duplicate_edge"
+    layer: str = "format"
+    description: str = "Predicted edge triples should not repeat."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
         pred_list = [_to_edge(edge) for edge in (pred_edges or [])]
         unique = set(pred_list)
-
         if len(pred_list) == len(unique):
             return []
-
         return [
             Violation(
                 type="duplicate_edge",
                 message="Predicted output contains duplicate relation triples.",
-                details={
-                    "num_edges": len(pred_list),
-                    "num_unique_edges": len(unique),
-                },
+                layer=self.layer,
+                constraint=self.name,
+                details={"num_edges": len(pred_list), "num_unique_edges": len(unique)},
+                counterexample=Counterexample(relation_edges=pred_list),
             )
         ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class ReasoningSupportConstraint:
-    """
-    Check that edges cited in reasoning steps are present in the final predicted relations.
-
-    This is a deliberately simple first trace-verification rule:
-    if a reasoning step claims support for an edge, that edge should appear
-    in the final predicted relation set.
-    """
     name: str = "reasoning_support"
+    layer: str = "trace"
+    description: str = "Reasoning supports should be grounded in final predicted relations."
 
     def check(
         self,
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-        **kwargs: Any,
     ) -> List[Violation]:
         if not reasoning_steps:
             return []
 
         pred_set = _edge_set(pred_edges or [])
-        unsupported: List[Dict[str, Any]] = []
+        unsupported: List[dict[str, Any]] = []
+        step_ids: Set[int] = set()
 
         for step in reasoning_steps:
             step_id = getattr(step, "step_id", None)
             supports = getattr(step, "supports", [])
-
             for edge in supports:
                 canonical_edge = _to_edge(edge)
                 if canonical_edge not in pred_set:
-                    unsupported.append(
-                        {
-                            "step_id": step_id,
-                            "edge": canonical_edge,
-                        }
-                    )
+                    unsupported.append({"step_id": step_id, "edge": canonical_edge})
+                    if isinstance(step_id, int):
+                        step_ids.add(step_id)
 
         if not unsupported:
             return []
@@ -343,7 +257,64 @@ class ReasoningSupportConstraint:
             Violation(
                 type="unsupported_reasoning_step",
                 message="One or more reasoning steps cite relations not present in final predicted relations.",
+                layer=self.layer,
+                constraint=self.name,
                 details={"unsupported_supports": unsupported},
+                counterexample=Counterexample(
+                    relation_edges=[item["edge"] for item in unsupported],
+                    step_ids=sorted(step_ids),
+                ),
+            )
+        ]
+
+
+@dataclass(frozen=True)
+class ReasoningGroundingConstraint:
+    name: str = "reasoning_grounding"
+    layer: str = "grounding"
+    description: str = "Reasoning supports should only reference allowed events."
+
+    def check(
+        self,
+        graph: TemporalGraph,
+        *,
+        allowed_events: Optional[Sequence[str]] = None,
+        pred_edges: Optional[Iterable[EdgeLike]] = None,
+        reasoning_steps: Optional[Sequence[Any]] = None,
+    ) -> List[Violation]:
+        if allowed_events is None or not reasoning_steps:
+            return []
+
+        allowed_set = set(allowed_events)
+        unsupported_refs: List[dict[str, Any]] = []
+        step_ids: Set[int] = set()
+
+        for step in reasoning_steps:
+            step_id = getattr(step, "step_id", None)
+            supports = getattr(step, "supports", [])
+            for edge in supports:
+                source, target, relation = _to_edge(edge)
+                if source not in allowed_set or target not in allowed_set:
+                    unsupported_refs.append(
+                        {"step_id": step_id, "edge": (source, target, relation)}
+                    )
+                    if isinstance(step_id, int):
+                        step_ids.add(step_id)
+
+        if not unsupported_refs:
+            return []
+
+        return [
+            Violation(
+                type="unsupported_reasoning_reference",
+                message="A reasoning step references event names outside the task event set.",
+                layer=self.layer,
+                constraint=self.name,
+                details={"unsupported_references": unsupported_refs},
+                counterexample=Counterexample(
+                    relation_edges=[item["edge"] for item in unsupported_refs],
+                    step_ids=sorted(step_ids),
+                ),
             )
         ]
 
@@ -357,35 +328,40 @@ class Verifier:
         graph: TemporalGraph,
         *,
         allowed_events: Optional[Sequence[str]] = None,
-        gold_relations: Optional[Iterable[EdgeLike]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-    ) -> List[Violation]:
+    ) -> VerificationResult:
         violations: List[Violation] = []
         for constraint in self.constraints:
             violations.extend(
                 constraint.check(
                     graph,
                     allowed_events=allowed_events,
-                    gold_relations=gold_relations,
                     pred_edges=pred_edges,
                     reasoning_steps=reasoning_steps,
                 )
             )
-        return violations
+
+        violation_counts = dict(Counter(violation.type for violation in violations))
+        layer_counts = dict(Counter(violation.layer for violation in violations))
+        return VerificationResult(
+            is_valid=len(violations) == 0,
+            violations=violations,
+            violation_counts=violation_counts,
+            layer_counts=layer_counts,
+        )
 
 
 def default_verifier() -> Verifier:
     return Verifier(
         constraints=[
-            AcyclicityConstraint(),
-            NoDirectContradictionsConstraint(relation="BEFORE"),
-            TemporalConsistencyConstraint(relation="BEFORE"),
-            NoHallucinatedNodesConstraint(),
-            OvercommitmentConstraint(),
-            MissingEdgeConstraint(),
-            SpuriousEdgeConstraint(),
             DuplicateEdgeConstraint(),
+            NoHallucinatedNodesConstraint(),
+            ReasoningGroundingConstraint(),
+            NoDirectContradictionsConstraint(),
+            SimultaneityConsistencyConstraint(),
+            AcyclicityConstraint(),
+            TemporalConsistencyConstraint(),
             ReasoningSupportConstraint(),
         ]
     )
