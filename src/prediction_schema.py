@@ -34,6 +34,17 @@ def _parse_string_list(value: Any, *, field_name: str) -> List[str]:
     return list(value)
 
 
+def _parse_optional_confidence(value: Any, *, field_name: str) -> float | None:
+    if value is None:
+        return None
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise PredictionParseError(f"'{field_name}' must be a number when present.")
+    confidence = float(value)
+    if confidence < 0.0 or confidence > 1.0:
+        raise PredictionParseError(f"'{field_name}' must be in [0.0, 1.0].")
+    return confidence
+
+
 def _parse_edge_list(value: Any, *, field_name: str) -> List[Edge]:
     if not isinstance(value, list):
         raise PredictionParseError(f"'{field_name}' must be a list.")
@@ -73,6 +84,10 @@ def _parse_reasoning_steps(value: Any) -> List[ReasoningStep]:
                 step_id=step_id,
                 text=text,
                 supports=supports,
+                confidence=_parse_optional_confidence(
+                    step_obj.get("confidence"),
+                    field_name="confidence",
+                ),
             )
         )
 
@@ -108,6 +123,10 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
     pred_events = _parse_string_list(top.get("events", []), field_name="events")
     pred_edges = _parse_edge_list(top.get("relations", []), field_name="relations")
     reasoning_steps = _parse_reasoning_steps(top.get("reasoning_steps", []))
+    answer_confidence = _parse_optional_confidence(
+        top.get("answer_confidence"),
+        field_name="answer_confidence",
+    )
 
     return ParsedPrediction(
         task_id=task_id,
@@ -115,5 +134,6 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
         pred_events=pred_events,
         pred_edges=pred_edges,
         reasoning_steps=reasoning_steps,
+        answer_confidence=answer_confidence,
         raw_output=raw_text,
     )

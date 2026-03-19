@@ -3,8 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Iterable, List, Optional, Protocol, Sequence, Tuple
 
+from src.ltl import Formula, formula_to_dict
 from src.results import Counterexample, Violation
 from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
+from src.trace import TemporalTrace
 
 Edge3 = Tuple[str, str, str]
 
@@ -17,11 +19,30 @@ class InvariantSpec:
 
 
 @dataclass(frozen=True)
+class FormulaSpec:
+    name: str
+    description: str
+    formula: Formula
+    violation_type: str
+    message: str
+
+    def serialise(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "formula": formula_to_dict(self.formula),
+            "violation_type": self.violation_type,
+            "message": self.message,
+        }
+
+
+@dataclass(frozen=True)
 class SpecContext:
     graph: TemporalGraph
     allowed_events: Optional[Sequence[str]] = None
     pred_edges: Tuple[Edge3, ...] = ()
     reasoning_steps: Tuple[Any, ...] = ()
+    trace: Optional[TemporalTrace] = None
 
 
 class Invariant(Protocol):
@@ -35,6 +56,7 @@ class Invariant(Protocol):
 class TemporalSpecification:
     name: str
     invariants: Tuple[Invariant, ...] = field(default_factory=tuple)
+    formulas: Tuple[FormulaSpec, ...] = field(default_factory=tuple)
 
 
 class BaseInvariant:
@@ -65,6 +87,7 @@ class BaseInvariant:
             message=message,
             layer=self.spec.layer,
             constraint=self.spec.name,
+            spec_source="invariant",
             details=details or {},
             counterexample=counterexample,
         )

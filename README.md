@@ -9,7 +9,7 @@
 
 ## Overview
 
-This repository evaluates temporal reasoning outputs from language models by converting structured predictions into temporal graphs, checking intrinsic consistency constraints, and scoring predictions against gold temporal relations.
+This repository evaluates temporal reasoning outputs from language models by converting structured predictions into temporal graphs, constructing a step-indexed reasoning trace, checking intrinsic temporal specifications, and scoring predictions against gold temporal relations.
 
 The current implementation is designed around four explicit layers:
 
@@ -29,7 +29,7 @@ The implementation is aimed at:
 - direct-edge and closure-level scoring
 - reproducible experiment runs for dissertation reporting and demos
 
-It is not yet a full general LTL model checker. The current verifier is a typed constraint library with a lightweight formal-spec direction, which is documented in [evaluation_design.md](docs/evaluation_design.md) and [literature_alignment.md](docs/literature_alignment.md).
+It is not yet a full general LTL model checker. The current verifier combines a typed invariant library with a focused, graph-grounded LTL subset over step traces, which is documented in [evaluation_design.md](docs/evaluation_design.md) and [literature_alignment.md](docs/literature_alignment.md).
 
 ## Repository Layout
 
@@ -48,13 +48,16 @@ stacs-temporal-graph-verification/
 │   ├── dataset.py
 │   ├── dataset_validation.py
 │   ├── evaluation.py
+│   ├── ltl.py
 │   ├── ollama_client.py
 │   ├── prediction_schema.py
 │   ├── results.py
 │   ├── schemas.py
+│   ├── specs.py
 │   ├── structured_predictor.py
 │   ├── taxonomy.py
-│   └── temporal_graph.py
+│   ├── temporal_graph.py
+│   └── trace.py
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -110,7 +113,7 @@ Each run writes a timestamped directory under `outputs/runs/<timestamp>/` contai
 
 Per-task records now separate:
 
-- `verification`: intrinsic validity and violation details
+- `verification`: intrinsic validity, formula-level violations, first-violation-step metadata, and active specification details
 - `score`: direct metrics, closure metrics, closure preservation, abstention, and overcommitment
 
 ## Datasets
@@ -140,9 +143,11 @@ Implemented:
 - typed task, prediction, verification, scoring, and report models
 - temporal graph handling for `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`
 - intrinsic constraint verification separated from gold scoring
+- step-indexed temporal traces for reasoning-step verification
+- focused LTL operators `G`, `F`, `X`, and `U` over graph-grounded predicates
 - label-aware direct metrics and ordering-closure metrics
 - overcommitment and abstention reporting
-- reproducible run artefacts with dataset and code metadata
+- reproducible run artefacts with dataset, code, and specification metadata
 - unit and integration tests for graph semantics, scoring, verification, parsing, and the runner
 
 Still future work:
@@ -150,4 +155,4 @@ Still future work:
 - external benchmark adapters such as TORQUE- or TempEval-style imports
 - richer visualisation and counterexample playback
 - confidence calibration analysis
-- a broader formal specification interface beyond the current constraint library
+- a broader temporal specification language and user-facing formula parser

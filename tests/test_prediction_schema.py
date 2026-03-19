@@ -65,6 +65,30 @@ def test_parse_model_prediction_json_valid_with_reasoning_steps() -> None:
     assert parsed.reasoning_steps[1].step_id == 2
 
 
+def test_parse_model_prediction_json_accepts_optional_confidence_fields() -> None:
+    raw = """
+    {
+      "answer": "A happened before B.",
+      "answer_confidence": 0.8,
+      "events": ["A", "B"],
+      "relations": [["A", "B", "BEFORE"]],
+      "reasoning_steps": [
+        {
+          "step_id": 1,
+          "text": "The question states A happened before B.",
+          "supports": [["A", "B", "BEFORE"]],
+          "confidence": 0.6
+        }
+      ]
+    }
+    """
+
+    parsed = parse_model_prediction_json(raw, task_id="t002b")
+
+    assert parsed.answer_confidence == 0.8
+    assert parsed.reasoning_steps[0].confidence == 0.6
+
+
 def test_parse_model_prediction_json_rejects_invalid_json() -> None:
     raw = """{ invalid json }"""
 
@@ -216,3 +240,38 @@ def test_parse_model_prediction_json_rejects_invalid_support_edge() -> None:
 
     with pytest.raises(PredictionParseError, match="Invalid edge in 'supports'"):
         parse_model_prediction_json(raw, task_id="t013")
+
+
+def test_parse_model_prediction_json_rejects_out_of_range_answer_confidence() -> None:
+    raw = """
+    {
+      "answer": "test",
+      "answer_confidence": 1.2,
+      "events": ["A", "B"],
+      "relations": []
+    }
+    """
+
+    with pytest.raises(PredictionParseError, match="'answer_confidence' must be in \\[0.0, 1.0\\]"):
+        parse_model_prediction_json(raw, task_id="t014")
+
+
+def test_parse_model_prediction_json_rejects_boolean_step_confidence() -> None:
+    raw = """
+    {
+      "answer": "test",
+      "events": ["A", "B"],
+      "relations": [],
+      "reasoning_steps": [
+        {
+          "step_id": 1,
+          "text": "A before B",
+          "supports": [],
+          "confidence": true
+        }
+      ]
+    }
+    """
+
+    with pytest.raises(PredictionParseError, match="'confidence' must be a number when present"):
+        parse_model_prediction_json(raw, task_id="t015")

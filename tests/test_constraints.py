@@ -36,6 +36,11 @@ def test_default_specification_exposes_named_invariants() -> None:
         "temporal_consistency",
         "reasoning_support",
     ]
+    assert [formula.name for formula in specification.formulas] == [
+        "ltl_no_contradiction",
+        "ltl_no_temporal_inconsistency",
+        "ltl_no_hallucinated_nodes",
+    ]
 
 
 def test_direct_contradiction_violation() -> None:
@@ -48,6 +53,8 @@ def test_direct_contradiction_violation() -> None:
 
     result = default_verifier().verify(tg, allowed_events=allowed, pred_edges=pred_edges)
     assert "contradiction" in _types(result)
+    assert "ltl_contradiction" in {violation.type for violation in result.formula_violations}
+    assert result.first_violation_step == 0
 
 
 def test_simultaneous_order_conflict_violation() -> None:
@@ -84,6 +91,7 @@ def test_hallucinated_node_violation() -> None:
 
     result = default_verifier().verify(tg, allowed_events=allowed, pred_edges=pred_edges)
     assert "hallucinated_node" in _types(result)
+    assert "ltl_hallucinated_node" in {violation.type for violation in result.formula_violations}
 
 
 def test_intrinsic_validity_is_independent_from_gold_match() -> None:
@@ -190,3 +198,4 @@ def test_reasoning_support_no_violation_when_supports_match_predictions() -> Non
     )
     assert result.is_valid is True
     assert "unsupported_reasoning_step" not in _types(result)
+    assert result.formula_violations == []

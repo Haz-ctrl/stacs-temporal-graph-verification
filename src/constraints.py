@@ -4,9 +4,11 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
 
-from src.results import VerificationResult, Violation
-from src.specs import BaseInvariant, InvariantSpec, SpecContext, TemporalSpecification
+from src.ltl import Atom, FormulaEvaluation, Globally, LTLEvaluator, Not, formula_to_dict, formula_to_string
+from src.results import Counterexample, VerificationResult, Violation
+from src.specs import BaseInvariant, FormulaSpec, InvariantSpec, SpecContext, TemporalSpecification
 from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
+from src.trace import TemporalTrace, build_temporal_trace
 
 Edge3 = Tuple[str, str, str]
 
@@ -25,6 +27,23 @@ class Constraint(Protocol):
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> List[Violation]:
         ...
+
+
+def _build_context(
+    graph: TemporalGraph,
+    *,
+    allowed_events: Optional[Sequence[str]] = None,
+    pred_edges: Optional[Iterable[EdgeLike]] = None,
+    reasoning_steps: Optional[Sequence[Any]] = None,
+    trace: Optional[TemporalTrace] = None,
+) -> SpecContext:
+    return SpecContext(
+        graph=graph,
+        allowed_events=allowed_events,
+        pred_edges=tuple(_to_edge(edge) for edge in (pred_edges or [])),
+        reasoning_steps=tuple(reasoning_steps or ()),
+        trace=trace,
+    )
 
 
 @dataclass(frozen=True)
@@ -481,6 +500,106 @@ class Verifier:
     constraints: List[Constraint]
     specification: TemporalSpecification
 
+    def _state_graph(self, *, allowed_events: Optional[Sequence[str]], edges: Sequence[Edge3]) -> TemporalGraph:
+        graph = TemporalGraph()
+        if allowed_events is not None:
+            graph.add_events(allowed_events)
+        graph.add_edges(edges)
+        return graph
+
+    def _state_violation_types(
+        self,
+        trace: TemporalTrace,
+        *,
+        allowed_events: Optional[Sequence[str]],
+        pred_edges: Tuple[Edge3, ...],
+        reasoning_steps: Tuple[Any, ...],
+    ) -> List[Set[str]]:
+        violation_types_by_state: List[Set[str]] = []
+        for state in trace.states:
+            if state.is_final_state:
+                graph = self._state_graph(allowed_events=allowed_events, edges=pred_edges)
+                state_reasoning_steps = reasoning_steps
+            else:
+                graph = self._state_graph(allowed_events=allowed_events, edges=state.active_edges)
+                state_reasoning_steps = tuple(
+                    step for step in reasoning_steps if getattr(step, "step_id", None) is not None and getattr(step, "step_id") <= (state.step_id or -1)
+                )
+
+            violations: Set[str] = set()
+            for constraint in self.constraints:
+                result = constraint.evaluate(
+                    _build_context(
+                        graph,
+                        allowed_events=allowed_events,
+                        pred_edges=pred_edges,
+                        reasoning_steps=state_reasoning_steps,
+                    )
+                )
+                violations.update(violation.type for violation in result)
+            violation_types_by_state.append(violations)
+        return violation_types_by_state
+
+    def _formula_violations(
+        self,
+        *,
+        context: SpecContext,
+    ) -> Tuple[List[Violation], Optional[int]]:
+        if context.trace is None or not self.specification.formulas:
+            return [], None
+
+        evaluator = LTLEvaluator(context.trace)
+        formula_violations: List[Violation] = []
+        first_violation_step: Optional[int] = None
+
+        for formula_spec in self.specification.formulas:
+            evaluation: FormulaEvaluation = evaluator.evaluate(formula_spec.formula)
+            if evaluation.satisfied:
+                continue
+
+            failure_step = (
+                evaluation.failure.first_failure_step
+                if evaluation.failure is not None
+                else 0
+            )
+            first_violation_step = (
+                failure_step
+                if first_violation_step is None
+                else min(first_violation_step, failure_step)
+            )
+
+            notes = [f"Formula failed: {formula_to_string(formula_spec.formula)}"]
+            if evaluation.failure is not None:
+                notes.append(
+                    f"Failing subformula: {formula_to_string(evaluation.failure.failing_formula)}"
+                )
+
+            formula_violations.append(
+                Violation(
+                    type=formula_spec.violation_type,
+                    message=formula_spec.message,
+                    layer="ltl",
+                    constraint=formula_spec.name,
+                    spec_source="ltl",
+                    details={
+                        "formula": formula_to_dict(formula_spec.formula),
+                        "formula_text": formula_to_string(formula_spec.formula),
+                        "first_failure_step": failure_step,
+                        "failing_subformula": (
+                            formula_to_string(evaluation.failure.failing_formula)
+                            if evaluation.failure is not None
+                            else formula_to_string(formula_spec.formula)
+                        ),
+                    },
+                    counterexample=None if context.trace is None else Counterexample(
+                        step_ids=[failure_step],
+                        notes=notes,
+                    ),
+                )
+            )
+
+        return formula_violations, first_violation_step
+
     def verify(
         self,
         graph: TemporalGraph,
@@ -489,24 +608,72 @@ class Verifier:
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
     ) -> VerificationResult:
+        pred_edges_tuple = tuple(_to_edge(edge) for edge in (pred_edges or []))
+        reasoning_steps_tuple = tuple(reasoning_steps or ())
+        invariant_context = _build_context(
+            graph,
+            allowed_events=allowed_events,
+            pred_edges=pred_edges_tuple,
+            reasoning_steps=reasoning_steps_tuple,
+        )
         violations: List[Violation] = []
         for constraint in self.constraints:
-            violations.extend(
-                constraint.check(
-                    graph,
-                    allowed_events=allowed_events,
-                    pred_edges=pred_edges,
-                    reasoning_steps=reasoning_steps,
-                )
-            )
+            violations.extend(constraint.evaluate(invariant_context))
 
+        trace = build_temporal_trace(
+            allowed_events=tuple(allowed_events or ()),
+            pred_edges=pred_edges_tuple,
+            reasoning_steps=reasoning_steps_tuple,
+        )
+        trace = trace.with_violations(
+            self._state_violation_types(
+                trace,
+                allowed_events=allowed_events,
+                pred_edges=pred_edges_tuple,
+                reasoning_steps=reasoning_steps_tuple,
+            )
+        )
+        formula_context = _build_context(
+            graph,
+            allowed_events=allowed_events,
+            pred_edges=pred_edges_tuple,
+            reasoning_steps=reasoning_steps_tuple,
+            trace=trace,
+        )
+        formula_violations, first_formula_violation_step = self._formula_violations(
+            context=formula_context
+        )
+
+        all_violations = violations + formula_violations
         violation_counts = dict(Counter(violation.type for violation in violations))
-        layer_counts = dict(Counter(violation.layer for violation in violations))
+        layer_counts = dict(Counter(violation.layer for violation in all_violations))
+        formula_violation_counts = dict(Counter(violation.type for violation in formula_violations))
+        first_invariant_step = min(
+            (
+                violation.counterexample.step_ids[0]
+                for violation in violations
+                if violation.counterexample is not None and violation.counterexample.step_ids
+            ),
+            default=None,
+        )
+        first_violation_step = min(
+            (
+                step
+                for step in (first_invariant_step, first_formula_violation_step)
+                if step is not None
+            ),
+            default=None,
+        )
+        spec_sources = dict(Counter(violation.spec_source for violation in all_violations))
         return VerificationResult(
-            is_valid=len(violations) == 0,
+            is_valid=len(all_violations) == 0,
             violations=violations,
+            formula_violations=formula_violations,
             violation_counts=violation_counts,
             layer_counts=layer_counts,
+            formula_violation_counts=formula_violation_counts,
+            first_violation_step=first_violation_step,
+            spec_sources=spec_sources,
         )
 
 
@@ -521,7 +688,34 @@ def default_temporal_specification() -> TemporalSpecification:
         TemporalConsistencyConstraint(),
         ReasoningSupportConstraint(),
     )
-    return TemporalSpecification(name="default_temporal_spec", invariants=invariants)
+    formulas = (
+        FormulaSpec(
+            name="ltl_no_contradiction",
+            description="Contradictions should never appear in the trace.",
+            formula=Globally(Not(Atom("has_violation", ("contradiction",)))),
+            violation_type="ltl_contradiction",
+            message="LTL spec violated: contradiction becomes true at some trace state.",
+        ),
+        FormulaSpec(
+            name="ltl_no_temporal_inconsistency",
+            description="Temporal inconsistency should never appear in the trace.",
+            formula=Globally(Not(Atom("has_violation", ("temporal_inconsistency",)))),
+            violation_type="ltl_temporal_inconsistency",
+            message="LTL spec violated: temporal inconsistency becomes true at some trace state.",
+        ),
+        FormulaSpec(
+            name="ltl_no_hallucinated_nodes",
+            description="Hallucinated nodes should never appear in the trace.",
+            formula=Globally(Not(Atom("has_violation", ("hallucinated_node",)))),
+            violation_type="ltl_hallucinated_node",
+            message="LTL spec violated: hallucinated node appears at some trace state.",
+        ),
+    )
+    return TemporalSpecification(
+        name="default_temporal_spec",
+        invariants=invariants,
+        formulas=formulas,
+    )
 
 
 def default_verifier() -> Verifier:
