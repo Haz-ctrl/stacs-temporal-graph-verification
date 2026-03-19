@@ -92,8 +92,9 @@ def test_parse_model_prediction_json_accepts_optional_confidence_fields() -> Non
 def test_parse_model_prediction_json_rejects_invalid_json() -> None:
     raw = """{ invalid json }"""
 
-    with pytest.raises(PredictionParseError, match="Invalid JSON"):
+    with pytest.raises(PredictionParseError, match="Invalid JSON") as exc_info:
         parse_model_prediction_json(raw, task_id="t003")
+    assert exc_info.value.category == "invalid_json"
 
 
 def test_parse_model_prediction_json_rejects_non_object_top_level() -> None:
@@ -151,8 +152,9 @@ def test_parse_model_prediction_json_rejects_malformed_relation_triple() -> None
     }
     """
 
-    with pytest.raises(PredictionParseError, match="Invalid edge in 'relations'"):
+    with pytest.raises(PredictionParseError, match="Invalid edge in 'relations'") as exc_info:
         parse_model_prediction_json(raw, task_id="t008")
+    assert exc_info.value.category == "invalid_edge_support"
 
 
 def test_parse_model_prediction_json_rejects_invalid_relation_label() -> None:
@@ -238,8 +240,25 @@ def test_parse_model_prediction_json_rejects_invalid_support_edge() -> None:
     }
     """
 
-    with pytest.raises(PredictionParseError, match="Invalid edge in 'supports'"):
+    with pytest.raises(PredictionParseError, match="Invalid edge in 'supports'") as exc_info:
         parse_model_prediction_json(raw, task_id="t013")
+    assert exc_info.value.category == "invalid_edge_support"
+
+
+def test_parse_model_prediction_json_repairs_missing_comma_once() -> None:
+    raw = """
+    {
+      "answer": "A happened before B."
+      "events": ["A", "B"],
+      "relations": [["A", "B", "BEFORE"]],
+      "reasoning_steps": []
+    }
+    """
+
+    parsed = parse_model_prediction_json(raw, task_id="t013b")
+
+    assert parsed.answer == "A happened before B."
+    assert parsed.pred_edges == [("A", "B", "BEFORE")]
 
 
 def test_parse_model_prediction_json_rejects_out_of_range_answer_confidence() -> None:

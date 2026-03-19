@@ -3,17 +3,44 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 import json
-import re
 import requests
 
 def _extract_first_json_object(text: str) -> str:
     text = text.strip()
     if text.startswith("{") and text.endswith("}"):
         return text
-    m = re.search(r"\{.*\}", text, flags=re.DOTALL)
-    if not m:
+
+    start = text.find("{")
+    if start == -1:
         raise ValueError(f"Could not find JSON object in model output:\n{text}")
-    return m.group(0)
+
+    depth = 0
+    in_string = False
+    escape = False
+
+    for index in range(start, len(text)):
+        char = text[index]
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+            continue
+        if char == "{":
+            depth += 1
+            continue
+        if char == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : index + 1]
+
+    raise ValueError(f"Could not find balanced JSON object in model output:\n{text}")
 
 
 @dataclass

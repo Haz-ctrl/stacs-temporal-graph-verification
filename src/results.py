@@ -81,6 +81,9 @@ class RunReport:
     num_tasks: int
     num_failures: int
     failures: List[Dict[str, Any]]
+    parse_success_rate: float
+    conditional_validity_rate: Optional[float]
+    parse_failure_counts: Dict[str, int]
     valid_count: int
     invalid_count: int
     validity_rate: float

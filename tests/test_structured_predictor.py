@@ -80,3 +80,5 @@ def test_predict_returns_parsed_prediction() -> None:
     assert prediction.pred_edges == [("A", "B", "BEFORE")]
     assert len(prediction.reasoning_steps) == 1
     assert prediction.reasoning_steps[0].step_id == 1
+    assert prediction.raw_output is not None
+    assert '"answer": "A happened before B."' in prediction.raw_output

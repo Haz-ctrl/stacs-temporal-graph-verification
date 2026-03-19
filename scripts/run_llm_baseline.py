@@ -14,6 +14,7 @@ from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
 from src.evaluation import aggregate_prf, score_prediction, task_score_to_json
 from src.ollama_client import OllamaClient
+from src.prediction_schema import PredictionParseError
 from src.results import DatasetMetadata, RunReport, VerificationResult
 from src.schemas import ParsedPrediction, ReasoningStep, TemporalTask
 from src.structured_predictor import StructuredOllamaPredictor
@@ -176,6 +177,12 @@ def _dataset_metadata(tasks: List[TemporalTask], data_path: str | Path) -> Datas
     )
 
 
+def _failure_category(exc: Exception) -> str:
+    if isinstance(exc, PredictionParseError):
+        return exc.category
+    return "other_failure"
+
+
 def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     raw_tasks: List[Dict[str, Any]] = load_jsonl(config.data_path)
     if config.max_tasks > 0:
@@ -243,6 +250,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     formula_violation_counts: Dict[str, int] = {}
     first_violation_step_histogram: Dict[str, int] = {}
     taxonomy_counts: Dict[str, int] = {}
+    parse_failure_counts: Dict[str, int] = {}
     failures: List[Dict[str, Any]] = []
 
     gold_empty_task_count = 0
@@ -371,11 +379,21 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                 )
 
             except Exception as exc:
-                failures.append({"id": task.id, "error": repr(exc)})
+                category = _failure_category(exc)
+                parse_failure_counts[category] = parse_failure_counts.get(category, 0) + 1
+                failure_record: Dict[str, Any] = {
+                    "id": task.id,
+                    "category": category,
+                    "error": repr(exc),
+                }
+                if config.log_raw and isinstance(exc, PredictionParseError) and exc.raw_output is not None:
+                    failure_record["raw_output"] = exc.raw_output
+                failures.append(failure_record)
                 print(f"[{task.id}] ERROR: {exc!r}")
 
     direct_summary = asdict(aggregate_prf(direct_correct_total, direct_pred_total, direct_gold_total))
     closure_summary = asdict(aggregate_prf(closure_correct_total, closure_pred_total, closure_gold_total))
+    parse_success_count = len(tasks) - len(failures)
 
     report = RunReport(
         run_id=run_id,
@@ -388,6 +406,13 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         num_tasks=len(tasks),
         num_failures=len(failures),
         failures=failures,
+        parse_success_rate=(parse_success_count / len(tasks)) if tasks else 0.0,
+        conditional_validity_rate=(
+            valid_count / parse_success_count
+            if parse_success_count > 0
+            else None
+        ),
+        parse_failure_counts=parse_failure_counts,
         valid_count=valid_count,
         invalid_count=invalid_count,
         validity_rate=(valid_count / len(tasks)) if tasks else 0.0,
