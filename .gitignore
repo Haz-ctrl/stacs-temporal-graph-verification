@@ -56,11 +56,11 @@ Thumbs.db
 # Project-specific
 # =========================
 
-# Experimental outputs (large + reproducible)
+# experimental outputs (large + reproducible)
 outputs/
 
-# Optional: raw benchmark downloads (if large)
+# raw benchmark downloads (if large)
 data/raw/
 
-# Temporary files
+# temporary files
 tmp/
