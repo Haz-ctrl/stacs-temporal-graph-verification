@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Dict, List
 
 from src.schemas import ParsedPrediction, ReasoningStep
@@ -9,6 +10,17 @@ from src.temporal_graph import Edge, _to_edge
 
 class PredictionParseError(ValueError):
     """Raised when structured model output cannot be parsed safely."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        category: str = "schema_violation",
+        raw_output: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.category = category
+        self.raw_output = raw_output
 
 
 def _require_object(value: Any, *, context: str) -> Dict[str, Any]:
@@ -55,6 +67,8 @@ def _parse_edge_list(value: Any, *, field_name: str) -> List[Edge]:
         except ValueError as exc:
             raise PredictionParseError(
                 f"Invalid edge in '{field_name}': {item!r}. {exc}"
+                ,
+                category="invalid_edge_support",
             ) from exc
     return edges
 
@@ -94,6 +108,73 @@ def _parse_reasoning_steps(value: Any) -> List[ReasoningStep]:
     return steps
 
 
+def _repair_json_text(raw_text: str) -> str:
+    repaired = raw_text
+    repaired = re.sub(r",(\s*[}\]])", r"\1", repaired)
+
+    result_chars: List[str] = []
+    in_string = False
+    escape = False
+    stack: List[str] = []
+    previous_significant: str | None = None
+
+    token_starters = set('"{[tfn-0123456789')
+    value_enders = set('"}]0123456789')
+
+    for char in repaired:
+        if in_string:
+            result_chars.append(char)
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+                previous_significant = '"'
+            continue
+
+        if char.isspace():
+            result_chars.append(char)
+            continue
+
+        if char == '"':
+            if previous_significant in value_enders and previous_significant not in "{[,:":
+                result_chars.append(",")
+            result_chars.append(char)
+            in_string = True
+            continue
+
+        if char in token_starters - {'"'}:
+            if previous_significant in value_enders and previous_significant not in "{[,:":
+                result_chars.append(",")
+            result_chars.append(char)
+            previous_significant = char
+            if char == "{":
+                stack.append("}")
+            elif char == "[":
+                stack.append("]")
+            continue
+
+        result_chars.append(char)
+        if char == ":":
+            previous_significant = ":"
+        elif char == ",":
+            previous_significant = ","
+        elif char == "}" and stack and stack[-1] == "}":
+            stack.pop()
+            previous_significant = "}"
+        elif char == "]" and stack and stack[-1] == "]":
+            stack.pop()
+            previous_significant = "]"
+        else:
+            previous_significant = char
+
+    while stack:
+        result_chars.append(stack.pop())
+
+    return "".join(result_chars)
+
+
 def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPrediction:
     """
     Parse strict structured model output into a typed ParsedPrediction.
@@ -115,7 +196,20 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
     try:
         obj = json.loads(raw_text)
     except json.JSONDecodeError as exc:
-        raise PredictionParseError(f"Invalid JSON: {exc.msg}") from exc
+        repaired_text = _repair_json_text(raw_text)
+        if repaired_text != raw_text:
+            try:
+                obj = json.loads(repaired_text)
+            except json.JSONDecodeError:
+                raise PredictionParseError(
+                    f"Invalid JSON: {exc.msg}",
+                    category="invalid_json",
+                ) from exc
+        else:
+            raise PredictionParseError(
+                f"Invalid JSON: {exc.msg}",
+                category="invalid_json",
+            ) from exc
 
     top = _require_object(obj, context="Top-level model output")
 

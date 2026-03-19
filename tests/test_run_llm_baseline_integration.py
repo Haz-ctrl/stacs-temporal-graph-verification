@@ -80,6 +80,9 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     report = result.report
     assert report.num_tasks == 3
     assert report.num_failures == 0
+    assert report.parse_success_rate == 1.0
+    assert report.conditional_validity_rate == 2 / 3
+    assert report.parse_failure_counts == {}
     assert report.valid_count == 2
     assert report.invalid_count == 1
     assert report.run_config["specification_name"] == "default_temporal_spec"
@@ -155,6 +158,9 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     report = result.report
     assert report.num_tasks == 2
     assert report.num_failures == 0
+    assert report.parse_success_rate == 1.0
+    assert report.conditional_validity_rate == 0.5
+    assert report.parse_failure_counts == {}
     assert report.invalid_count >= 1
     assert report.violation_counts != {}
     assert report.formula_violation_counts != {}
@@ -225,6 +231,9 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     report = result.report
     assert report.num_tasks == 1
     assert report.num_failures == 0
+    assert report.parse_success_rate == 1.0
+    assert report.conditional_validity_rate == 1.0
+    assert report.parse_failure_counts == {}
     assert report.valid_count == 1
     assert report.invalid_count == 0
     assert report.model_metadata["prediction_mode"] == "structured_json"
@@ -241,3 +250,126 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     assert record["verification"]["is_valid"] is True
     assert record["verification"]["ltl_passed"] is True
     assert record["verification"]["formula_violations"] == []
+
+
+class FakeOllamaClientWithParseIssues:
+    def __init__(self, base_url: str) -> None:
+        self.base_url = base_url
+        self._responses = [
+            """
+            {
+              "answer": "A happened before B."
+              "events": ["A happened", "B happened"],
+              "relations": [["A happened", "B happened", "BEFORE"]],
+              "reasoning_steps": []
+            }
+            """,
+            """{ "answer": "broken" """,
+            """
+            {
+              "answer": "A happened before B.",
+              "events": ["A happened", "B happened"],
+              "relations": [],
+              "reasoning_steps": [
+                {
+                  "step_id": 1,
+                  "text": "bad support",
+                  "supports": [["A happened"]]
+                }
+              ]
+            }
+            """,
+            """
+            {
+              "answer": 123,
+              "events": ["A happened", "B happened"],
+              "relations": []
+            }
+            """,
+        ]
+
+    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+        return self._responses.pop(0)
+
+    def tags_snapshot(self) -> list[str]:
+        return ["fake-model:latest"]
+
+
+def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.run_llm_baseline as baseline_module
+
+    monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClientWithParseIssues)
+
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "ok_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "bad_json_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "bad_edge_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+            {
+                "id": "schema_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            },
+        ],
+    )
+
+    result = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="llm",
+            output_root=tmp_path / "runs",
+            model="fake-model",
+            log_raw=True,
+        )
+    )
+
+    report = result.report
+    assert report.num_tasks == 4
+    assert report.num_failures == 3
+    assert report.parse_success_rate == 0.25
+    assert report.conditional_validity_rate == 1.0
+    assert report.parse_failure_counts == {
+        "invalid_json": 1,
+        "invalid_edge_support": 1,
+        "schema_violation": 1,
+    }
+
+    assert [failure["category"] for failure in report.failures] == [
+        "invalid_json",
+        "invalid_edge_support",
+        "schema_violation",
+    ]
+    assert all("raw_output" in failure for failure in report.failures)

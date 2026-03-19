@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
 from src.ollama_client import OllamaClient, _extract_first_json_object
-from src.prediction_schema import ParsedPrediction, parse_model_prediction_json
+from src.prediction_schema import ParsedPrediction, PredictionParseError, parse_model_prediction_json
 from src.schemas import TemporalTask
 
 
@@ -63,8 +63,30 @@ class StructuredOllamaPredictor:
             temperature=self.temperature,
             seed=self.seed,
         )
-        json_text = _extract_first_json_object(raw)
-        return parse_model_prediction_json(json_text, task_id=task.id)
+        try:
+            json_text = _extract_first_json_object(raw)
+            parsed = parse_model_prediction_json(json_text, task_id=task.id)
+        except PredictionParseError as exc:
+            raise PredictionParseError(
+                str(exc),
+                category=exc.category,
+                raw_output=raw,
+            ) from exc
+        except ValueError as exc:
+            raise PredictionParseError(
+                f"Invalid JSON: {exc}",
+                category="invalid_json",
+                raw_output=raw,
+            ) from exc
+        return ParsedPrediction(
+            task_id=parsed.task_id,
+            answer=parsed.answer,
+            pred_events=parsed.pred_events,
+            pred_edges=parsed.pred_edges,
+            reasoning_steps=parsed.reasoning_steps,
+            answer_confidence=parsed.answer_confidence,
+            raw_output=raw,
+        )
 
     def metadata(self) -> Dict[str, Any]:
         return {
