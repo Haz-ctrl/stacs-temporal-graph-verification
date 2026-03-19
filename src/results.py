@@ -20,6 +20,7 @@ class Violation:
     message: str
     layer: str
     constraint: str
+    spec_source: str = "invariant"
     details: Dict[str, Any] = field(default_factory=dict)
     counterexample: Optional[Counterexample] = None
 
@@ -28,8 +29,12 @@ class Violation:
 class VerificationResult:
     is_valid: bool
     violations: List[Violation]
+    formula_violations: List[Violation]
     violation_counts: Dict[str, int]
     layer_counts: Dict[str, int]
+    formula_violation_counts: Dict[str, int]
+    first_violation_step: Optional[int]
+    spec_sources: Dict[str, int]
 
 
 @dataclass(frozen=True)
@@ -80,6 +85,8 @@ class RunReport:
     invalid_count: int
     validity_rate: float
     violation_counts: Dict[str, int]
+    formula_violation_counts: Dict[str, int]
+    first_violation_step_histogram: Dict[str, int]
     taxonomy_counts: Dict[str, int]
     overcommitment: Dict[str, Any]
     metrics_expected_valid_only: Dict[str, Any]

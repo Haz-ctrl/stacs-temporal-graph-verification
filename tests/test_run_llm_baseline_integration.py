@@ -83,6 +83,8 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert report.valid_count == 2
     assert report.invalid_count == 1
     assert report.run_config["specification_name"] == "default_temporal_spec"
+    assert "ltl_contradiction" in report.formula_violation_counts
+    assert report.first_violation_step_histogram == {"0": 1}
     assert report.dataset.expected_valid_tasks == 2
     assert report.dataset.expected_invalid_tasks == 1
 
@@ -104,6 +106,8 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert records[2]["id"] == "con_001"
     assert records[0]["verification"]["specification_name"] == "default_temporal_spec"
     assert records[1]["verification"]["is_valid"] is True
+    assert records[1]["verification"]["ltl_passed"] is True
+    assert records[1]["verification"]["active_specification"]["formulas"] != []
     assert records[1]["score"]["preserves_ordering_closure"] is True
 
 
@@ -153,6 +157,7 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     assert report.num_failures == 0
     assert report.invalid_count >= 1
     assert report.violation_counts != {}
+    assert report.formula_violation_counts != {}
     assert report.taxonomy_counts != {}
     assert report.overcommitment["num_gold_empty_tasks"] == 1
     assert report.overcommitment["num_overcommit_tasks"] == 1
@@ -234,3 +239,5 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     assert record["reasoning_steps"][0]["step_id"] == 1
     assert "raw_output" in record
     assert record["verification"]["is_valid"] is True
+    assert record["verification"]["ltl_passed"] is True
+    assert record["verification"]["formula_violations"] == []

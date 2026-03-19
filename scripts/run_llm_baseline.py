@@ -240,6 +240,8 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     valid_count = 0
     invalid_count = 0
     violation_counts: Dict[str, int] = {}
+    formula_violation_counts: Dict[str, int] = {}
+    first_violation_step_histogram: Dict[str, int] = {}
     taxonomy_counts: Dict[str, int] = {}
     failures: List[Dict[str, Any]] = []
 
@@ -289,6 +291,15 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     category = map_violation_to_category(violation.type)
                     taxonomy_counts[category] = taxonomy_counts.get(category, 0) + 1
                     task_taxonomy_categories.append(category)
+                for violation in verification.formula_violations:
+                    formula_violation_counts[violation.type] = (
+                        formula_violation_counts.get(violation.type, 0) + 1
+                    )
+                if verification.first_violation_step is not None:
+                    key = str(verification.first_violation_step)
+                    first_violation_step_histogram[key] = (
+                        first_violation_step_histogram.get(key, 0) + 1
+                    )
 
                 task_taxonomy_categories = sorted(set(task_taxonomy_categories))
 
@@ -334,8 +345,17 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                         "specification_name": verifier.specification.name,
                         "is_valid": verification.is_valid,
                         "violations": [asdict(violation) for violation in verification.violations],
+                        "ltl_passed": len(verification.formula_violations) == 0,
+                        "formula_violations": [asdict(violation) for violation in verification.formula_violations],
                         "violation_counts": verification.violation_counts,
+                        "formula_violation_counts": verification.formula_violation_counts,
                         "layer_counts": verification.layer_counts,
+                        "first_violation_step": verification.first_violation_step,
+                        "spec_sources": verification.spec_sources,
+                        "active_specification": {
+                            "invariants": [invariant.name for invariant in verifier.specification.invariants],
+                            "formulas": [formula.serialise() for formula in verifier.specification.formulas],
+                        },
                     },
                     "score": task_score_to_json(task_score),
                     "taxonomy_categories": task_taxonomy_categories,
@@ -372,6 +392,8 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         invalid_count=invalid_count,
         validity_rate=(valid_count / len(tasks)) if tasks else 0.0,
         violation_counts=violation_counts,
+        formula_violation_counts=formula_violation_counts,
+        first_violation_step_histogram=first_violation_step_histogram,
         taxonomy_counts=taxonomy_counts,
         overcommitment={
             "num_gold_empty_tasks": gold_empty_task_count,

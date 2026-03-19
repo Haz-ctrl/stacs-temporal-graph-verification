@@ -59,6 +59,7 @@ class ReasoningStep:
     step_id: int
     text: str
     supports: List[Edge] = field(default_factory=list)
+    confidence: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -67,6 +68,7 @@ class ModelPrediction:
     events: List[str]
     relations: List[Edge]
     reasoning_steps: List[ReasoningStep] = field(default_factory=list)
+    answer_confidence: Optional[float] = None
     raw_output: Optional[str] = None
 
 
@@ -77,4 +79,5 @@ class ParsedPrediction:
     pred_events: List[str]
     pred_edges: List[Edge]
     reasoning_steps: List[ReasoningStep]
+    answer_confidence: Optional[float] = None
     raw_output: Optional[str] = None
