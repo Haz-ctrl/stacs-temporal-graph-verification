@@ -18,6 +18,12 @@ def main() -> None:
         action="store_true",
         help="Require expected_valid and expected_consistent fields on every task.",
     )
+    ap.add_argument(
+        "--profile",
+        choices=["generic", "canonical"],
+        default="generic",
+        help="Validation profile: generic schema checks or canonical synthetic benchmark checks.",
+    )
     ap.add_argument("--out", default="", help="Optional path to write a validation report JSON.")
     args = ap.parse_args()
 
@@ -26,6 +32,7 @@ def main() -> None:
         tasks,
         strict=args.strict,
         require_expected_fields=args.require_expected_fields,
+        profile=args.profile,
     )
 
     # Print summary

@@ -4,15 +4,18 @@ from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple
 
 from src.temporal_graph import TemporalGraph, Edge, EdgeLike, _to_edge
+from src.schemas import TemporalRelation
 
-Relation = Literal["BEFORE"]
-Category = Literal[
+Relation = Literal["BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"]
+ValidationProfile = Literal["generic", "canonical"]
+
+CANONICAL_CATEGORIES = {
     "linear_chain",
     "transitive_reasoning",
     "ambiguous",
     "contradiction",
     "long_chain",
-]
+}
 
 
 @dataclass
@@ -78,6 +81,7 @@ def validate_tasks(
     *,
     strict: bool = True,
     require_expected_fields: bool = False,
+    profile: ValidationProfile = "generic",
 ) -> ValidationReport:
     """
     Validate dataset tasks for schema + logical/category coherence.
@@ -170,8 +174,18 @@ def validate_tasks(
         # check that gold edges reference known events and relation set
         event_set = set(events)
         for (a, b, r) in gold_edges:
-            if r != "BEFORE":
-                add_issue(task_id, "error", "bad_relation", "Only 'BEFORE' is supported.", relation=r)
+            try:
+                relation = TemporalRelation.canonicalise(r)
+            except ValueError:
+                add_issue(
+                    task_id,
+                    "error",
+                    "bad_relation",
+                    "Unsupported relation label in gold_relations.",
+                    relation=r,
+                    allowed=sorted(member.value for member in TemporalRelation),
+                )
+                continue
             if a not in event_set or b not in event_set:
                 add_issue(
                     task_id,
@@ -182,6 +196,15 @@ def validate_tasks(
                 )
             if a == b:
                 add_issue(task_id, "error", "self_edge", "Gold edge cannot be self-referential.", edge=[a, b, r])
+            if relation.is_abstention() and len(events) == 2 and len(gold_edges) > 1:
+                sev: Literal["error", "warning"] = "warning" if not strict else "error"
+                add_issue(
+                    task_id,
+                    sev,
+                    "dense_unknown_gold",
+                    "UNKNOWN relations are best used sparingly; consider a smaller gold relation set.",
+                    edge=[a, b, r],
+                )
 
         # question should contain each event string (helps prompting consistency)
         q = task["question"]
@@ -254,10 +277,19 @@ def validate_tasks(
                     "Contradiction tasks must contain at least one direct contradictory pair.",
                 )
 
-        else:
-            # Unknown category: allow but warn/error depending on strict.
-            sev2: Literal["error", "warning"] = "warning" if not strict else "error"
-            add_issue(task_id, sev2, "unknown_category", "Unknown category value.", category=cat)
+        elif cat not in CANONICAL_CATEGORIES:
+            if profile == "canonical":
+                sev2: Literal["error", "warning"] = "warning" if not strict else "error"
+                add_issue(task_id, sev2, "unknown_category", "Unknown canonical category value.", category=cat)
+            else:
+                sev2 = "warning" if strict else "warning"
+                add_issue(
+                    task_id,
+                    sev2,
+                    "noncanonical_category",
+                    "Category is outside the canonical synthetic benchmark taxonomy.",
+                    category=cat,
+                )
 
     num_errors = sum(1 for it in issues if it.severity == "error")
     num_warnings = sum(1 for it in issues if it.severity == "warning")

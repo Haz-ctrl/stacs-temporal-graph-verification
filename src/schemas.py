@@ -80,4 +80,5 @@ class ParsedPrediction:
     pred_edges: List[Edge]
     reasoning_steps: List[ReasoningStep]
     answer_confidence: Optional[float] = None
+    json_repaired: bool = False
     raw_output: Optional[str] = None

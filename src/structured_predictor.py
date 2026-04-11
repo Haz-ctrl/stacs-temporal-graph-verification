@@ -85,6 +85,7 @@ class StructuredOllamaPredictor:
             pred_edges=parsed.pred_edges,
             reasoning_steps=parsed.reasoning_steps,
             answer_confidence=parsed.answer_confidence,
+            json_repaired=parsed.json_repaired,
             raw_output=raw,
         )
 
