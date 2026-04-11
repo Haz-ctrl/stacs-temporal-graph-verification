@@ -80,6 +80,8 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     report = result.report
     assert report.num_tasks == 3
     assert report.num_failures == 0
+    assert report.repair_hit_count == 0
+    assert report.repair_hit_rate == 0.0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 2 / 3
     assert report.parse_failure_counts == {}
@@ -158,6 +160,7 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     report = result.report
     assert report.num_tasks == 2
     assert report.num_failures == 0
+    assert report.repair_hit_count == 0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 0.5
     assert report.parse_failure_counts == {}
@@ -231,6 +234,7 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     report = result.report
     assert report.num_tasks == 1
     assert report.num_failures == 0
+    assert report.repair_hit_count == 0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 1.0
     assert report.parse_failure_counts == {}
@@ -359,6 +363,8 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
     report = result.report
     assert report.num_tasks == 4
     assert report.num_failures == 3
+    assert report.repair_hit_count == 1
+    assert report.repair_hit_rate == 0.25
     assert report.parse_success_rate == 0.25
     assert report.conditional_validity_rate == 1.0
     assert report.parse_failure_counts == {
@@ -372,4 +378,5 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
         "invalid_edge_support",
         "schema_violation",
     ]
+    assert all(failure["task_category"] == "linear_chain" for failure in report.failures)
     assert all("raw_output" in failure for failure in report.failures)

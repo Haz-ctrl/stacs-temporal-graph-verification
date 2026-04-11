@@ -10,6 +10,18 @@ Each baseline run records:
 
 Outputs are written to a UTC-stamped directory under `outputs/runs/`.
 
+For large model sweeps, use `scripts/run_model_sweep.py` to execute a manifest of models sequentially and persist a `run_manifest.json` plus `sweep_index.json` alongside the per-run artefacts.
+
+For supervisor-facing summaries, use `scripts/summarise_runs.py` to turn one or more run directories into:
+
+- `summary.csv`
+- `category_breakdown.csv`
+- `difficulty_breakdown.csv`
+- `failure_breakdown.csv`
+- `counterexamples.md`
+- `report.md`
+- `plots/*.png`
+
 ## Recommended Workflow
 
 1. Create and activate a virtual environment.

@@ -1,0 +1,3 @@
+{"id":"te3_001","passage":"Maya arrived at the station before Noah boarded the train.","events":[{"id":"e1","text":"Maya arrived at the station"},{"id":"e2","text":"Noah boarded the train"}],"relations":[{"source":"e1","target":"e2","relation":"BEFORE"}]}
+{"id":"te3_002","passage":"Lina switched off the alarm after Omar woke up.","events":[{"id":"e1","text":"Lina switched off the alarm"},{"id":"e2","text":"Omar woke up"}],"relations":[{"source":"e1","target":"e2","relation":"AFTER"}]}
+{"id":"te3_003","passage":"Ava signed the form while Ben checked the details.","events":[{"id":"e1","text":"Ava signed the form"},{"id":"e2","text":"Ben checked the details"}],"relations":[{"source":"e1","target":"e2","relation":"SIMULTANEOUS"}]}

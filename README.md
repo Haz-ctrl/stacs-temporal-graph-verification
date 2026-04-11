@@ -40,8 +40,11 @@ stacs-temporal-graph-verification/
 ├── outputs/
 │   └── runs/
 ├── scripts/
+│   ├── convert_tempeval_style.py
 │   ├── generate_temporal_dataset.py
 │   ├── run_llm_baseline.py
+│   ├── run_model_sweep.py
+│   ├── summarise_runs.py
 │   └── validate_dataset.py
 ├── src/
 │   ├── constraints.py
@@ -85,6 +88,13 @@ Validate the canonical synthetic dataset:
 python -m scripts.validate_dataset --data data/temporal_reasoning_eval.jsonl
 ```
 
+Validate the external-style and diagnostic slices:
+
+```bash
+python -m scripts.validate_dataset --data data/tempeval_eval.jsonl --profile generic
+python -m scripts.validate_dataset --data data/diagnostic_eval.jsonl --profile generic
+```
+
 Run the baseline pipeline with gold labels as predictions:
 
 ```bash
@@ -95,6 +105,18 @@ Run the structured Ollama pipeline:
 
 ```bash
 python -m scripts.run_llm_baseline --model qwen3.5:9b --pred-source llm
+```
+
+Run a lab-style model sweep from a JSON manifest:
+
+```bash
+python -m scripts.run_model_sweep --manifest manifests/lab_models.json --log-raw
+```
+
+Summarise a set of completed runs into tables and plots:
+
+```bash
+python -m scripts.summarise_runs --runs outputs/runs --out outputs/analysis/latest
 ```
 
 Important defaults:
@@ -121,6 +143,9 @@ Per-task records now separate:
 Current dataset files have different roles:
 
 - `data/temporal_reasoning_eval.jsonl`: canonical runnable synthetic evaluation set
+- `data/tempeval_eval.jsonl`: small TempEval-style relation-extraction slice in canonical task format
+- `data/tempeval_style_fixture.jsonl`: simplified adapter input for TempEval-style conversion
+- `data/diagnostic_eval.jsonl`: hand-authored diagnostic stress slice for ambiguity, anchors, and richer relations
 - `data/sample_tasks.jsonl`: small quickstart example set using the same schema
 - `data/synthetic_v2.jsonl`: legacy exploratory dataset with older category naming
 - `data/constraint_fixtures.jsonl`: fixture-style examples for verifier-oriented checks
@@ -148,11 +173,14 @@ Implemented:
 - label-aware direct metrics and ordering-closure metrics
 - overcommitment and abstention reporting
 - reproducible run artefacts with dataset, code, and specification metadata
+- model sweep orchestration for Ollama-backed lab evaluations
+- cross-run aggregation with static plots and counterexample summaries
+- a TempEval-style adapter path and a small diagnostic evaluation slice
 - unit and integration tests for graph semantics, scoring, verification, parsing, and the runner
 
 Still future work:
 
-- external benchmark adapters such as TORQUE- or TempEval-style imports
+- broader benchmark adapters such as TORQUE-style temporal QA imports
 - richer visualisation and counterexample playback
 - confidence calibration analysis
 - a broader temporal specification language and user-facing formula parser

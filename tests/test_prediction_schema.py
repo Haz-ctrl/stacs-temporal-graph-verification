@@ -259,6 +259,7 @@ def test_parse_model_prediction_json_repairs_missing_comma_once() -> None:
 
     assert parsed.answer == "A happened before B."
     assert parsed.pred_edges == [("A", "B", "BEFORE")]
+    assert parsed.json_repaired is True
 
 
 def test_parse_model_prediction_json_rejects_out_of_range_answer_confidence() -> None:

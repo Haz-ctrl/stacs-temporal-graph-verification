@@ -64,6 +64,20 @@ def write_json(path: Path, obj: Any) -> None:
     path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
 
 
+def allocate_run_dir(output_root: str | Path) -> tuple[str, Path]:
+    root = Path(output_root)
+    base_run_id = utc_stamp()
+    candidate_id = base_run_id
+    candidate_dir = root / candidate_id
+    suffix = 1
+    while candidate_dir.exists():
+        candidate_id = f"{base_run_id}_{suffix:02d}"
+        candidate_dir = root / candidate_id
+        suffix += 1
+    ensure_dir(candidate_dir)
+    return candidate_id, candidate_dir
+
+
 def git_revision() -> str:
     try:
         proc = subprocess.run(
@@ -124,7 +138,7 @@ def _prediction_from_source(
     pred_source: PredSource,
     predictor: Optional[StructuredOllamaPredictor],
     seed: int,
-) -> tuple[List[str], List[Edge], List[ReasoningStep], str, Optional[str]]:
+) -> tuple[List[str], List[Edge], List[ReasoningStep], str, Optional[str], bool]:
     if pred_source == "llm":
         if predictor is None:
             raise ValueError("Structured predictor is required when pred_source='llm'.")
@@ -135,18 +149,19 @@ def _prediction_from_source(
             list(parsed.reasoning_steps),
             parsed.answer,
             parsed.raw_output,
+            parsed.json_repaired,
         )
     if pred_source == "gold":
-        return (list(task.events), list(task.gold_relations), [], "", None)
+        return (list(task.events), list(task.gold_relations), [], "", None, False)
     if pred_source == "empty":
-        return (list(task.events), [], [], "", None)
+        return (list(task.events), [], [], "", None, False)
 
     pred_edges = make_noisy_preds(
         allowed_events=list(task.events),
         gold_edges=list(task.gold_relations),
         seed=seed,
     )
-    return (list(task.events), pred_edges, [], "", None)
+    return (list(task.events), pred_edges, [], "", None, False)
 
 
 def _model_metadata(
@@ -207,9 +222,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
 
     tasks: List[TemporalTask] = [parse_temporal_task(obj) for obj in raw_tasks]
 
-    run_id = utc_stamp()
-    run_dir = Path(config.output_root) / run_id
-    ensure_dir(run_dir)
+    run_id, run_dir = allocate_run_dir(config.output_root)
 
     client: Optional[OllamaClient] = None
     predictor: Optional[StructuredOllamaPredictor] = None
@@ -252,6 +265,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     taxonomy_counts: Dict[str, int] = {}
     parse_failure_counts: Dict[str, int] = {}
     failures: List[Dict[str, Any]] = []
+    repair_hit_count = 0
 
     gold_empty_task_count = 0
     overcommit_task_count = 0
@@ -269,12 +283,21 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     with preds_path.open("w", encoding="utf-8") as handle:
         for idx, task in enumerate(tasks, start=1):
             try:
-                pred_events, pred_edges, reasoning_steps, answer, raw_output = _prediction_from_source(
+                (
+                    pred_events,
+                    pred_edges,
+                    reasoning_steps,
+                    answer,
+                    raw_output,
+                    json_repaired,
+                ) = _prediction_from_source(
                     task=task,
                     pred_source=config.pred_source,
                     predictor=predictor,
                     seed=config.seed + idx,
                 )
+                if json_repaired:
+                    repair_hit_count += 1
 
                 graph = TemporalGraph()
                 graph.add_events(task.events)
@@ -343,6 +366,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     "pred_events": list(pred_events),
                     "pred_edges": edges_to_jsonl(pred_edges),
                     "answer": answer,
+                    "json_repaired": json_repaired,
                     "reasoning_steps": [asdict(step) for step in reasoning_steps],
                     "graph": {
                         "num_nodes": len(graph.nodes()),
@@ -384,6 +408,10 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                 failure_record: Dict[str, Any] = {
                     "id": task.id,
                     "category": category,
+                    "task_category": task.category,
+                    "num_events": len(task.events),
+                    "gold_relation_count": len(task.gold_relations),
+                    "expected_valid": task.expected_valid,
                     "error": repr(exc),
                 }
                 if config.log_raw and isinstance(exc, PredictionParseError) and exc.raw_output is not None:
@@ -406,6 +434,8 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         num_tasks=len(tasks),
         num_failures=len(failures),
         failures=failures,
+        repair_hit_count=repair_hit_count,
+        repair_hit_rate=(repair_hit_count / len(tasks)) if tasks else 0.0,
         parse_success_rate=(parse_success_count / len(tasks)) if tasks else 0.0,
         conditional_validity_rate=(
             valid_count / parse_success_count

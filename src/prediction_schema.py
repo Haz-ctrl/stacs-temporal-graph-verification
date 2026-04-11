@@ -193,6 +193,8 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
       ]
     }
     """
+    repaired_successfully = False
+
     try:
         obj = json.loads(raw_text)
     except json.JSONDecodeError as exc:
@@ -200,6 +202,7 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
         if repaired_text != raw_text:
             try:
                 obj = json.loads(repaired_text)
+                repaired_successfully = True
             except json.JSONDecodeError:
                 raise PredictionParseError(
                     f"Invalid JSON: {exc.msg}",
@@ -229,5 +232,6 @@ def parse_model_prediction_json(raw_text: str, *, task_id: str) -> ParsedPredict
         pred_edges=pred_edges,
         reasoning_steps=reasoning_steps,
         answer_confidence=answer_confidence,
+        json_repaired=repaired_successfully,
         raw_output=raw_text,
     )
