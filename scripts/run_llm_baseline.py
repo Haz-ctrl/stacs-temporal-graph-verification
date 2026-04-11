@@ -505,6 +505,11 @@ def parse_args() -> BaselineRunConfig:
     ap.add_argument("--log-raw", action="store_true", help="Log raw model output in predictions.jsonl.")
     ap.add_argument("--validate-data", action="store_true", help="Validate dataset before running.")
     ap.add_argument("--strict-data", action="store_true", help="Use stricter dataset validation.")
+    ap.add_argument(
+        "--output-root",
+        default=str(Path("outputs") / "runs"),
+        help="Directory under which timestamped run directories will be created.",
+    )
     ap.set_defaults(validate_data=True)
     args = ap.parse_args()
 
@@ -519,6 +524,7 @@ def parse_args() -> BaselineRunConfig:
         log_raw=args.log_raw,
         validate_data=args.validate_data,
         strict_data=args.strict_data,
+        output_root=args.output_root,
     )
 
 
