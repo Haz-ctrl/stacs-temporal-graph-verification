@@ -1,0 +1,25 @@
+run_id,model_label,failure_scope,failure_type,count
+2026-04-11_133750UTC,DeepSeek R1 7B,parse,invalid_edge_support,1
+2026-04-11_133750UTC,DeepSeek R1 7B,parse,invalid_json,4
+2026-04-11_134155UTC,Qwen 3.5 9B,parse,other_failure,1
+2026-04-11_134155UTC,Qwen 3.5 9B,parse,schema_violation,1
+2026-04-11_134155UTC,Qwen 3.5 9B,verification,contradiction,1
+2026-04-11_134155UTC,Qwen 3.5 9B,verification,cycle,1
+2026-04-11_134155UTC,Qwen 3.5 9B,verification,temporal_inconsistency,1
+2026-04-11_134155UTC,Qwen 3.5 9B,verification,unsupported_reasoning_step,4
+2026-04-11_134155UTC,Qwen 3.5 9B,ltl_formula,ltl_contradiction,4
+2026-04-11_134155UTC,Qwen 3.5 9B,ltl_formula,ltl_temporal_inconsistency,4
+2026-04-11_140319UTC,Llama 3.1 8B,verification,contradiction,4
+2026-04-11_140319UTC,Llama 3.1 8B,verification,cycle,4
+2026-04-11_140319UTC,Llama 3.1 8B,verification,temporal_inconsistency,4
+2026-04-11_140319UTC,Llama 3.1 8B,verification,unsupported_reasoning_step,1
+2026-04-11_140319UTC,Llama 3.1 8B,ltl_formula,ltl_contradiction,4
+2026-04-11_140319UTC,Llama 3.1 8B,ltl_formula,ltl_temporal_inconsistency,4
+2026-04-11_140512UTC,Mistral 7B,parse,invalid_edge_support,1
+2026-04-11_140512UTC,Mistral 7B,verification,contradiction,2
+2026-04-11_140512UTC,Mistral 7B,verification,cycle,2
+2026-04-11_140512UTC,Mistral 7B,verification,temporal_inconsistency,2
+2026-04-11_140512UTC,Mistral 7B,verification,unsupported_reasoning_step,4
+2026-04-11_140512UTC,Mistral 7B,ltl_formula,ltl_contradiction,4
+2026-04-11_140512UTC,Mistral 7B,ltl_formula,ltl_temporal_inconsistency,4
+2026-04-11_140642UTC,Gemma 3 12B,verification,unsupported_reasoning_step,1

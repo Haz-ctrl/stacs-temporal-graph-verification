@@ -1,0 +1,77 @@
+{
+  "run_id": "2026-04-11_133334UTC",
+  "predictions_file": "outputs/runs/controls/canonical_empty/2026-04-11_133334UTC/predictions.jsonl",
+  "pred_source": "empty",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 150,
+    "expected_valid_tasks": 130,
+    "expected_invalid_tasks": 20
+  },
+  "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+  "model_metadata": {
+    "provider": "synthetic",
+    "model": "deepseek-r1:7b",
+    "prediction_mode": "empty",
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "run_config": {
+    "run_id": "2026-04-11_133334UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 150,
+    "pred_source": "empty",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 150,
+  "num_failures": 0,
+  "failures": [],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 1.0,
+  "conditional_validity_rate": 1.0,
+  "parse_failure_counts": {},
+  "valid_count": 150,
+  "invalid_count": 0,
+  "validity_rate": 1.0,
+  "violation_counts": {},
+  "formula_violation_counts": {},
+  "first_violation_step_histogram": {},
+  "taxonomy_counts": {},
+  "overcommitment": {
+    "num_gold_empty_tasks": 30,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "correct": 0,
+      "pred_total": 0,
+      "gold_total": 378
+    },
+    "closure": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "correct": 0,
+      "pred_total": 0,
+      "gold_total": 657
+    }
+  },
+  "report_path": "outputs/runs/controls/canonical_empty/2026-04-11_133334UTC/report.json"
+}
