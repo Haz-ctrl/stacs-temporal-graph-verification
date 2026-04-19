@@ -19,6 +19,7 @@ def test_cycle_violation() -> None:
 
     result = default_verifier().verify(tg, allowed_events=allowed, pred_edges=pred_edges)
     assert result.is_valid is False
+    assert result.graph_valid is False
     assert "cycle" in _types(result)
 
 
@@ -104,6 +105,7 @@ def test_intrinsic_validity_is_independent_from_gold_match() -> None:
 
     result = default_verifier().verify(tg, allowed_events=allowed, pred_edges=pred_edges)
     assert result.is_valid is True
+    assert result.graph_valid is True
     assert result.violations == []
 
 
@@ -140,10 +142,40 @@ def test_reasoning_support_violation_when_step_support_missing_from_predictions(
         pred_edges=pred_edges,
         reasoning_steps=reasoning_steps,
     )
+    assert result.graph_valid is True
+    assert result.trace_grounded is False
+    assert result.is_valid is True
     assert "unsupported_reasoning_step" in _types(result)
     violation = next(v for v in result.violations if v.type == "unsupported_reasoning_step")
     assert violation.counterexample is not None
     assert violation.counterexample.step_ids == [1]
+
+
+def test_reasoning_support_accepts_closure_implied_supports() -> None:
+    allowed = ["A", "B", "C"]
+    pred_edges = [["A", "B", "BEFORE"], ["B", "C", "BEFORE"]]
+    reasoning_steps = [
+        ReasoningStep(
+            step_id=2,
+            text="Therefore A happened before C.",
+            supports=[("A", "C", "BEFORE")],
+        )
+    ]
+
+    tg = TemporalGraph()
+    tg.add_events(allowed)
+    tg.add_edges(pred_edges)
+
+    result = default_verifier().verify(
+        tg,
+        allowed_events=allowed,
+        pred_edges=pred_edges,
+        reasoning_steps=reasoning_steps,
+    )
+
+    assert result.graph_valid is True
+    assert result.trace_grounded is True
+    assert "unsupported_reasoning_step" not in _types(result)
 
 
 def test_reasoning_grounding_violation_when_support_references_unknown_event() -> None:

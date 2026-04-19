@@ -84,6 +84,16 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     assert (out_dir / "counterexamples.md").exists()
     assert (out_dir / "plots" / "parse_success_rate.png").exists()
     assert (out_dir / "plots" / "direct_vs_closure_f1.png").exists()
+    assert (out_dir / "plots" / "ambiguity_behaviour.png").exists()
+    assert (out_dir / "plots" / "contradiction_detection_rate.png").exists()
+    assert (out_dir / "plots" / "verification_task_incidence.png").exists()
     assert any(row["model_label"] == "gold-baseline" for row in result["summary"])
     assert any(row["category"] == "ambiguous" for row in result["category_breakdown"])
     assert any(row["difficulty"] == "empty_gold" for row in result["difficulty_breakdown"])
+    gold_row = next(row for row in result["summary"] if row["model_label"] == "gold-baseline")
+    assert gold_row["parse_success_ci_low"] is not None
+    ambiguous_row = next(
+        row for row in result["category_breakdown"]
+        if row["model_label"] == "gold-baseline" and row["category"] == "ambiguous"
+    )
+    assert ambiguous_row["direct_f1"] is None

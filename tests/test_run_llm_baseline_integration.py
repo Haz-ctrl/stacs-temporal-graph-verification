@@ -84,9 +84,13 @@ def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     assert report.repair_hit_rate == 0.0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 2 / 3
+    assert report.conditional_trace_grounding_rate == 1.0
+    assert report.transport_failure_counts == {}
     assert report.parse_failure_counts == {}
     assert report.valid_count == 2
     assert report.invalid_count == 1
+    assert report.trace_grounded_count == 3
+    assert report.trace_ungrounded_count == 0
     assert report.run_config["specification_name"] == "default_temporal_spec"
     assert "ltl_contradiction" in report.formula_violation_counts
     assert report.first_violation_step_histogram == {"0": 1}
@@ -163,6 +167,8 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     assert report.repair_hit_count == 0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 0.5
+    assert report.conditional_trace_grounding_rate == 1.0
+    assert report.transport_failure_counts == {}
     assert report.parse_failure_counts == {}
     assert report.invalid_count >= 1
     assert report.violation_counts != {}
@@ -177,7 +183,7 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
 
 
 class FakeOllamaClient:
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, **_: object) -> None:
         self.base_url = base_url
 
     def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
@@ -237,6 +243,8 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     assert report.repair_hit_count == 0
     assert report.parse_success_rate == 1.0
     assert report.conditional_validity_rate == 1.0
+    assert report.conditional_trace_grounding_rate == 1.0
+    assert report.transport_failure_counts == {}
     assert report.parse_failure_counts == {}
     assert report.valid_count == 1
     assert report.invalid_count == 0
@@ -257,7 +265,7 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
 
 
 class FakeOllamaClientWithParseIssues:
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, **_: object) -> None:
         self.base_url = base_url
         self._responses = [
             """
@@ -367,6 +375,8 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
     assert report.repair_hit_rate == 0.25
     assert report.parse_success_rate == 0.25
     assert report.conditional_validity_rate == 1.0
+    assert report.conditional_trace_grounding_rate == 1.0
+    assert report.transport_failure_counts == {}
     assert report.parse_failure_counts == {
         "invalid_json": 1,
         "invalid_edge_support": 1,
@@ -380,3 +390,56 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
     ]
     assert all(failure["task_category"] == "linear_chain" for failure in report.failures)
     assert all("raw_output" in failure for failure in report.failures)
+
+
+class FakeOllamaClientWithTransportTimeout:
+    def __init__(self, base_url: str, **_: object) -> None:
+        self.base_url = base_url
+
+    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+        from src.ollama_client import OllamaTransportError
+
+        raise OllamaTransportError("timed out", category="transport_timeout")
+
+    def tags_snapshot(self) -> list[str]:
+        return ["fake-model:latest"]
+
+
+def test_run_baseline_separates_transport_failures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import scripts.run_llm_baseline as baseline_module
+
+    monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClientWithTransportTimeout)
+
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "lc_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_consistent": True,
+                "expected_valid": True,
+            }
+        ],
+    )
+
+    result = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="llm",
+            output_root=tmp_path / "runs",
+            model="fake-model",
+        )
+    )
+
+    report = result.report
+    assert report.num_failures == 1
+    assert report.parse_failure_counts == {}
+    assert report.transport_failure_counts == {"transport_timeout": 1}
+    assert report.parse_success_rate == 0.0

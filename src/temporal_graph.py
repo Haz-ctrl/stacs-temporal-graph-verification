@@ -119,6 +119,18 @@ class TemporalGraph:
         _, groups = self._simultaneous_sets()
         return sorted(groups.values(), key=lambda members: (members[0], len(members)))
 
+    def simultaneous_pair_set(self) -> Set[Tuple[str, str]]:
+        _, groups = self._simultaneous_sets()
+        pairs: Set[Tuple[str, str]] = set()
+        for members in groups.values():
+            if len(members) < 2:
+                continue
+            for source in members:
+                for target in members:
+                    if source != target:
+                        pairs.add((source, target))
+        return pairs
+
     def direct_order_pairs(self) -> Set[Tuple[str, str]]:
         order_pairs: Set[Tuple[str, str]] = set()
         for source, target, relation in self._edges:
@@ -221,3 +233,14 @@ class TemporalGraph:
         unknown = [node for node in self._nodes if node not in allowed]
         unknown.sort()
         return unknown
+
+    def entails_edge(self, edge_like: EdgeLike) -> bool:
+        source, target, relation = _to_edge(edge_like)
+        rel = TemporalRelation.canonicalise(relation)
+        if rel is TemporalRelation.BEFORE:
+            return (source, target) in self.ordering_pairs()
+        if rel is TemporalRelation.AFTER:
+            return (target, source) in self.ordering_pairs()
+        if rel is TemporalRelation.SIMULTANEOUS:
+            return (source, target) in self.simultaneous_pair_set()
+        return (source, target, rel.value) in self._edge_set

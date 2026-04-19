@@ -24,6 +24,19 @@ def main() -> None:
     parser.add_argument("--log-raw", action="store_true", help="Log raw outputs in run artefacts.")
     parser.add_argument("--max-tasks", type=int, default=0, help="Limit tasks per run (0 = full dataset).")
     parser.add_argument("--base-url", default="http://localhost:11434", help="Default Ollama base URL.")
+    parser.add_argument("--timeout-s", type=int, default=120, help="Ollama request timeout in seconds.")
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=1,
+        help="Maximum number of transport attempts for each Ollama request.",
+    )
+    parser.add_argument(
+        "--retry-backoff-s",
+        type=float,
+        default=2.0,
+        help="Base backoff in seconds between transport retries.",
+    )
     parser.add_argument(
         "--output-root",
         default="outputs/runs",
@@ -50,6 +63,9 @@ def main() -> None:
                 max_tasks=args.max_tasks,
                 pred_source="llm",
                 log_raw=args.log_raw,
+                timeout_s=args.timeout_s,
+                max_retries=args.max_retries,
+                retry_backoff_s=args.retry_backoff_s,
                 output_root=output_root,
             )
         )
@@ -81,6 +97,9 @@ def main() -> None:
                 "data_path": args.data,
                 "seed": args.seed,
                 "temperature": args.temperature,
+                "timeout_s": args.timeout_s,
+                "max_retries": args.max_retries,
+                "retry_backoff_s": args.retry_backoff_s,
                 "max_tasks": args.max_tasks,
                 "runs": sweep_index,
             },
