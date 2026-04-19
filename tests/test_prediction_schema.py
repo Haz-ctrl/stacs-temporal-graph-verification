@@ -65,6 +65,29 @@ def test_parse_model_prediction_json_valid_with_reasoning_steps() -> None:
     assert parsed.reasoning_steps[1].step_id == 2
 
 
+def test_parse_model_prediction_json_accepts_reasoning_step_aliases() -> None:
+    raw = """
+    {
+      "answer": "UNKNOWN",
+      "events": ["A", "B"],
+      "relations": [["A", "B", "UNKNOWN"]],
+      "reasoning_steps": [
+        {
+          "step": 1,
+          "description": "The text does not link A and B.",
+          "support": [["A", "B", "UNKNOWN"]]
+        }
+      ]
+    }
+    """
+
+    parsed = parse_model_prediction_json(raw, task_id="t002_alias")
+
+    assert parsed.reasoning_steps[0].step_id == 1
+    assert parsed.reasoning_steps[0].text == "The text does not link A and B."
+    assert parsed.reasoning_steps[0].supports == [("A", "B", "UNKNOWN")]
+
+
 def test_parse_model_prediction_json_accepts_optional_confidence_fields() -> None:
     raw = """
     {
@@ -184,7 +207,7 @@ def test_parse_model_prediction_json_requires_reasoning_steps_list() -> None:
         parse_model_prediction_json(raw, task_id="t010")
 
 
-def test_parse_model_prediction_json_rejects_reasoning_step_without_integer_step_id() -> None:
+def test_parse_model_prediction_json_accepts_digit_string_step_id() -> None:
     raw = """
     {
       "answer": "test",
@@ -200,8 +223,28 @@ def test_parse_model_prediction_json_rejects_reasoning_step_without_integer_step
     }
     """
 
+    parsed = parse_model_prediction_json(raw, task_id="t011")
+    assert parsed.reasoning_steps[0].step_id == 1
+
+
+def test_parse_model_prediction_json_rejects_non_numeric_reasoning_step_id() -> None:
+    raw = """
+    {
+      "answer": "test",
+      "events": ["A", "B"],
+      "relations": [],
+      "reasoning_steps": [
+        {
+          "step_id": "first",
+          "text": "A before B",
+          "supports": [["A", "B", "BEFORE"]]
+        }
+      ]
+    }
+    """
+
     with pytest.raises(PredictionParseError, match="must include integer 'step_id'"):
-        parse_model_prediction_json(raw, task_id="t011")
+        parse_model_prediction_json(raw, task_id="t011b")
 
 
 def test_parse_model_prediction_json_rejects_reasoning_step_without_text_string() -> None:
@@ -220,7 +263,7 @@ def test_parse_model_prediction_json_rejects_reasoning_step_without_text_string(
     }
     """
 
-    with pytest.raises(PredictionParseError, match="Expected string field 'text'"):
+    with pytest.raises(PredictionParseError, match="must include string 'text'"):
         parse_model_prediction_json(raw, task_id="t012")
 
 

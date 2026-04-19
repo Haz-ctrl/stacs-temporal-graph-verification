@@ -31,6 +31,8 @@ Rules:
 - Do not include explanatory text outside the JSON.
 - If uncertain, still return valid JSON.
 - 'supports' must be a list when present.
+- Use the exact keys `step_id` and `text` inside `reasoning_steps`.
+- If you cannot provide grounded support edges, return `"reasoning_steps": []`.
 - Keep reasoning_steps concise and grounded in the task.
 
 Question:

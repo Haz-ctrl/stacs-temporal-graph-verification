@@ -13,7 +13,7 @@ from src.constraints import default_verifier
 from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
 from src.evaluation import aggregate_prf, score_prediction, task_score_to_json
-from src.ollama_client import OllamaClient
+from src.ollama_client import OllamaClient, OllamaTransportError
 from src.prediction_schema import PredictionParseError
 from src.results import DatasetMetadata, RunReport, VerificationResult
 from src.schemas import ParsedPrediction, ReasoningStep, TemporalTask
@@ -36,6 +36,9 @@ class BaselineRunConfig:
     log_raw: bool = False
     validate_data: bool = True
     strict_data: bool = False
+    timeout_s: int = 120
+    max_retries: int = 1
+    retry_backoff_s: float = 2.0
     output_root: str | Path = Path("outputs") / "runs"
 
 
@@ -195,6 +198,8 @@ def _dataset_metadata(tasks: List[TemporalTask], data_path: str | Path) -> Datas
 def _failure_category(exc: Exception) -> str:
     if isinstance(exc, PredictionParseError):
         return exc.category
+    if isinstance(exc, OllamaTransportError):
+        return exc.category
     return "other_failure"
 
 
@@ -227,7 +232,12 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     client: Optional[OllamaClient] = None
     predictor: Optional[StructuredOllamaPredictor] = None
     if config.pred_source == "llm":
-        client = OllamaClient(base_url=config.base_url)
+        client = OllamaClient(
+            base_url=config.base_url,
+            timeout_s=config.timeout_s,
+            max_retries=config.max_retries,
+            retry_backoff_s=config.retry_backoff_s,
+        )
         predictor = StructuredOllamaPredictor(
             model=config.model,
             client=client,
@@ -251,6 +261,9 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         "log_raw": config.log_raw,
         "validate_data": config.validate_data,
         "strict_data": config.strict_data,
+        "timeout_s": config.timeout_s,
+        "max_retries": config.max_retries,
+        "retry_backoff_s": config.retry_backoff_s,
         "dataset_version": dataset_metadata.dataset_version,
         "code_version": git_revision(),
         "specification_name": verifier.specification.name,
@@ -264,8 +277,11 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
     first_violation_step_histogram: Dict[str, int] = {}
     taxonomy_counts: Dict[str, int] = {}
     parse_failure_counts: Dict[str, int] = {}
+    transport_failure_counts: Dict[str, int] = {}
     failures: List[Dict[str, Any]] = []
     repair_hit_count = 0
+    trace_grounded_count = 0
+    trace_ungrounded_count = 0
 
     gold_empty_task_count = 0
     overcommit_task_count = 0
@@ -311,10 +327,14 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     reasoning_steps=reasoning_steps,
                 )
 
-                if verification.is_valid:
+                if verification.graph_valid:
                     valid_count += 1
                 else:
                     invalid_count += 1
+                if verification.trace_grounded:
+                    trace_grounded_count += 1
+                else:
+                    trace_ungrounded_count += 1
 
                 task_taxonomy_categories: List[str] = []
                 for violation in verification.violations:
@@ -376,6 +396,8 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     "verification": {
                         "specification_name": verifier.specification.name,
                         "is_valid": verification.is_valid,
+                        "graph_valid": verification.graph_valid,
+                        "trace_grounded": verification.trace_grounded,
                         "violations": [asdict(violation) for violation in verification.violations],
                         "ltl_passed": len(verification.formula_violations) == 0,
                         "formula_violations": [asdict(violation) for violation in verification.formula_violations],
@@ -404,7 +426,10 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
 
             except Exception as exc:
                 category = _failure_category(exc)
-                parse_failure_counts[category] = parse_failure_counts.get(category, 0) + 1
+                if category.startswith("transport_"):
+                    transport_failure_counts[category] = transport_failure_counts.get(category, 0) + 1
+                else:
+                    parse_failure_counts[category] = parse_failure_counts.get(category, 0) + 1
                 failure_record: Dict[str, Any] = {
                     "id": task.id,
                     "category": category,
@@ -442,9 +467,17 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
             if parse_success_count > 0
             else None
         ),
+        conditional_trace_grounding_rate=(
+            trace_grounded_count / parse_success_count
+            if parse_success_count > 0
+            else None
+        ),
+        transport_failure_counts=transport_failure_counts,
         parse_failure_counts=parse_failure_counts,
         valid_count=valid_count,
         invalid_count=invalid_count,
+        trace_grounded_count=trace_grounded_count,
+        trace_ungrounded_count=trace_ungrounded_count,
         validity_rate=(valid_count / len(tasks)) if tasks else 0.0,
         violation_counts=violation_counts,
         formula_violation_counts=formula_violation_counts,
@@ -505,6 +538,19 @@ def parse_args() -> BaselineRunConfig:
     ap.add_argument("--log-raw", action="store_true", help="Log raw model output in predictions.jsonl.")
     ap.add_argument("--validate-data", action="store_true", help="Validate dataset before running.")
     ap.add_argument("--strict-data", action="store_true", help="Use stricter dataset validation.")
+    ap.add_argument("--timeout-s", type=int, default=120, help="Ollama request timeout in seconds.")
+    ap.add_argument(
+        "--max-retries",
+        type=int,
+        default=1,
+        help="Maximum number of transport attempts for each Ollama request.",
+    )
+    ap.add_argument(
+        "--retry-backoff-s",
+        type=float,
+        default=2.0,
+        help="Base backoff in seconds between transport retries.",
+    )
     ap.add_argument(
         "--output-root",
         default=str(Path("outputs") / "runs"),
@@ -524,6 +570,9 @@ def parse_args() -> BaselineRunConfig:
         log_raw=args.log_raw,
         validate_data=args.validate_data,
         strict_data=args.strict_data,
+        timeout_s=args.timeout_s,
+        max_retries=args.max_retries,
+        retry_backoff_s=args.retry_backoff_s,
         output_root=args.output_root,
     )
 

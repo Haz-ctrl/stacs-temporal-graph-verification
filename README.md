@@ -119,6 +119,16 @@ Summarise a set of completed runs into tables and plots:
 python -m scripts.summarise_runs --runs outputs/runs --out outputs/analysis/latest
 ```
 
+The summariser is designed for supervisor-facing evaluation work. It writes:
+
+- `summary.csv`: top-line per-run metrics, uncertainty intervals, and diagnostic rates
+- `category_breakdown.csv`: category-specific fidelity and consistency summaries
+- `difficulty_breakdown.csv`: structural complexity slices
+- `failure_breakdown.csv`: parse and verification failures using affected-task rates
+- `counterexamples.md`: representative parse and verification failures
+- `report.md`: narrative summary that warns when a run is only a screening-scale slice
+- `plots/`: static PNG figures for reports and slides
+
 Important defaults:
 
 - default dataset: `data/temporal_reasoning_eval.jsonl`
@@ -135,7 +145,7 @@ Each run writes a timestamped directory under `outputs/runs/<timestamp>/` contai
 
 Per-task records now separate:
 
-- `verification`: intrinsic validity, formula-level violations, first-violation-step metadata, and active specification details
+- `verification`: graph validity, trace grounding, formula-level violations, first-violation-step metadata, and active specification details
 - `score`: direct metrics, closure metrics, closure preservation, abstention, and overcommitment
 
 ## Datasets
@@ -156,6 +166,7 @@ See [dataset_schema.md](docs/dataset_schema.md) for the canonical schema and cur
 
 - [Architecture](docs/architecture.md)
 - [Evaluation Design](docs/evaluation_design.md)
+- [Evaluation Reporting](docs/evaluation_reporting.md)
 - [Dataset Schema](docs/dataset_schema.md)
 - [Reproducibility](docs/reproducibility.md)
 - [Limitations](docs/limitations.md)
@@ -172,6 +183,7 @@ Implemented:
 - focused LTL operators `G`, `F`, `X`, and `U` over graph-grounded predicates
 - label-aware direct metrics and ordering-closure metrics
 - overcommitment and abstention reporting
+- separate reporting for graph validity, trace grounding, parse failures, and transport failures
 - reproducible run artefacts with dataset, code, and specification metadata
 - model sweep orchestration for Ollama-backed lab evaluations
 - cross-run aggregation with static plots and counterexample summaries

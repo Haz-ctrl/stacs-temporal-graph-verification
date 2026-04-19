@@ -28,6 +28,8 @@ class Violation:
 @dataclass(frozen=True)
 class VerificationResult:
     is_valid: bool
+    graph_valid: bool
+    trace_grounded: bool
     violations: List[Violation]
     formula_violations: List[Violation]
     violation_counts: Dict[str, int]
@@ -85,9 +87,13 @@ class RunReport:
     repair_hit_rate: float
     parse_success_rate: float
     conditional_validity_rate: Optional[float]
+    conditional_trace_grounding_rate: Optional[float]
+    transport_failure_counts: Dict[str, int]
     parse_failure_counts: Dict[str, int]
     valid_count: int
     invalid_count: int
+    trace_grounded_count: int
+    trace_ungrounded_count: int
     validity_rate: float
     violation_counts: Dict[str, int]
     formula_violation_counts: Dict[str, int]

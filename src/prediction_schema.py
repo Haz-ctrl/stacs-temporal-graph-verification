@@ -38,6 +38,32 @@ def _require_string_field(obj: Dict[str, Any], key: str) -> str:
     return value
 
 
+def _get_first_present(obj: Dict[str, Any], keys: List[str]) -> Any:
+    for key in keys:
+        if key in obj:
+            return obj[key]
+    return None
+
+
+def _coerce_step_id(value: Any, *, index: int) -> int:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.isdigit():
+        return int(value)
+    raise PredictionParseError(
+        f"reasoning step at index {index} must include integer 'step_id'."
+    )
+
+
+def _coerce_step_text(step_obj: Dict[str, Any], *, index: int) -> str:
+    value = _get_first_present(step_obj, ["text", "description", "reasoning"])
+    if not isinstance(value, str):
+        raise PredictionParseError(
+            f"reasoning step at index {index} must include string 'text'."
+        )
+    return value
+
+
 def _parse_string_list(value: Any, *, field_name: str) -> List[str]:
     if not isinstance(value, list):
         raise PredictionParseError(f"'{field_name}' must be a list of strings.")
@@ -84,14 +110,12 @@ def _parse_reasoning_steps(value: Any) -> List[ReasoningStep]:
     for idx, item in enumerate(value):
         step_obj = _require_object(item, context=f"reasoning step at index {idx}")
 
-        step_id = step_obj.get("step_id")
-        if not isinstance(step_id, int):
-            raise PredictionParseError(
-                f"reasoning step at index {idx} must include integer 'step_id'."
-            )
-
-        text = _require_string_field(step_obj, "text")
-        supports = _parse_edge_list(step_obj.get("supports", []), field_name="supports")
+        step_id = _coerce_step_id(_get_first_present(step_obj, ["step_id", "step"]), index=idx)
+        text = _coerce_step_text(step_obj, index=idx)
+        supports = _parse_edge_list(
+            _get_first_present(step_obj, ["supports", "support", "evidence"]) or [],
+            field_name="supports",
+        )
 
         steps.append(
             ReasoningStep(

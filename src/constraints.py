@@ -396,7 +396,6 @@ class ReasoningSupportConstraint(BaseInvariant):
         if not context.reasoning_steps:
             return []
 
-        pred_set = set(context.pred_edges)
         unsupported: List[dict[str, Any]] = []
         step_ids: Set[int] = set()
 
@@ -405,7 +404,7 @@ class ReasoningSupportConstraint(BaseInvariant):
             supports = getattr(step, "supports", [])
             for edge in supports:
                 canonical_edge = _to_edge(edge)
-                if canonical_edge not in pred_set:
+                if not context.graph.entails_edge(canonical_edge):
                     unsupported.append({"step_id": step_id, "edge": canonical_edge})
                     if isinstance(step_id, int):
                         step_ids.add(step_id)
@@ -665,8 +664,15 @@ class Verifier:
             default=None,
         )
         spec_sources = dict(Counter(violation.spec_source for violation in all_violations))
+        trace_only_violation_types = {"unsupported_reasoning_step", "unsupported_reasoning_reference"}
+        has_trace_violation = any(violation.type in trace_only_violation_types for violation in violations)
+        has_graph_violation = any(violation.type not in trace_only_violation_types for violation in violations)
+        graph_valid = not has_graph_violation and len(formula_violations) == 0
+        trace_grounded = not has_trace_violation
         return VerificationResult(
-            is_valid=len(all_violations) == 0,
+            is_valid=graph_valid,
+            graph_valid=graph_valid,
+            trace_grounded=trace_grounded,
             violations=violations,
             formula_violations=formula_violations,
             violation_counts=violation_counts,
