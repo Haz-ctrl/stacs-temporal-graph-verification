@@ -1,0 +1,88 @@
+{
+  "run_id": "2026-04-11_133307UTC",
+  "predictions_file": "outputs/runs/controls/canonical_gold/2026-04-11_133307UTC/predictions.jsonl",
+  "pred_source": "gold",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 150,
+    "expected_valid_tasks": 130,
+    "expected_invalid_tasks": 20
+  },
+  "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+  "model_metadata": {
+    "provider": "synthetic",
+    "model": "deepseek-r1:7b",
+    "prediction_mode": "gold",
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "run_config": {
+    "run_id": "2026-04-11_133307UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 150,
+    "pred_source": "gold",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 150,
+  "num_failures": 0,
+  "failures": [],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 1.0,
+  "conditional_validity_rate": 0.8666666666666667,
+  "parse_failure_counts": {},
+  "valid_count": 130,
+  "invalid_count": 20,
+  "validity_rate": 0.8666666666666667,
+  "violation_counts": {
+    "contradiction": 20,
+    "cycle": 20,
+    "temporal_inconsistency": 20
+  },
+  "formula_violation_counts": {
+    "ltl_contradiction": 20,
+    "ltl_temporal_inconsistency": 20
+  },
+  "first_violation_step_histogram": {
+    "0": 20
+  },
+  "taxonomy_counts": {
+    "structural": 60
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 30,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "correct": 378,
+      "pred_total": 378,
+      "gold_total": 378
+    },
+    "closure": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "correct": 657,
+      "pred_total": 657,
+      "gold_total": 657
+    }
+  },
+  "report_path": "outputs/runs/controls/canonical_gold/2026-04-11_133307UTC/report.json"
+}

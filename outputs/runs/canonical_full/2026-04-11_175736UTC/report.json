@@ -1,0 +1,231 @@
+{
+  "run_id": "2026-04-11_175736UTC",
+  "predictions_file": "outputs/runs/canonical_full/2026-04-11_175736UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 150,
+    "expected_valid_tasks": 130,
+    "expected_invalid_tasks": 20
+  },
+  "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "mistral:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-04-11T14:17:41.060507071+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-04-11T14:15:24.414113227+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-04-11T14:14:28.863953367+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-04-11T14:12:21.007585421+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-04-11T14:09:21.147061316+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "2026-04-11_175736UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 150,
+    "pred_source": "llm",
+    "model": "mistral:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": true,
+    "validate_data": true,
+    "strict_data": false,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 150,
+  "num_failures": 4,
+  "failures": [
+    {
+      "id": "amb_029",
+      "category": "invalid_edge_support",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': 'Noah sent an email at the office'. Invalid edge format (expected 3 items): 'Noah sent an email at the office'\")",
+      "raw_output": "{\n  \"answer\": \"Noah sent an email at the office BEFORE Omar started the car at the caf\u00e9 AND Sara uploaded the file in the lab\",\n  \"events\": [\"Omar started the car at the caf\u00e9\", \"Noah sent an email at the office\", \"Sara uploaded the file in the lab\"],\n  \"relations\": [[\"Noah sent an email at the office\", \"Omar started the car at the caf\u00e9\", \"BEFORE\"], [\"Noah sent an email at the office\", \"Sara uploaded the file in the lab\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The events take place in different locations, so the order of events at each location is independent.\",\n      \"supports\": []\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Noah's email is sent at the office, which is a location distinct from the caf\u00e9 where Omar starts the car.\",\n      \"supports\": [\"Noah sent an email at the office\"]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"There is no information provided to suggest that Noah's email was sent after Omar started the car.\",\n      \"supports\": []\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Therefore, Noah's email was sent before Omar started the car.\",\n      \"supports\": [\"Noah sent an email at the office\", \"Omar started the car at the caf\u00e9\", \"BEFORE\"]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Similarly, Sara's file upload is in a different location (the lab) from both the office and the caf\u00e9.\",\n      \"supports\": [\"Sara uploaded the file in the lab\"]\n    },\n    {\n      \"step_id\": 6,\n      \"text\": \"There is no information provided to suggest that Sara's file upload was after Noah sent his email.\",\n      \"supports\": []\n    },\n    {\n      \"step_id\": 7,\n      \"text\": \"Therefore, Sara's file upload was also before Noah sent his email.\",\n      \"supports\": [\"Noah sent an email at the office\", \"Sara uploaded the file in the lab\", \"BEFORE\"]\n    }\n  ]\n}"
+    },
+    {
+      "id": "lc_020",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': 'Kai locked the bike in the lab'. Invalid edge format (expected 3 items): 'Kai locked the bike in the lab'\")",
+      "raw_output": "{\n  \"answer\": \"Priya boarded the train at the caf\u00e9 is after Sofia uploaded the file at the caf\u00e9 and after Kai locked the bike in the lab.\",\n  \"events\": [\"Ben watered the plants at the office\", \"Sofia uploaded the file at the caf\u00e9\", \"Kai locked the bike in the lab\", \"Priya boarded the train at the caf\u00e9\"],\n  \"relations\": [[\"Ben watered the plants at the office\", \"Sofia uploaded the file at the caf\u00e9\", \"AFTER\"], [\"Sofia uploaded the file at the caf\u00e9\", \"Kai locked the bike in the lab\", \"AFTER\"], [\"Kai locked the bike in the lab\", \"Priya boarded the train at the caf\u00e9\", \"AFTER\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ben watered the plants at the office is not related to Sofia uploading the file at the caf\u00e9, Kai locking the bike in the lab, or Priya boarding the train at the caf\u00e9.\",\n      \"supports\": []\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sofia uploaded the file at the caf\u00e9 is before Kai locking the bike in the lab and before Priya boarding the train at the caf\u00e9.\",\n      \"supports\": [[\"Sofia uploaded the file at the caf\u00e9\", \"Kai locked the bike in the lab\", \"BEFORE\"], [\"Sofia uploaded the file at the caf\u00e9\", \"Priya boarded the train at the caf\u00e9\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Kai locking the bike in the lab is before Priya boarding the train at the caf\u00e9.\",\n      \"supports\": [\"Kai locked the bike in the lab\", \"Priya boarded the train at the caf\u00e9\", \"AFTER\"]\n    }\n  ]\n}"
+    },
+    {
+      "id": "lc_036",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['Lina fed the cat at the caf\u00e9', 'Nora ran the tests at home', 'Nora started the car at the station']. Unsupported relation label: 'Nora started the car at the station'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "raw_output": "{\n  \"answer\": \"Nora started the car at the station is after Nora ran the tests at home\",\n  \"events\": [\"Lina fed the cat at the caf\u00e9\", \"Nora ran the tests at home\", \"Nora started the car at the station\"],\n  \"relations\": [[\"Nora ran the tests at home\", \"Nora started the car at the station\", \"AFTER\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The order of events is given as Lina fed the cat at the caf\u00e9, Nora ran the tests at home, and Nora started the car at the station.\",\n      \"supports\": [[\"Lina fed the cat at the caf\u00e9\", \"Nora ran the tests at home\", \"Nora started the car at the station\"], [\"Nora ran the tests at home\", \"Nora started the car at the station\", \"AFTER\"]]\n    }\n  ]\n}"
+    },
+    {
+      "id": "lc_010",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['Ruby locked the bike at the caf\u00e9', 'Omar ran the tests in the classroom', 'Jon installed the update at the caf\u00e9']. Unsupported relation label: 'Jon installed the update at the caf\u00e9'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "raw_output": "{\n  \"answer\": \"Jon installed the update at the caf\u00e9 is after Omar ran the tests in the classroom\",\n  \"events\": [\"Ruby locked the bike at the caf\u00e9\", \"Omar ran the tests in the classroom\", \"Jon installed the update at the caf\u00e9\"],\n  \"relations\": [[\"Omar ran the tests in the classroom\", \"Jon installed the update at the caf\u00e9\", \"AFTER\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The order of events is given as Ruby locked the bike at the caf\u00e9, then Omar ran the tests in the classroom, and finally Jon installed the update at the caf\u00e9.\",\n      \"supports\": [[\"Ruby locked the bike at the caf\u00e9\", \"Omar ran the tests in the classroom\", \"Jon installed the update at the caf\u00e9\"], [\"Omar ran the tests in the classroom\", \"Jon installed the update at the caf\u00e9\", \"AFTER\"]]\n    }\n  ]\n}"
+    }
+  ],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 0.9733333333333334,
+  "conditional_validity_rate": 0.6438356164383562,
+  "parse_failure_counts": {
+    "invalid_edge_support": 4
+  },
+  "valid_count": 94,
+  "invalid_count": 52,
+  "validity_rate": 0.6266666666666667,
+  "violation_counts": {
+    "unsupported_reasoning_step": 37,
+    "contradiction": 13,
+    "cycle": 14,
+    "temporal_inconsistency": 14,
+    "hallucinated_node": 2,
+    "unsupported_reasoning_reference": 1
+  },
+  "formula_violation_counts": {
+    "ltl_contradiction": 18,
+    "ltl_temporal_inconsistency": 20,
+    "ltl_hallucinated_node": 1
+  },
+  "first_violation_step_histogram": {
+    "1": 42,
+    "3": 1,
+    "2": 6,
+    "0": 1,
+    "4": 2
+  },
+  "taxonomy_counts": {
+    "reasoning_trace": 37,
+    "structural": 41,
+    "grounding": 3
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 29,
+    "num_overcommit_tasks": 29,
+    "num_overcommit_edges": 30,
+    "task_overcommit_rate": 1.0,
+    "avg_overcommit_edges_per_gold_empty_task": 1.0344827586206897
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.5392156862745098,
+      "recall": 0.29649595687331537,
+      "f1": 0.3826086956521739,
+      "correct": 110,
+      "pred_total": 204,
+      "gold_total": 371
+    },
+    "closure": {
+      "precision": 0.6677740863787376,
+      "recall": 0.3116279069767442,
+      "f1": 0.4249471458773784,
+      "correct": 201,
+      "pred_total": 301,
+      "gold_total": 645
+    }
+  },
+  "report_path": "outputs/runs/canonical_full/2026-04-11_175736UTC/report.json"
+}

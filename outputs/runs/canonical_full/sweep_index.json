@@ -1,0 +1,38 @@
+{
+  "data_path": "data/temporal_reasoning_eval.jsonl",
+  "seed": 42,
+  "temperature": 0.0,
+  "max_tasks": 0,
+  "runs": [
+    {
+      "run_id": "2026-04-11_142547UTC",
+      "run_dir": "outputs/runs/canonical_full/2026-04-11_142547UTC",
+      "model": "deepseek-r1:7b",
+      "label": "DeepSeek R1 7B"
+    },
+    {
+      "run_id": "2026-04-11_145329UTC",
+      "run_dir": "outputs/runs/canonical_full/2026-04-11_145329UTC",
+      "model": "qwen3.5:9b",
+      "label": "Qwen 3.5 9B"
+    },
+    {
+      "run_id": "2026-04-11_174418UTC",
+      "run_dir": "outputs/runs/canonical_full/2026-04-11_174418UTC",
+      "model": "llama3.1:8b",
+      "label": "Llama 3.1 8B"
+    },
+    {
+      "run_id": "2026-04-11_175736UTC",
+      "run_dir": "outputs/runs/canonical_full/2026-04-11_175736UTC",
+      "model": "mistral:7b",
+      "label": "Mistral 7B"
+    },
+    {
+      "run_id": "2026-04-11_180851UTC",
+      "run_dir": "outputs/runs/canonical_full/2026-04-11_180851UTC",
+      "model": "gemma3:12b",
+      "label": "Gemma 3 12B"
+    }
+  ]
+}
