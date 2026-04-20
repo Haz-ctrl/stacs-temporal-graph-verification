@@ -281,15 +281,6 @@ def validate_tasks(
             if profile == "canonical":
                 sev2: Literal["error", "warning"] = "warning" if not strict else "error"
                 add_issue(task_id, sev2, "unknown_category", "Unknown canonical category value.", category=cat)
-            else:
-                sev2 = "warning" if strict else "warning"
-                add_issue(
-                    task_id,
-                    sev2,
-                    "noncanonical_category",
-                    "Category is outside the canonical synthetic benchmark taxonomy.",
-                    category=cat,
-                )
 
     num_errors = sum(1 for it in issues if it.severity == "error")
     num_warnings = sum(1 for it in issues if it.severity == "warning")

@@ -1,0 +1,194 @@
+{
+  "input_root": "tmp/tieval_data/tempeval_3",
+  "splits": [
+    "test"
+  ],
+  "num_tasks": 496,
+  "relation_counts": {
+    "AFTER": 170,
+    "BEFORE": 228,
+    "SIMULTANEOUS": 98
+  },
+  "documents": [
+    {
+      "document_id": "AP_20130322",
+      "split": "test",
+      "total_tlinks": 44,
+      "event_event_tlinks": 21,
+      "converted_tasks": 16,
+      "skipped_unmapped_relations": 5,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "CNN_20130321_821",
+      "split": "test",
+      "total_tlinks": 12,
+      "event_event_tlinks": 6,
+      "converted_tasks": 5,
+      "skipped_unmapped_relations": 1,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "CNN_20130322_1003",
+      "split": "test",
+      "total_tlinks": 102,
+      "event_event_tlinks": 65,
+      "converted_tasks": 64,
+      "skipped_unmapped_relations": 1,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "CNN_20130322_1243",
+      "split": "test",
+      "total_tlinks": 15,
+      "event_event_tlinks": 6,
+      "converted_tasks": 5,
+      "skipped_unmapped_relations": 1,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "CNN_20130322_248",
+      "split": "test",
+      "total_tlinks": 30,
+      "event_event_tlinks": 21,
+      "converted_tasks": 20,
+      "skipped_unmapped_relations": 1,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "CNN_20130322_314",
+      "split": "test",
+      "total_tlinks": 43,
+      "event_event_tlinks": 31,
+      "converted_tasks": 26,
+      "skipped_unmapped_relations": 5,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "WSJ_20130318_731",
+      "split": "test",
+      "total_tlinks": 36,
+      "event_event_tlinks": 23,
+      "converted_tasks": 23,
+      "skipped_unmapped_relations": 0,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "WSJ_20130321_1145",
+      "split": "test",
+      "total_tlinks": 37,
+      "event_event_tlinks": 12,
+      "converted_tasks": 9,
+      "skipped_unmapped_relations": 3,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "WSJ_20130322_159",
+      "split": "test",
+      "total_tlinks": 63,
+      "event_event_tlinks": 51,
+      "converted_tasks": 43,
+      "skipped_unmapped_relations": 8,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "WSJ_20130322_804",
+      "split": "test",
+      "total_tlinks": 44,
+      "event_event_tlinks": 24,
+      "converted_tasks": 22,
+      "skipped_unmapped_relations": 2,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "bbc_20130322_1150",
+      "split": "test",
+      "total_tlinks": 65,
+      "event_event_tlinks": 39,
+      "converted_tasks": 38,
+      "skipped_unmapped_relations": 1,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "bbc_20130322_1353",
+      "split": "test",
+      "total_tlinks": 55,
+      "event_event_tlinks": 45,
+      "converted_tasks": 37,
+      "skipped_unmapped_relations": 8,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "bbc_20130322_1600",
+      "split": "test",
+      "total_tlinks": 27,
+      "event_event_tlinks": 19,
+      "converted_tasks": 12,
+      "skipped_unmapped_relations": 7,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "bbc_20130322_332",
+      "split": "test",
+      "total_tlinks": 67,
+      "event_event_tlinks": 48,
+      "converted_tasks": 25,
+      "skipped_unmapped_relations": 23,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "bbc_20130322_721",
+      "split": "test",
+      "total_tlinks": 30,
+      "event_event_tlinks": 23,
+      "converted_tasks": 18,
+      "skipped_unmapped_relations": 5,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "nyt_20130321_china_pollution",
+      "split": "test",
+      "total_tlinks": 67,
+      "event_event_tlinks": 33,
+      "converted_tasks": 25,
+      "skipped_unmapped_relations": 8,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "nyt_20130321_cyprus",
+      "split": "test",
+      "total_tlinks": 79,
+      "event_event_tlinks": 51,
+      "converted_tasks": 48,
+      "skipped_unmapped_relations": 3,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "nyt_20130321_sarcozy",
+      "split": "test",
+      "total_tlinks": 24,
+      "event_event_tlinks": 17,
+      "converted_tasks": 17,
+      "skipped_unmapped_relations": 0,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "nyt_20130321_women_senate",
+      "split": "test",
+      "total_tlinks": 69,
+      "event_event_tlinks": 34,
+      "converted_tasks": 28,
+      "skipped_unmapped_relations": 6,
+      "skipped_missing_instances": 0
+    },
+    {
+      "document_id": "nyt_20130322_strange_computer",
+      "split": "test",
+      "total_tlinks": 26,
+      "event_event_tlinks": 17,
+      "converted_tasks": 15,
+      "skipped_unmapped_relations": 2,
+      "skipped_missing_instances": 0
+    }
+  ]
+}

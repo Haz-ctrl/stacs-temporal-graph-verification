@@ -86,14 +86,55 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     assert (out_dir / "plots" / "direct_vs_closure_f1.png").exists()
     assert (out_dir / "plots" / "ambiguity_behaviour.png").exists()
     assert (out_dir / "plots" / "contradiction_detection_rate.png").exists()
+    assert (out_dir / "plots" / "validity_expectation_alignment_rate.png").exists()
     assert (out_dir / "plots" / "verification_task_incidence.png").exists()
     assert any(row["model_label"] == "gold-baseline" for row in result["summary"])
     assert any(row["category"] == "ambiguous" for row in result["category_breakdown"])
     assert any(row["difficulty"] == "empty_gold" for row in result["difficulty_breakdown"])
     gold_row = next(row for row in result["summary"] if row["model_label"] == "gold-baseline")
     assert gold_row["parse_success_ci_low"] is not None
+    assert gold_row["validity_expectation_alignment_rate"] == 1.0
+    assert gold_row["validity_expectation_alignment_rate_e2e"] == 1.0
+    assert gold_row["avg_first_violation_step"] is None
+    assert gold_row["fidelity_direct_f1"] == 1.0
+    assert gold_row["fidelity_closure_f1"] == 1.0
     ambiguous_row = next(
         row for row in result["category_breakdown"]
         if row["model_label"] == "gold-baseline" and row["category"] == "ambiguous"
     )
     assert ambiguous_row["direct_f1"] is None
+
+
+def test_summarise_runs_auto_loads_run_manifest(tmp_path: Path) -> None:
+    dataset_path = tmp_path / "eval.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "lc_001",
+                "category": "linear_chain",
+                "question": "A happened before B.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_valid": True,
+                "expected_consistent": True,
+            },
+        ],
+    )
+
+    run = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="gold",
+            output_root=tmp_path / "runs",
+        )
+    )
+
+    manifest_path = (tmp_path / "runs") / "run_manifest.json"
+    manifest_path.write_text(
+        json.dumps({"runs": {run.run_id: {"model_label": "gold-auto"}}}),
+        encoding="utf-8",
+    )
+
+    result = summarise_runs([run.run_dir], out_dir=tmp_path / "analysis")
+    assert result["summary"][0]["model_label"] == "gold-auto"

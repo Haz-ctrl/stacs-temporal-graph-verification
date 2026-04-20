@@ -1,35 +1,35 @@
 run_id,model_label,failure_scope,failure_type,event_count,affected_tasks,affected_task_rate
-2026-04-19_160821UTC,deepseek-r1:7b,ltl_formula,ltl_contradiction,2,2,0.013333333333333334
-2026-04-19_160821UTC,deepseek-r1:7b,ltl_formula,ltl_hallucinated_node,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,ltl_formula,ltl_temporal_inconsistency,2,2,0.013333333333333334
-2026-04-19_160821UTC,deepseek-r1:7b,parse,invalid_edge_support,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,parse,invalid_json,32,32,0.21333333333333335
-2026-04-19_160821UTC,deepseek-r1:7b,transport,transport_timeout,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,contradiction,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,cycle,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,hallucinated_node,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,temporal_inconsistency,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,unsupported_reasoning_reference,1,1,0.006666666666666667
-2026-04-19_160821UTC,deepseek-r1:7b,verification,unsupported_reasoning_step,6,6,0.04
-2026-04-19_163647UTC,qwen3.5:9b,ltl_formula,ltl_contradiction,14,14,0.09333333333333334
-2026-04-19_163647UTC,qwen3.5:9b,ltl_formula,ltl_temporal_inconsistency,14,14,0.09333333333333334
-2026-04-19_163647UTC,qwen3.5:9b,transport,transport_timeout,10,10,0.06666666666666667
-2026-04-19_163647UTC,qwen3.5:9b,verification,contradiction,8,8,0.05333333333333334
-2026-04-19_163647UTC,qwen3.5:9b,verification,cycle,8,8,0.05333333333333334
-2026-04-19_163647UTC,qwen3.5:9b,verification,temporal_inconsistency,8,8,0.05333333333333334
-2026-04-19_163647UTC,qwen3.5:9b,verification,unsupported_reasoning_step,6,6,0.04
-2026-04-19_192221UTC,llama3.1:8b,ltl_formula,ltl_contradiction,18,18,0.12
-2026-04-19_192221UTC,llama3.1:8b,ltl_formula,ltl_temporal_inconsistency,19,19,0.12666666666666668
-2026-04-19_192221UTC,llama3.1:8b,verification,contradiction,18,18,0.12
-2026-04-19_192221UTC,llama3.1:8b,verification,cycle,19,19,0.12666666666666668
-2026-04-19_192221UTC,llama3.1:8b,verification,temporal_inconsistency,19,19,0.12666666666666668
-2026-04-19_192221UTC,llama3.1:8b,verification,unsupported_reasoning_step,6,6,0.04
-2026-04-19_193445UTC,mistral:7b,ltl_formula,ltl_contradiction,16,16,0.10666666666666667
-2026-04-19_193445UTC,mistral:7b,ltl_formula,ltl_hallucinated_node,1,1,0.006666666666666667
-2026-04-19_193445UTC,mistral:7b,ltl_formula,ltl_temporal_inconsistency,18,18,0.12
-2026-04-19_193445UTC,mistral:7b,parse,invalid_edge_support,5,5,0.03333333333333333
-2026-04-19_193445UTC,mistral:7b,verification,contradiction,13,13,0.08666666666666667
-2026-04-19_193445UTC,mistral:7b,verification,cycle,14,14,0.09333333333333334
-2026-04-19_193445UTC,mistral:7b,verification,hallucinated_node,1,1,0.006666666666666667
-2026-04-19_193445UTC,mistral:7b,verification,temporal_inconsistency,14,14,0.09333333333333334
-2026-04-19_193445UTC,mistral:7b,verification,unsupported_reasoning_step,32,32,0.21333333333333335
+2026-04-19_160821UTC,DeepSeek R1 7B,ltl_formula,ltl_contradiction,2,2,0.013333333333333334
+2026-04-19_160821UTC,DeepSeek R1 7B,ltl_formula,ltl_hallucinated_node,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,ltl_formula,ltl_temporal_inconsistency,2,2,0.013333333333333334
+2026-04-19_160821UTC,DeepSeek R1 7B,parse,invalid_edge_support,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,parse,invalid_json,32,32,0.21333333333333335
+2026-04-19_160821UTC,DeepSeek R1 7B,transport,transport_timeout,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,contradiction,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,cycle,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,hallucinated_node,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,temporal_inconsistency,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,unsupported_reasoning_reference,1,1,0.006666666666666667
+2026-04-19_160821UTC,DeepSeek R1 7B,verification,unsupported_reasoning_step,6,6,0.04
+2026-04-19_163647UTC,Qwen 3.5 9B,ltl_formula,ltl_contradiction,14,14,0.09333333333333334
+2026-04-19_163647UTC,Qwen 3.5 9B,ltl_formula,ltl_temporal_inconsistency,14,14,0.09333333333333334
+2026-04-19_163647UTC,Qwen 3.5 9B,transport,transport_timeout,10,10,0.06666666666666667
+2026-04-19_163647UTC,Qwen 3.5 9B,verification,contradiction,8,8,0.05333333333333334
+2026-04-19_163647UTC,Qwen 3.5 9B,verification,cycle,8,8,0.05333333333333334
+2026-04-19_163647UTC,Qwen 3.5 9B,verification,temporal_inconsistency,8,8,0.05333333333333334
+2026-04-19_163647UTC,Qwen 3.5 9B,verification,unsupported_reasoning_step,6,6,0.04
+2026-04-19_192221UTC,Llama 3.1 8B,ltl_formula,ltl_contradiction,18,18,0.12
+2026-04-19_192221UTC,Llama 3.1 8B,ltl_formula,ltl_temporal_inconsistency,19,19,0.12666666666666668
+2026-04-19_192221UTC,Llama 3.1 8B,verification,contradiction,18,18,0.12
+2026-04-19_192221UTC,Llama 3.1 8B,verification,cycle,19,19,0.12666666666666668
+2026-04-19_192221UTC,Llama 3.1 8B,verification,temporal_inconsistency,19,19,0.12666666666666668
+2026-04-19_192221UTC,Llama 3.1 8B,verification,unsupported_reasoning_step,6,6,0.04
+2026-04-19_193445UTC,Mistral 7B,ltl_formula,ltl_contradiction,16,16,0.10666666666666667
+2026-04-19_193445UTC,Mistral 7B,ltl_formula,ltl_hallucinated_node,1,1,0.006666666666666667
+2026-04-19_193445UTC,Mistral 7B,ltl_formula,ltl_temporal_inconsistency,18,18,0.12
+2026-04-19_193445UTC,Mistral 7B,parse,invalid_edge_support,5,5,0.03333333333333333
+2026-04-19_193445UTC,Mistral 7B,verification,contradiction,13,13,0.08666666666666667
+2026-04-19_193445UTC,Mistral 7B,verification,cycle,14,14,0.09333333333333334
+2026-04-19_193445UTC,Mistral 7B,verification,hallucinated_node,1,1,0.006666666666666667
+2026-04-19_193445UTC,Mistral 7B,verification,temporal_inconsistency,14,14,0.09333333333333334
+2026-04-19_193445UTC,Mistral 7B,verification,unsupported_reasoning_step,32,32,0.21333333333333335

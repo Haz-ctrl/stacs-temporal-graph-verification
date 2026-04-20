@@ -18,7 +18,9 @@ The canonical synthetic dataset is still dominated by `BEFORE` relations. The co
 
 ## Benchmark Breadth
 
-The repo does not yet include production-ready dataset adapters for external benchmarks such as TORQUE or TempEval.
+The repo now includes a TempEval-3 Platinum event-event import path, but only through a conservative coarse mapping onto the current relation set.
+
+It does not yet support the full TimeML interval algebra end-to-end, and it still does not include broader benchmark adapters such as TORQUE.
 
 ## Visualisation
 

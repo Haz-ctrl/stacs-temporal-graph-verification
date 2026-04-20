@@ -38,6 +38,23 @@ The canonical synthetic dataset currently uses `BEFORE` relations for gold annot
 
 The graph and scoring code supports additional relation labels (`AFTER`, `SIMULTANEOUS`, `UNKNOWN`), but the canonical synthetic generator has not yet expanded gold dataset coverage to those labels.
 
+## TempEval Slice
+
+`data/tempeval_eval.jsonl` is an external evaluation slice derived from TempEval-3 Platinum TimeML annotations.
+
+It is intentionally a coarse event-event subset:
+
+- source corpus: TempEval-3 Platinum test documents
+- unit of evaluation: one event-event TLINK per task
+- retained relations: `BEFORE`, `IBEFORE`, `AFTER`, `IAFTER`, `SIMULTANEOUS`, `IDENTITY`
+- coarse mapping:
+  - `BEFORE`, `IBEFORE` -> `BEFORE`
+  - `AFTER`, `IAFTER` -> `AFTER`
+  - `SIMULTANEOUS`, `IDENTITY` -> `SIMULTANEOUS`
+- excluded relations: interval-specific labels such as `INCLUDES`, `IS_INCLUDED`, `BEGINS`, `ENDS`
+
+This keeps the benchmark slice aligned with the current graph semantics without overstating support for the full TimeML relation algebra.
+
 ## Legacy Files
 
 Some files under `data/` predate the canonical schema or use older category names. They are retained for exploratory work and fixtures, but the recommended runnable dataset is:
