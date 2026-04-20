@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-04-11_174418UTC",
-  "predictions_file": "outputs/runs/canonical_full/2026-04-11_174418UTC/predictions.jsonl",
+  "run_id": "2026-04-19_192221UTC",
+  "predictions_file": "outputs/runs/canonical_full/2026-04-19_192221UTC/predictions.jsonl",
   "pred_source": "llm",
   "dataset": {
     "path": "data/temporal_reasoning_eval.jsonl",
@@ -9,7 +9,7 @@
     "expected_valid_tasks": 130,
     "expected_invalid_tasks": 20
   },
-  "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+  "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
   "model_metadata": {
     "provider": "ollama",
     "model": "llama3.1:8b",
@@ -108,7 +108,7 @@
     "prediction_mode": "structured_json"
   },
   "run_config": {
-    "run_id": "2026-04-11_174418UTC",
+    "run_id": "2026-04-19_192221UTC",
     "data_path": "data/temporal_reasoning_eval.jsonl",
     "num_tasks": 150,
     "pred_source": "llm",
@@ -119,8 +119,11 @@
     "log_raw": true,
     "validate_data": true,
     "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 1,
+    "retry_backoff_s": 2.0,
     "dataset_version": "temporal_reasoning_eval",
-    "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+    "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
     "specification_name": "default_temporal_spec"
   },
   "num_tasks": 150,
@@ -129,55 +132,58 @@
   "repair_hit_count": 0,
   "repair_hit_rate": 0.0,
   "parse_success_rate": 1.0,
-  "conditional_validity_rate": 0.8133333333333334,
+  "conditional_validity_rate": 0.8733333333333333,
+  "conditional_trace_grounding_rate": 0.96,
+  "transport_failure_counts": {},
   "parse_failure_counts": {},
-  "valid_count": 122,
-  "invalid_count": 28,
-  "validity_rate": 0.8133333333333334,
+  "valid_count": 131,
+  "invalid_count": 19,
+  "trace_grounded_count": 144,
+  "trace_ungrounded_count": 6,
+  "validity_rate": 0.8733333333333333,
   "violation_counts": {
-    "contradiction": 20,
-    "cycle": 20,
-    "temporal_inconsistency": 20,
-    "unsupported_reasoning_step": 7,
-    "duplicate_edge": 1
+    "contradiction": 18,
+    "cycle": 19,
+    "temporal_inconsistency": 19,
+    "unsupported_reasoning_step": 6
   },
   "formula_violation_counts": {
-    "ltl_contradiction": 20,
-    "ltl_temporal_inconsistency": 20
+    "ltl_contradiction": 18,
+    "ltl_temporal_inconsistency": 19
   },
   "first_violation_step_histogram": {
-    "1": 24,
-    "2": 3
+    "1": 23,
+    "3": 1,
+    "2": 1
   },
   "taxonomy_counts": {
-    "structural": 60,
-    "reasoning_trace": 7,
-    "format": 1
+    "structural": 56,
+    "reasoning_trace": 6
   },
   "overcommitment": {
     "num_gold_empty_tasks": 30,
     "num_overcommit_tasks": 30,
-    "num_overcommit_edges": 34,
+    "num_overcommit_edges": 33,
     "task_overcommit_rate": 1.0,
-    "avg_overcommit_edges_per_gold_empty_task": 1.1333333333333333
+    "avg_overcommit_edges_per_gold_empty_task": 1.1
   },
   "metrics_expected_valid_only": {
     "direct": {
-      "precision": 0.627906976744186,
-      "recall": 0.5714285714285714,
-      "f1": 0.5983379501385041,
-      "correct": 216,
-      "pred_total": 344,
+      "precision": 0.5891238670694864,
+      "recall": 0.5158730158730159,
+      "f1": 0.5500705218617772,
+      "correct": 195,
+      "pred_total": 331,
       "gold_total": 378
     },
     "closure": {
-      "precision": 0.7847113884555382,
-      "recall": 0.7656012176560122,
-      "f1": 0.7750385208012327,
-      "correct": 503,
-      "pred_total": 641,
+      "precision": 0.7278911564625851,
+      "recall": 0.6514459665144596,
+      "f1": 0.6875502008032129,
+      "correct": 428,
+      "pred_total": 588,
       "gold_total": 657
     }
   },
-  "report_path": "outputs/runs/canonical_full/2026-04-11_174418UTC/report.json"
+  "report_path": "outputs/runs/canonical_full/2026-04-19_192221UTC/report.json"
 }

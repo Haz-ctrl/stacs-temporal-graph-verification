@@ -1,0 +1,537 @@
+{
+  "run_id": "2026-04-19_160821UTC",
+  "predictions_file": "outputs/runs/canonical_full/2026-04-19_160821UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 150,
+    "expected_valid_tasks": 130,
+    "expected_invalid_tasks": 20
+  },
+  "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-04-11T14:17:41.060507071+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-04-11T14:15:24.414113227+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-04-11T14:14:28.863953367+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-04-11T14:12:21.007585421+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-04-11T14:09:21.147061316+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "2026-04-19_160821UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 150,
+    "pred_source": "llm",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": true,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 1,
+    "retry_backoff_s": 2.0,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 150,
+  "num_failures": 34,
+  "failures": [
+    {
+      "id": "long_014",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 7,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\n    \"Sofia closed the window at home\",\n    \"Jon printed the handouts in the lab\",\n    \"Ethan opened the door at the station\",\n    \"Sofia started the meeting in the classroom\",\n    \"Zara sent an email in the garden\",\n    \"Priya paid the bill in the lab\",\n    \"Ethan watered the plants at the office\"\n  ],\n  \"relations\": [\n    [\"Sofia closed the window at home\", \"Jon printed the handouts in the lab\", \"BEFORE\"],\n    [\"Zara sent an email in the garden\", \"Priya paid the bill in the lab\", \"BEFORE\"],\n    [\"Ethan opened the door at the station\", \"Sofia started the meeting in the classroom\", \"BEFORE\"],\n    [\"Ethan opened the door at the station\", \"Zara sent an email in the garden\", \"BEFORE\"],\n    [\"Ethan opened the door at the station\", \"Priya paid the bill in the lab\", \"BEFORE\"],\n    [\"Ethan opened the door at the station\", \"Ethan watered the plants at the office\", \"BEFORE\"]\n  ],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Sofia closed the window at home happened before Jon printed the handouts in the lab.\",\n      \"supports\": [[\"Sofia closed the window at home\", \"Jon printed the handouts in the lab\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Zara sent an email in the garden happened before Priya paid the bill in the lab.\",\n      \"supports\": [[\"Zara sent an email in the garden\", \"Priya paid the bill in the lab\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Ethan opened the door at the station happened before Sofia started the meeting in the classroom.\",\n      \"supports\": [[\"Ethan opened the door at the station\", \"Sofia started the meeting in the classroom\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Ethan opened the door at the station happened before Zara sent an email in the garden.\",\n      \"supports\": [[\"Ethan opened the door at the station\", \"Zara sent an email in the garden\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Ethan opened the door at the station happened before Priya paid the bill in the lab.\",\n      \"supports\": [[\"Ethan opened the door at the station\", \"Priya paid the bill in the lab\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 6,\n      \"text\": \"Ethan opened the door at the station happened before Ethan watered the plants at the office.\",\n      \"supports\": [[\"Ethan opened the door at the station\", \"Ethan watered the plants at the office\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_022",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"string\",\n  \"events\": [\"Sam washed the dishes at the office\", \"Hana started the meeting at home\", \"Ruby locked the bike in the hallway\"],\n  \"relations\": [[\"Sam washed the dishes at the office\", \"Hana started the meeting at home\", \"BEFORE\"], [\"Ruby locked the bike in the hallway\", \"Sam washed the dishes at the office\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Hana started the meeting at home immediately after Sam washed the dishes at the office.\",\n      \"supports\": [[\"Sam washed the dishes at the office\", \"Hana started the meeting at home\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Before Hana started the meeting, Ruby locked the bike in the hallway.\",\n      \"supports\": [[\"Ruby locked the bike in the hallway\", \"Sam washed the dishes at the office\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "amb_001",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Sofia making tea in the classroom and Hana opening the door in the garden are in different locations.\",\n      \"supports\": [[\"Sofia made tea in the classroom\", \"Hana opened the door in the garden\", \"UNKNOWN\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_015",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "{\n  \"answer\": \"Lina received a confirmation email in the classroom before Zara packed a bag in the kitchen, which in turn happened before Mia set an alarm at the office.\",\n  \"events\": [\"Lina received a confirmation email in the classroom\", \"Zara packed a bag in the kitchen\", \"Mia set an alarm at the office\"],\n  \"relations\": [[\"Lina received a confirmation email in the classroom\", \"Zara packed a bag in the kitchen\", \"BEFORE\"], [\"Zara packed a bag in the kitchen\", \"Mia set an alarm at the office\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Lina received a confirmation email in the classroom before Zara packed a bag in the kitchen.\",\n      \"supports\": [[\"Lina received a confirmation email in the classroom\", \"Zara packed a bag in the kitchen\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Zara packed a bag in the kitchen before Mia set an alarm at the office.\",\n      \"supports\": [[\"Zara packed a bag in the kitchen\", \"Mia set an alarm at the office\", \"BEFORE\"]]]\n    }\n  ]\n}"
+    },
+    {
+      "id": "tr_024",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"Mia fed the cat in the lab happened before Ivy boarded the train at the office, which happened before Ruby packed a bag in the hallway, which happened before Sofia watered the plants in the lab.\",\\n  \"events\": [\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\"],\\n  \"relations\": [[\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"BEFORE\"], [\"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"BEFORE\"], [\"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\", \"BEFORE\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Mia fed the cat in the lab happened before Ivy boarded the train at the office\",\\n      \"supports\": [[\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ivy boarded the train at the office happened before Ruby packed a bag in the hallway\",\\n      \"supports\": [[\"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Ruby packed a bag in the hallway happened before Sofia watered the plants in the lab\",\\n      \"supports\": [[\"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"Mia fed the cat in the lab happened before Ivy boarded the train at the office, which happened before Ruby packed a bag in the hallway, which happened before Sofia watered the plants in the lab.\",\n  \"events\": [\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\"],\n  \"relations\": [[\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"BEFORE\"], [\"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"BEFORE\"], [\"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Mia fed the cat in the lab happened before Ivy boarded the train at the office\",\n      \"supports\": [[\"Mia fed the cat in the lab\", \"Ivy boarded the train at the office\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ivy boarded the train at the office happened before Ruby packed a bag in the hallway\",\n      \"supports\": [[\"Ivy boarded the train at the office\", \"Ruby packed a bag in the hallway\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Ruby packed a bag in the hallway happened before Sofia watered the plants in the lab\",\n      \"supports\": [[\"Ruby packed a bag in the hallway\", \"Sofia watered the plants in the lab\", \"BEFORE\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "con_010",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The two events are asserted to happen in opposite orders, making the relationship unknown.\",\n      \"supports\": [[\"Omar charged the phone in the library\", \"Hana printed the handouts in the kitchen\", \"UNKNOWN\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "tr_015",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"Jon opened the door in the lab\",\\n  \"events\": [\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\"],\\n  \"relations\": [[\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"BEFORE\"], [\"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"BEFORE\"], [\"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\", \"BEFORE\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Jon opened the door in the lab happened before Ethan finished the lecture in the library\",\\n      \"supports\": [[\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ethan finished the lecture in the library happened before Ben submitted the form at the caf\u00e9\",\\n      \"supports\": [[\"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Ben submitted the form at the caf\u00e9 happened before Ava approved the release at the caf\u00e9\",\\n      \"supports\": [[\"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"Jon opened the door in the lab\",\n  \"events\": [\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\"],\n  \"relations\": [[\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"BEFORE\"], [\"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"BEFORE\"], [\"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Jon opened the door in the lab happened before Ethan finished the lecture in the library\",\n      \"supports\": [[\"Jon opened the door in the lab\", \"Ethan finished the lecture in the library\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ethan finished the lecture in the library happened before Ben submitted the form at the caf\u00e9\",\n      \"supports\": [[\"Ethan finished the lecture in the library\", \"Ben submitted the form at the caf\u00e9\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Ben submitted the form at the caf\u00e9 happened before Ava approved the release at the caf\u00e9\",\n      \"supports\": [[\"Ben submitted the form at the caf\u00e9\", \"Ava approved the release at the caf\u00e9\", \"BEFORE\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "amb_018",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The events 'Priya locked the bike at the office' and 'Hana left the station at the station' do not have a known relation.\",\n      \"supports\": []\n    }\n  ],\n  \"events\": [\"Priya locked the bike at the office\", \"Hana left the station at the station\"],\n  \"relations\": []\n}\n```"
+    },
+    {
+      "id": "long_019",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "{\n  \"answer\": \"\",\n  \"events\": [\n    \"Noah printed the handouts in the library\",\n    \"Sam approved the release in the library\",\n    \"Noah paid the bill in the classroom\",\n    \"Priya checked the battery at the station\",\n    \"Ruby fed the cat in the lab\",\n    \"Ethan closed the window at the office\"\n  ],\n  \"relations\": [\n    [\"Noah printed the handouts in the library\", \"Sam approved the release in the library\", \"AFTER\"],\n    [\"Sam approved the release in the library\", \"Noah paid the bill in the classroom\", \"AFTER\"],\n    [\"Noah paid the bill in the classroom\", \"Priya checked the battery at the station\", \"AFTER\"],\n    [\"Priya checked the battery at the station\", \"Ruby fed the cat in the lab\", \"AFTER\"],\n    [\"Ruby fed the cat in the lab\", \"Ethan closed the window at the office\", \"AFTER\"]\n  ],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Noah printed the handouts in the library\",\n      \"supports\": [[\"Noah printed the handouts in the library\", \"Sam approved the release in the library\", \"AFTER\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sam approved the release in the library\",\n      \"supports\": [[\"Sam approved the release in the library\", \"Noah paid the bill in the classroom\", \"AFTER\"]]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Noah paid the bill in the classroom\",\n      \"supports\": [[\"Noah paid the bill in the classroom\", \"Priya checked the battery at the station\", \"AFTER\"]]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Priya checked the battery at the station\",\n      \"supports\": [[\"Priya checked the battery at the station\", \"Ruby fed the cat in the lab\", \"AFTER\"]]]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Ruby fed the cat in the lab\",\n      \"supports\": [[\"Ruby fed the cat in the lab\", \"Ethan closed the window at the office\", \"AFTER\"]]]\n    }\n  ]\n}"
+    },
+    {
+      "id": "lc_028",
+      "category": "transport_timeout",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 1 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")"
+    },
+    {
+      "id": "long_015",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\n    \"Nora finished the lecture in the kitchen\",\n    \"Sam turned on the kettle in the lab\",\n    \"Amir ran the tests in the lab\",\n    \"Priya paid the bill at the station\",\n    \"Amir locked the bike in the kitchen\",\n    \"Amir left the station at the office\"\n  ],\n  \"relations\": [\n    [\"Nora finished the lecture in the kitchen\", \"Sam turned on the kettle in the lab\", \"UNKNOWN\"],\n    [\"Sam turned on the kettle in the lab\", \"Amir ran the tests in the lab\", \"SIMULTANEOUS\"],\n    [\"Amir ran the tests in the lab\", \"Priya paid the bill at the station\", \"UNKNOWN\"],\n    [\"Priya paid the bill at the station\", \"Amir locked the bike in the kitchen\", \"SIMULTANEOUS\"],\n    [\"Amir locked the bike in the kitchen\", \"Amir left the station at the office\", \"SIMULTANEOUS\"]\n  ],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Nora finished the lecture in the kitchen and Sam turned on the kettle in the lab are in different locations, so their relation is UNKNOWN.\",\n      \"supports\": [[\"Nora finished the lecture in the kitchen\", \"Sam turned on the kettle in the lab\", \"UNKNOWN\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sam turned on the kettle in the lab and Amir ran the tests in the lab are in the same location, so their relation is SIMULTANEOUS.\",\n      \"supports\": [[\"Sam turned on the kettle in the lab\", \"Amir ran the tests in the lab\", \"SIMULTANEOUS\"]\u7684\u7406\u89e3\u3002\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Amir ran the tests in the lab and Priya paid the bill at the station are in different locations, so their relation is UNKNOWN.\",\n      \"supports\": [[\"Amir ran the tests in the lab\", \"Priya paid the bill at the station\", \"UNKNOWN\"]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Priya paid the bill at the station and Amir locked the bike in the kitchen are in different locations, so their relation is UNKNOWN.\",\n      \"supports\": [[\"Priya paid the bill at the station\", \"Amir locked the bike in the kitchen\", \"UNKNOWN\"]]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Amir locked the bike in the kitchen and Amir left the station at the office are in the same location, so their relation is SIMULTANEOUS.\",\n      \"supports\": [[\"Amir locked the bike in the kitchen\", \"Amir left the station at the office\", \"SIMULTANEOUS\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_002",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"string\",\\n  \"events\": [\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"Kai fed the cat in the kitchen\"],\\n  \"relations\": [[\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"AFTER\"], [\"Ruby downloaded the update at the caf\u00e9\", \"Kai fed the cat in the kitchen\", \"AFTER\"], [\"Ava locked the bike in the hallway\", \"Kai fed the cat in the kitchen\", \"AFTER\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Ava locked the bike in the hallway happened first.\",\\n      \"supports\": [[\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ruby downloaded the update at the caf\u00e9 happened after Ava locked the bike in the hallway.\",\\n      \"supports\": [[\"Ruby downloaded the update at the caf\u00e9\", \"Ava locked the bike in the hallway\", \"AFTER\"]]\\n\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"string\",\n  \"events\": [\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"Kai fed the cat in the kitchen\"],\n  \"relations\": [[\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"AFTER\"], [\"Ruby downloaded the update at the caf\u00e9\", \"Kai fed the cat in the kitchen\", \"AFTER\"], [\"Ava locked the bike in the hallway\", \"Kai fed the cat in the kitchen\", \"AFTER\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ava locked the bike in the hallway happened first.\",\n      \"supports\": [[\"Ava locked the bike in the hallway\", \"Ruby downloaded the update at the caf\u00e9\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ruby downloaded the update at the caf\u00e9 happened after Ava locked the bike in the hallway.\",\n      \"supports\": [[\"Ruby downloaded the update at the caf\u00e9\", \"Ava locked the bike in the hallway\", \"AFTER\"]]\n\n```"
+    },
+    {
+      "id": "tr_006",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"Nora uploaded the file in the classroom happened before Sam boarded the train in the lab. Sam boarded the train in the lab happened before Zara submitted the form at the office. Zara submitted the form at the office happened before Amir ran the tests in the kitchen.\",\n  \"events\": [\"Nora uploaded the file in the classroom\", \"Sam boarded the train in the lab\", \"Zara submitted the form at the office\", \"Amir ran the tests in the kitchen\"],\n  \"relations\": [[\"Nora uploaded the file in the classroom\", \"Sam boarded the train in the lab\", \"BEFORE\"], [\"Sam boarded the train in the lab\", \"Zara submitted the form at the office\", \"BEFORE\"], [\"Zara submitted the form at the office\", \"Amir ran the tests in the kitchen\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Nora uploaded the file in the classroom happened before Sam boarded the train in the lab.\",\n      \"supports\": [[\"Nora uploaded the file in the classroom\", \"Sam boarded the train in the lab\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sam boarded the train in the lab happened before Zara submitted the form at the office.\",\n      \"supports\": [[\"Sam boarded the train in the lab\", \"Zara submitted the form at the office\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Zara submitted the form at the office happened before Amir ran the tests in the kitchen.\",\n      \"supports\": [[\"Zara submitted the form at the office\", \"Amir ran the tests in the kitchen\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "long_018",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Noah started the meeting in the kitchen\", \"Sam packed a bag in the garden\", \"Amir boarded the train in the garden\", \"Nora submitted the form in the hallway\", \"Mia left the station in the hallway\"],\n  \"relations\": [[\"Noah started the meeting in the kitchen\", \"Sam packed a bag in the garden\", \"BEFORE\"], [\"Sam packed a bag in the garden\", \"Amir boarded the train in the garden\", \"BEFORE\"], [\"Amir boarded the train in the garden\", \"Nora submitted the form in the hallway\", \"BEFORE\"], [\"Nora submitted the form in the hallway\", \"Mia left the station in the hallway\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Noah started the meeting in the kitchen (Event A) is before Sam packed a bag in the garden (Event B)\",\n      \"supports\": [[\"Noah started the meeting in the kitchen\", \"Sam packed a bag in the garden\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sam packed a bag in the garden (Event B) is before Amir boarded the train in the garden (Event C)\",\n      \"supports\": [[\"Sam packed a bag in the garden\", \"Amir boarded the train in the garden\", \"BEFORE\"]])\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Amir boarded the train in the garden (Event C) is before Nora submitted the form in the hallway (Event D)\",\n      \"supports\": [[\"Amir boarded the train in the garden\", \"Nora submitted the form in the hallway\", \"BEFORE\"]])\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Nora submitted the form in the hallway (Event D) is before Mia left the station in the hallway (Event E)\",\n      \"supports\": [[\"Nora submitted the form in the hallway\", \"Mia left the station in the hallway\", \"BEFORE\"]])\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_005",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"The events are ordered as Sara sending an email in the kitchen, followed by Ivy installing the update at the office, and then Jon turning on the kettle at home. Each subsequent event occurs after the previous one.\",\n  \"events\": [\"Sara sent an email in the kitchen\", \"Ivy installed the update at the office\", \"Jon turned on the kettle at home\"],\n  \"relations\": [[\"Sara sent an email in the kitchen\", \"Ivy installed the update at the office\", \"BEFORE\"], [\"Ivy installed the update at the office\", \"Jon turned on the kettle at home\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Sara sent an email in the kitchen, which is the first event.\",\n      \"supports\": [[\"Sara sent an email in the kitchen\", \"Ivy installed the update at the office\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ivy installed the update at the office, which happens after Sara's email.\",\n      \"supports\": [[\"Ivy installed the update at the office\", \"Jon turned on the kettle at home\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_031",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"string\",\n  \"events\": [\"Ruby downloaded the update in the library\", \"Zara opened the door at the office\", \"Priya checked the battery at the office\", \"Leo left the station in the hallway\"],\n  \"relations\": [[\"Ruby downloaded the update in the library\", \"Zara opened the door at the office\", \"BEFORE\"], [\"Zara opened the door at the office\", \"Priya checked the battery at the office\", \"BEFORE\"], [\"Priya checked the battery at the office\", \"Leo left the station in the hallway\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ruby downloaded the update in the library\",\n      \"supports\": [[\"Ruby downloaded the update in the library\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Zara opened the door at the office\",\n      \"supports\": [[\"Zara opened the door at the office\", \"Ruby downloaded the update in the library\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Priya checked the battery at the office\",\n      \"supports\": [[\"Priya checked the battery at the office\", \"Zara opened the door at the office\", \"BEFORE\"]])\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Leo left the station in the hallway\",\n      \"supports\": [[\"Leo left the station in the hallway\", \"Priya checked the battery at the office\", \"BEFORE\"]])\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_004",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Ivy called a friend at home\", \"Ivy sent an email in the library\", \"Sara packed a bag in the garden\"],\n  \"relations\": [[\"Ivy called a friend at home\", \"Ivy sent an email in the library\", \"BEFORE\"], [\"Sara packed a bag in the garden\", \"Ivy sent an email in the library\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Sara packed a bag in the garden happened before Ivy sent an email in the library.\",\n      \"supports\": [[\"Sara packed a bag in the garden\", \"Ivy sent an email in the library\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ivy sent an email in the library happened before she called her friend at home.\",\n      \"supports\": [[\"Ivy sent an email in the library\", \"Ivy called a friend at home\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "tr_005",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"Sofia left the station in the garden happened before Jon opened the door in the garden. Jon opened the door in the garden happened before Sara turned on the kettle in the garden. Sara turned on the kettle in the garden happened before Noah read the note in the kitchen.\",\n  \"events\": [\"Sofia left the station in the garden\", \"Jon opened the door in the garden\", \"Sara turned on the kettle in the garden\", \"Noah read the note in the kitchen\"],\n  \"relations\": [[\"Sofia left the station in the garden\", \"Jon opened the door in the garden\", \"BEFORE\"], [\"Jon opened the door in the garden\", \"Sara turned on the kettle in the garden\", \"BEFORE\"], [\"Sara turned on the kettle in the garden\", \"Noah read the note in the kitchen\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Sofia left the station in the garden happened before Jon opened the door in the garden\",\n      \"supports\": [[\"Sofia left the station in the garden\", \"Jon opened the door in the garden\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Jon opened the door in the garden happened before Sara turned on the kettle in the garden\",\n      \"supports\": [[\"Jon opened the door in the garden\", \"Sara turned on the kettle in the garden\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Sara turned on the kettle in the garden happened before Noah read the note in the kitchen\",\n      \"supports\": [[\"Sara turned on the kettle in the garden\", \"Noah read the note in the kitchen\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_029",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"\",\\n  \"events\": [\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\"],\\n  \"relations\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"], [\"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\", \"BEFORE\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Jon opened the door in the hallway\",\\n      \"supports\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Priya started the meeting in the kitchen\",\\n      \"supports\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Sam fed the cat in the hallway\",\\n      \"supports\": [[\"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\"],\n  \"relations\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"], [\"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Jon opened the door in the hallway\",\n      \"supports\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Priya started the meeting in the kitchen\",\n      \"supports\": [[\"Jon opened the door in the hallway\", \"Priya started the meeting in the kitchen\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Sam fed the cat in the hallway\",\n      \"supports\": [[\"Priya started the meeting in the kitchen\", \"Sam fed the cat in the hallway\", \"BEFORE\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "tr_026",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"Omar made tea in the garden\",\n  \"events\": [\"Omar made tea in the garden\", \"Sara ran the tests in the garden\", \"Ruby downloaded the update at the caf\u00e9\"],\n  \"relations\": [[\"Omar made tea in the garden\", \"Sara ran the tests in the garden\", \"BEFORE\"], [\"Sara ran the tests in the garden\", \"Ruby downloaded the update at the caf\u00e9\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Omar made tea in the garden happened before Sara ran the tests in the garden\",\n      \"supports\": [[\"Omar made tea in the garden\", \"Sara ran the tests in the garden\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Sara ran the tests in the garden happened before Ruby downloaded the update at the caf\u00e9\",\n      \"supports\": [[\"Sara ran the tests in the garden\", \"Ruby downloaded the update at the caf\u00e9\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_035",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Mia submitted the form in the kitchen\", \"Ivy received a confirmation email at the office\", \"Kai boarded the train in the lab\"],\n  \"relations\": [[\"Mia submitted the form in the kitchen\", \"Ivy received a confirmation email at the office\", \"BEFORE\"], [\"Ivy received a confirmation email at the office\", \"Kai boarded the train in the lab\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Mia submitted the form in the kitchen.\",\n      \"supports\": [[\"Mia submitted the form in the kitchen\", \"Ivy received a confirmation email at the office\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ivy received a confirmation email at the office immediately after Mia submitted the form.\",\n      \"supports\": [[\"Ivy received a confirmation email at the office\", \"Kai boarded the train in the lab\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "con_001",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [],\n  \"events\": [\"Zara locked the bike at the office\", \"Lina charged the phone at the caf\u00e9\"],\n  \"relations\": [[\"Zara locked the bike at the office\", \"Lina charged the phone at the caf\u00e9\", \"BEFORE\"], [\"Lina charged the phone at the caf\u00e9\", \"Zara locked the bike at the office\", \"BEFORE\"]]\n}\n```"
+    },
+    {
+      "id": "con_007",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "The events are \"Leo received a confirmation email in the garden\" and \"Lina watered the plants in the library.\" Based on the conflicting information, the most accurate relationship is that they are simultaneous.\n\n```json\n{\n  \"answer\": \"The events are simultaneous.\",\n  \"events\": [\"Leo received a confirmation email in the garden\", \"Lina watered the plants in the library\"],\n  \"relations\": [[\"Leo received a confirmation email in the garden\", \"Lina watered the plants in the library\", \"SIMULTANEOUS\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The conflicting information suggests that the order of events cannot be determined.\",\n      \"supports\": [[\"Leo received a confirmation email in the garden\", \"Lina watered the plants in the library\", \"SIMULTANEOUS\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "amb_012",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"\",\\n  \"events\": [\"Ethan uploaded the file in the garden\", \"Ruby turned on the kettle at the office\", \"Mia checked the battery in the lab\"],\\n  \"relations\": [[\"Ethan uploaded the file in the garden\", \"Ruby turned on the kettle at the office\", \"AFTER\"], [\"Mia checked the battery in the lab\", \"Ruby turned on the kettle at the office\", \"BEFORE\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Ethan uploaded the file in the garden, which is an outdoor activity.\",\\n      \"supports\": [[\"Ethan uploaded the file in the garden\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ruby turned on the kettle at the office, which is an indoor activity.\",\\n      \"supports\": [[\"Ruby turned on the kettle at the office\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Mia checked the battery in the lab, which is another indoor activity.\",\\n      \"supports\": [[\"Mia checked the battery in the lab\"]]\\n    },\\n    {\\n      \"step_id\": 4,\\n      \"text\": \"The battery check by Mia supports the action of Ruby turning on the kettle.\",\\n      \"supports\": [[\"Mia checked the battery in the lab\", \"Ruby turned on the kettle at the office\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Ethan uploaded the file in the garden\", \"Ruby turned on the kettle at the office\", \"Mia checked the battery in the lab\"],\n  \"relations\": [[\"Ethan uploaded the file in the garden\", \"Ruby turned on the kettle at the office\", \"AFTER\"], [\"Mia checked the battery in the lab\", \"Ruby turned on the kettle at the office\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ethan uploaded the file in the garden, which is an outdoor activity.\",\n      \"supports\": [[\"Ethan uploaded the file in the garden\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ruby turned on the kettle at the office, which is an indoor activity.\",\n      \"supports\": [[\"Ruby turned on the kettle at the office\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Mia checked the battery in the lab, which is another indoor activity.\",\n      \"supports\": [[\"Mia checked the battery in the lab\"]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"The battery check by Mia supports the action of Ruby turning on the kettle.\",\n      \"supports\": [[\"Mia checked the battery in the lab\", \"Ruby turned on the kettle at the office\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_018",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"valid\",\n  \"events\": [\"Lina installed the update at home\", \"Lina opened the door at home\", \"Jon watered the plants at the office\"],\n  \"relations\": [[\"Lina installed the update at home\", \"Lina opened the door at home\", \"BEFORE\"], [\"Lina opened the door at home\", \"Jon watered the plants at the office\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Lina installed the update at home happened before Lina opened the door at home.\",\n      \"supports\": [[\"Lina installed the update at home\", \"Lina opened the door at home\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Lina opened the door at home happened before Jon watered the plants at the office.\",\n      \"supports\": [[\"Lina opened the door at home\", \"Jon watered the plants at the office\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "amb_020",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Hana uploaded the file at the station before Ruby locked the bike at the caf\u00e9.\",\n      \"supports\": [[\"Hana uploaded the file at the station\", \"Ruby locked the bike at the caf\u00e9\", \"BEFORE\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "lc_037",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['Lina boarded the train at the office']. Invalid edge format (expected 3 items): ['Lina boarded the train at the office']\")",
+      "raw_output": "```json\n{\n  \"answer\": \"Omar checked the battery at the caf\u00e9 after Lina boarded the train at the office. Nora finished the lecture at home after Omar checked the battery at the caf\u00e9.\",\n  \"events\": [\"Lina boarded the train at the office\", \"Omar checked the battery at the caf\u00e9\", \"Nora finished the lecture at home\"],\n  \"relations\": [[\"Lina boarded the train at the office\", \"Omar checked the battery at the caf\u00e9\", \"BEFORE\"], [\"Omar checked the battery at the caf\u00e9\", \"Nora finished the lecture at home\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Lina boarded the train at the office.\",\n      \"supports\": [[\"Lina boarded the train at the office\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Omar checked the battery at the caf\u00e9 immediately after Lina boarded the train.\",\n      \"supports\": [[\"Lina boarded the train at the office\", \"Omar checked the battery at the caf\u00e9\"]]\n\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Nora finished the lecture at home after Omar checked the battery.\",\n      \"supports\": [[\"Omar checked the battery at the caf\u00e9\", \"Nora finished the lecture at home\"]]\n\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "long_016",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 7,
+      "gold_relation_count": 6,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\n    \"Jon sent an email in the garden\",\n    \"Hana made tea at the office\",\n    \"Jon approved the release in the garden\",\n    \"Sara charged the phone in the garden\",\n    \"Noah uploaded the file in the library\",\n    \"Noah started the meeting in the library\",\n    \"Leo watered the plants in the classroom\"\n  ],\n  \"relations\": [\n    [\"Jon sent an email in the garden\", \"Hana made tea at the office\", \"UNKNOWN\"],\n    [\"Jon sent an email in the garden\", \"Jon approved the release in the garden\", \"BEFORE\"],\n    [\"Sara charged the phone in the garden\", \"Noah uploaded the file in the library\", \"UNKNOWN\"],\n    [\"Noah uploaded the file in the library\", \"Noah started the meeting in the library\", \"AFTER\"],\n    [\"Noah started the meeting in the library\", \"Leo watered the plants in the classroom\", \"UNKNOWN\"]\n  ],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Hana made tea at the office happens in the office, while Jon sent an email in the garden. Since they are in different locations, their relation is unknown.\",\n      \"supports\": [[\"Jon sent an email in the garden\", \"Hana made tea at the office\", \"UNKNOWN\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Jon approved the release in the garden comes after Jon sent an email in the garden.\",\n      \"supports\": [[\"Jon sent an email in the garden\", \"Jon approved the release in the garden\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Sara charged the phone in the garden and Noah uploaded the file in the library. Since they are in different locations, their relation is unknown.\",\n      \"supports\": [[\"Sara charged the phone in the garden\", \"Noah uploaded the file in the library\", \"UNKNOWN\"]]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Noah started the meeting in the library comes after Noah uploaded the file in the library.\",\n      \"supports\": [[\"Noah uploaded the file in the library\", \"Noah started the meeting in the library\", \"AFTER\"]]]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Leo watered the plants in the classroom happens in a different location, so its relation to the previous events is unknown.\",\n      \"supports\": [[\"Leo watered the plants in the classroom\", \"Noah started the meeting in the library\", \"UNKNOWN\"], [\"Leo watered the plants in the classroom\", \"Sara charged the phone in the garden\", \"UNKNOWN\"], [\"Leo watered the plants in the classroom\", \"Jon approved the release in the garden\", \"UNKNOWN\"]]\n    }]\n}\n```"
+    },
+    {
+      "id": "amb_027",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The events Amir closing the window in the lab and Jon starting the car at the office do not have a direct temporal relationship.\",\n      \"supports\": [[\"Amir closed the window in the lab\", \"Jon started the car at the office\", \"UNKNOWN\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "tr_020",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "{\n  \"answer\": \"Ava left the station in the lab, Ruby sent an email in the kitchen, Mia uploaded the file at the office\",\n  \"events\": [\"Ava left the station in the lab\", \"Ruby sent an email in the kitchen\", \"Mia uploaded the file at the office\"],\n  \"relations\": [[\"Ava left the station in the lab\", \"Ruby sent an email in the kitchen\", \"BEFORE\"], [\"Ruby sent an email in the kitchen\", \"Mia uploaded the file at the office\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ava left the station in the lab happened before Ruby sent an email in the kitchen\",\n      \"supports\": [[\"Ava left the station in the lab\", \"Ruby sent an email in the kitchen\", \"BEFORE\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ruby sent an email in the kitchen happened before Mia uploaded the file at the office\",\n      \"supports\": [[\"Ruby sent an email in the kitchen\", \"Mia uploaded the file at the office\", \"BEFORE\"]]]\n    }\n  ]\n}"
+    },
+    {
+      "id": "tr_033",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"The events occurred in the following order: Priya ran the tests in the kitchen, then Ruby read the note in the kitchen, and finally Nora paid the bill in the garden.\",\n  \"events\": [\"Priya ran the tests in the kitchen\", \"Ruby read the note in the kitchen\", \"Nora paid the bill in the garden\"],\n  \"relations\": [[\"Priya ran the tests in the kitchen\", \"Ruby read the note in the kitchen\", \"BEFORE\"], [\"Ruby read the note in the kitchen\", \"Nora paid the bill in the garden\", \"BEFORE\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Priya ran the tests in the kitchen happened before Ruby read the note in the kitchen.\",\n      \"supports\": [[\"Priya ran the tests in the kitchen\", \"Ruby read the note in the kitchen\", \"BEFORE\"]]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ruby read the note in the kitchen happened before Nora paid the bill in the garden.\",\n      \"supports\": [[\"Ruby read the note in the kitchen\", \"Nora paid the bill in the garden\", \"BEFORE\"]]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "long_005",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"\",\\n  \"events\": [\"Sara paid the bill in the hallway\", \"Ava approved the release in the library\", \"Omar started the car at the station\", \"Leo boarded the train at the office\", \"Leo submitted the form at home\"],\\n  \"relations\": [\\n    [\"Ava approved the release in the library\", \"Omar started the car at the station\", \"UNKNOWN\"],\\n    [\"Omar started the car at the station\", \"Leo boarded the train at the office\", \"AFTER\"],\\n    [\"Leo boarded the train at the office\", \"Leo submitted the form at home\", \"AFTER\"]\\n  ],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Ava approved the release in the library happens after Omar started the car at the station.\",\\n      \"supports\": [[\"Ava approved the release in the library\", \"Omar started the car at the station\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Omar started the car at the station happens before Leo boarded the train at the office.\",\\n      \"supports\": [[\"Omar started the car at the station\", \"Leo boarded the train at the office\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Leo boarded the train at the office happens before Leo submitted the form at home.\",\\n      \"supports\": [[\"Leo boarded the train at the office\", \"Leo submitted the form at home\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"\",\n  \"events\": [\"Sara paid the bill in the hallway\", \"Ava approved the release in the library\", \"Omar started the car at the station\", \"Leo boarded the train at the office\", \"Leo submitted the form at home\"],\n  \"relations\": [\n    [\"Ava approved the release in the library\", \"Omar started the car at the station\", \"UNKNOWN\"],\n    [\"Omar started the car at the station\", \"Leo boarded the train at the office\", \"AFTER\"],\n    [\"Leo boarded the train at the office\", \"Leo submitted the form at home\", \"AFTER\"]\n  ],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Ava approved the release in the library happens after Omar started the car at the station.\",\n      \"supports\": [[\"Ava approved the release in the library\", \"Omar started the car at the station\", \"AFTER\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Omar started the car at the station happens before Leo boarded the train at the office.\",\n      \"supports\": [[\"Omar started the car at the station\", \"Leo boarded the train at the office\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Leo boarded the train at the office happens before Leo submitted the form at home.\",\n      \"supports\": [[\"Leo boarded the train at the office\", \"Leo submitted the form at home\", \"BEFORE\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "long_009",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"string\",\\n  \"events\": [\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\"],\\n  \"relations\": [[\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"AFTER\"], [\"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"AFTER\"], [\"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"AFTER\"], [\"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\", \"AFTER\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Leo printed the handouts in the hallway\",\\n      \"supports\": [[\"Leo printed the handouts in the hallway\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ruby packed a bag in the lab\",\\n      \"supports\": [[\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"AFTER\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Mia ran the tests at the office\",\\n      \"supports\": [[\"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 4,\\n      \"text\": \"Jon set an alarm at the caf\u00e9\",\\n      \"supports\": [[\"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 5,\\n      \"text\": \"Ruby boarded the train in the lab\",\\n      \"supports\": [[\"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\", \"AFTER\"]]\\n    }\\n  ]\\n}\\n```')",
+      "raw_output": "```json\n{\n  \"answer\": \"string\",\n  \"events\": [\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\"],\n  \"relations\": [[\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"AFTER\"], [\"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"AFTER\"], [\"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"AFTER\"], [\"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\", \"AFTER\"]],\n  \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"Leo printed the handouts in the hallway\",\n      \"supports\": [[\"Leo printed the handouts in the hallway\"]]\n    },\n    {\n      \"step_id\": 2,\n      \"text\": \"Ruby packed a bag in the lab\",\n      \"supports\": [[\"Leo printed the handouts in the hallway\", \"Ruby packed a bag in the lab\", \"AFTER\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\n    },\n    {\n      \"step_id\": 3,\n      \"text\": \"Mia ran the tests at the office\",\n      \"supports\": [[\"Ruby packed a bag in the lab\", \"Mia ran the tests at the office\", \"AFTER\"]]\n    },\n    {\n      \"step_id\": 4,\n      \"text\": \"Jon set an alarm at the caf\u00e9\",\n      \"supports\": [[\"Mia ran the tests at the office\", \"Jon set an alarm at the caf\u00e9\", \"AFTER\"]]\n    },\n    {\n      \"step_id\": 5,\n      \"text\": \"Ruby boarded the train in the lab\",\n      \"supports\": [[\"Jon set an alarm at the caf\u00e9\", \"Ruby boarded the train in the lab\", \"AFTER\"]]\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "con_020",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "raw_output": "```json\n{\n  \"answer\": \"reasoning_steps\": [\n    {\n      \"step_id\": 1,\n      \"text\": \"The information provided is contradictory. Amir cannot both submit the form in the library before setting the alarm and set the alarm before submitting the form in the library.\",\n      \"supports\": [[\"Amir submitted the form in the library\", \"Amir set an alarm at the station\", \"UNKNOWN\"]]\n    }\n  ]\n}\n```"
+    }
+  ],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 0.7733333333333333,
+  "conditional_validity_rate": 0.9741379310344828,
+  "conditional_trace_grounding_rate": 0.9396551724137931,
+  "transport_failure_counts": {
+    "transport_timeout": 1
+  },
+  "parse_failure_counts": {
+    "invalid_json": 32,
+    "invalid_edge_support": 1
+  },
+  "valid_count": 113,
+  "invalid_count": 3,
+  "trace_grounded_count": 109,
+  "trace_ungrounded_count": 7,
+  "validity_rate": 0.7533333333333333,
+  "violation_counts": {
+    "contradiction": 1,
+    "cycle": 1,
+    "temporal_inconsistency": 1,
+    "unsupported_reasoning_step": 6,
+    "hallucinated_node": 1,
+    "unsupported_reasoning_reference": 1
+  },
+  "formula_violation_counts": {
+    "ltl_contradiction": 2,
+    "ltl_temporal_inconsistency": 2,
+    "ltl_hallucinated_node": 1
+  },
+  "first_violation_step_histogram": {
+    "1": 6,
+    "0": 2
+  },
+  "taxonomy_counts": {
+    "structural": 3,
+    "reasoning_trace": 6,
+    "grounding": 2
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 25,
+    "num_overcommit_tasks": 22,
+    "num_overcommit_edges": 26,
+    "task_overcommit_rate": 0.88,
+    "avg_overcommit_edges_per_gold_empty_task": 1.04
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.6909871244635193,
+      "recall": 0.5609756097560976,
+      "f1": 0.6192307692307693,
+      "correct": 161,
+      "pred_total": 233,
+      "gold_total": 287
+    },
+    "closure": {
+      "precision": 0.8264840182648402,
+      "recall": 0.7494824016563147,
+      "f1": 0.7861020629750272,
+      "correct": 362,
+      "pred_total": 438,
+      "gold_total": 483
+    }
+  },
+  "report_path": "outputs/runs/canonical_full/2026-04-19_160821UTC/report.json"
+}
