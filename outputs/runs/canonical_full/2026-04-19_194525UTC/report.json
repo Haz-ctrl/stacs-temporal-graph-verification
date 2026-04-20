@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-04-11_180851UTC",
-  "predictions_file": "outputs/runs/canonical_full/2026-04-11_180851UTC/predictions.jsonl",
+  "run_id": "2026-04-19_194525UTC",
+  "predictions_file": "outputs/runs/canonical_full/2026-04-19_194525UTC/predictions.jsonl",
   "pred_source": "llm",
   "dataset": {
     "path": "data/temporal_reasoning_eval.jsonl",
@@ -9,7 +9,7 @@
     "expected_valid_tasks": 130,
     "expected_invalid_tasks": 20
   },
-  "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+  "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
   "model_metadata": {
     "provider": "ollama",
     "model": "gemma3:12b",
@@ -108,7 +108,7 @@
     "prediction_mode": "structured_json"
   },
   "run_config": {
-    "run_id": "2026-04-11_180851UTC",
+    "run_id": "2026-04-19_194525UTC",
     "data_path": "data/temporal_reasoning_eval.jsonl",
     "num_tasks": 150,
     "pred_source": "llm",
@@ -119,8 +119,11 @@
     "log_raw": true,
     "validate_data": true,
     "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 1,
+    "retry_backoff_s": 2.0,
     "dataset_version": "temporal_reasoning_eval",
-    "code_version": "7343f5784b80fdd0a19d9a193c7314b3013549d3",
+    "code_version": "f84424da92a2990e362716fe83d6686a7337014e",
     "specification_name": "default_temporal_spec"
   },
   "num_tasks": 150,
@@ -129,53 +132,43 @@
   "repair_hit_count": 0,
   "repair_hit_rate": 0.0,
   "parse_success_rate": 1.0,
-  "conditional_validity_rate": 0.9466666666666667,
+  "conditional_validity_rate": 1.0,
+  "conditional_trace_grounding_rate": 1.0,
+  "transport_failure_counts": {},
   "parse_failure_counts": {},
-  "valid_count": 142,
-  "invalid_count": 8,
-  "validity_rate": 0.9466666666666667,
-  "violation_counts": {
-    "unsupported_reasoning_step": 7,
-    "contradiction": 1,
-    "cycle": 1,
-    "temporal_inconsistency": 1
-  },
-  "formula_violation_counts": {
-    "ltl_contradiction": 1,
-    "ltl_temporal_inconsistency": 1
-  },
-  "first_violation_step_histogram": {
-    "3": 7,
-    "1": 1
-  },
-  "taxonomy_counts": {
-    "reasoning_trace": 7,
-    "structural": 3
-  },
+  "valid_count": 150,
+  "invalid_count": 0,
+  "trace_grounded_count": 150,
+  "trace_ungrounded_count": 0,
+  "validity_rate": 1.0,
+  "violation_counts": {},
+  "formula_violation_counts": {},
+  "first_violation_step_histogram": {},
+  "taxonomy_counts": {},
   "overcommitment": {
     "num_gold_empty_tasks": 30,
-    "num_overcommit_tasks": 10,
-    "num_overcommit_edges": 10,
-    "task_overcommit_rate": 0.3333333333333333,
-    "avg_overcommit_edges_per_gold_empty_task": 0.3333333333333333
+    "num_overcommit_tasks": 8,
+    "num_overcommit_edges": 8,
+    "task_overcommit_rate": 0.26666666666666666,
+    "avg_overcommit_edges_per_gold_empty_task": 0.26666666666666666
   },
   "metrics_expected_valid_only": {
     "direct": {
-      "precision": 0.7348993288590604,
-      "recall": 0.5793650793650794,
-      "f1": 0.6479289940828402,
-      "correct": 219,
-      "pred_total": 298,
+      "precision": 0.7589928057553957,
+      "recall": 0.5582010582010583,
+      "f1": 0.6432926829268294,
+      "correct": 211,
+      "pred_total": 278,
       "gold_total": 378
     },
     "closure": {
-      "precision": 0.856140350877193,
-      "recall": 0.7427701674277016,
-      "f1": 0.7954360228198858,
-      "correct": 488,
-      "pred_total": 570,
+      "precision": 0.8151986183074266,
+      "recall": 0.7184170471841704,
+      "f1": 0.7637540453074433,
+      "correct": 472,
+      "pred_total": 579,
       "gold_total": 657
     }
   },
-  "report_path": "outputs/runs/canonical_full/2026-04-11_180851UTC/report.json"
+  "report_path": "outputs/runs/canonical_full/2026-04-19_194525UTC/report.json"
 }
