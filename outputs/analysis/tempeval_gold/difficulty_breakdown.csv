@@ -1,0 +1,2 @@
+run_id,model_label,difficulty,num_tasks,num_parsed,num_failures,expected_valid_parsed_tasks,gold_bearing_parsed_tasks,parse_success_rate,conditional_validity_rate,validity_expectation_alignment_rate,validity_expectation_alignment_rate_e2e,invalidity_rate,trace_grounding_rate,direct_f1,closure_f1,closure_preservation_rate,abstention_rate,overcommitment_rate,contradiction_detection_rate,avg_first_violation_step,analysis_focus
+2026-04-20_183259UTC,deepseek-r1:7b,low_complexity,496,496,0,496,496,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity

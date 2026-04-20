@@ -153,12 +153,29 @@ Per-task records now separate:
 Current dataset files have different roles:
 
 - `data/temporal_reasoning_eval.jsonl`: canonical runnable synthetic evaluation set
-- `data/tempeval_eval.jsonl`: small TempEval-style relation-extraction slice in canonical task format
+- `data/tempeval_eval.jsonl`: TempEval-3 Platinum event-event slice in canonical task format using a conservative coarse mapping onto `BEFORE`, `AFTER`, and `SIMULTANEOUS`
 - `data/tempeval_style_fixture.jsonl`: simplified adapter input for TempEval-style conversion
 - `data/diagnostic_eval.jsonl`: hand-authored diagnostic stress slice for ambiguity, anchors, and richer relations
 - `data/sample_tasks.jsonl`: small quickstart example set using the same schema
 - `data/synthetic_v2.jsonl`: legacy exploratory dataset with older category naming
 - `data/constraint_fixtures.jsonl`: fixture-style examples for verifier-oriented checks
+
+To rebuild the TempEval slice from raw TempEval-3 TimeML files:
+
+```bash
+python -m scripts.import_tempeval3 \
+  --input-root path/to/tempeval_3 \
+  --split test \
+  --output data/tempeval_eval.jsonl
+```
+
+The checked-in external slice is derived from the TempEval-3 Platinum test documents and keeps only event-event TLINKs that map cleanly into the repo's current label set:
+
+- `BEFORE`, `IBEFORE` -> `BEFORE`
+- `AFTER`, `IAFTER` -> `AFTER`
+- `SIMULTANEOUS`, `IDENTITY` -> `SIMULTANEOUS`
+
+Interval relations such as `INCLUDES` or `IS_INCLUDED` are intentionally excluded rather than coerced.
 
 See [dataset_schema.md](docs/dataset_schema.md) for the canonical schema and current scope boundaries.
 

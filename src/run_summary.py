@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import csv
 import json
+import math
+import os
 import random
 from collections import defaultdict
 from dataclasses import dataclass
@@ -13,10 +15,16 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
 
 
 BOOTSTRAP_ITERATIONS = 500
 BOOTSTRAP_SEED = 7
+
+try:
+    plt.style.use("seaborn-v0_8-whitegrid")
+except OSError:
+    pass
 
 
 @dataclass(frozen=True)
@@ -79,6 +87,18 @@ def _load_manifest(path: str | Path | None) -> Dict[str, Dict[str, Any]]:
     if isinstance(raw, dict):
         return {str(run_id): dict(meta) for run_id, meta in raw.items()}
     raise ValueError("Run manifest must be an object or an object containing a 'runs' mapping.")
+
+
+def _auto_manifest_path(run_dirs: Sequence[str | Path]) -> Optional[Path]:
+    resolved_run_dirs = [Path(run_dir).resolve() for run_dir in run_dirs]
+    if not resolved_run_dirs:
+        return None
+    try:
+        common_root = Path(os.path.commonpath([str(run_dir.parent) for run_dir in resolved_run_dirs]))
+    except ValueError:
+        return None
+    manifest_path = common_root / "run_manifest.json"
+    return manifest_path if manifest_path.exists() else None
 
 
 def _difficulty_bucket(*, num_events: int, gold_relation_count: int) -> str:
@@ -172,11 +192,20 @@ def _expected_valid_parsed_rows(rows: Sequence[Dict[str, Any]]) -> List[Dict[str
     return [row for row in rows if row.get("expected_valid", True)]
 
 
+def _row_verification(row: Dict[str, Any]) -> Dict[str, Any]:
+    if isinstance(row.get("verification"), dict):
+        return row["verification"]
+    prediction = row.get("prediction")
+    if isinstance(prediction, dict) and isinstance(prediction.get("verification"), dict):
+        return prediction["verification"]
+    return {}
+
+
 def _trace_grounded_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
     def is_grounded(row: Dict[str, Any]) -> bool:
-        verification = row.get("verification", {})
+        verification = _row_verification(row)
         if "trace_grounded" in verification:
             return bool(verification.get("trace_grounded"))
         violation_types = {item.get("type") for item in verification.get("violations", [])}
@@ -205,14 +234,28 @@ def _overcommitment_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
 def _invalidity_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
-    return sum(1 for row in rows if not row.get("verification", {}).get("is_valid")) / len(rows)
+    return sum(1 for row in rows if not _row_verification(row).get("is_valid")) / len(rows)
+
+
+def _validity_expectation_alignment_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
+    if not rows:
+        return None
+    aligned = 0
+    for row in rows:
+        if not row.get("parsed", True):
+            continue
+        expected_valid = bool(row.get("expected_valid", True))
+        observed_valid = bool(_row_verification(row).get("is_valid"))
+        if observed_valid == expected_valid:
+            aligned += 1
+    return aligned / len(rows)
 
 
 def _average_first_violation_step(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     steps = [
-        int(row.get("verification", {}).get("first_violation_step"))
+        int(_row_verification(row).get("first_violation_step"))
         for row in rows
-        if row.get("verification", {}).get("first_violation_step") is not None
+        if _row_verification(row).get("first_violation_step") is not None
     ]
     if not steps:
         return None
@@ -220,7 +263,7 @@ def _average_first_violation_step(rows: Sequence[Dict[str, Any]]) -> Optional[fl
 
 
 def _contradiction_detected(row: Dict[str, Any]) -> bool:
-    verification = row.get("verification", {})
+    verification = _row_verification(row)
     violation_types = {item.get("type") for item in verification.get("violations", [])}
     formula_types = {item.get("type") for item in verification.get("formula_violations", [])}
     return bool(
@@ -245,7 +288,8 @@ def _metric_or_none(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Optio
 
 
 def load_runs(run_dirs: Sequence[str | Path], *, manifest_path: str | Path | None = None) -> List[LoadedRun]:
-    manifest = _load_manifest(manifest_path)
+    resolved_manifest_path = Path(manifest_path) if manifest_path is not None else _auto_manifest_path(run_dirs)
+    manifest = _load_manifest(resolved_manifest_path)
     loaded: List[LoadedRun] = []
     for run_dir_like in run_dirs:
         run_dir = Path(run_dir_like)
@@ -267,8 +311,13 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
     parsed_rows = list(run.predictions)
     combined_entries = _combine_task_entries(run)
     expected_valid_parsed_rows = _expected_valid_parsed_rows(parsed_rows)
+    expected_valid_gold_bearing_rows = [
+        row for row in expected_valid_parsed_rows
+        if len(row.get("gold_relations", [])) > 0
+    ]
     ambiguous_rows = [row for row in parsed_rows if row.get("category") == "ambiguous"]
     contradiction_rows = [row for row in parsed_rows if row.get("category") == "contradiction"]
+    contradiction_entries = [row for row in combined_entries if row.get("category") == "contradiction"]
 
     direct = report["metrics_expected_valid_only"]["direct"]
     closure = report["metrics_expected_valid_only"]["closure"]
@@ -288,6 +337,16 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
     )
     closure_ci_low, closure_ci_high = _bootstrap_ci(
         expected_valid_parsed_rows,
+        metric_fn=lambda sample: _metric_or_none(sample, metric_key="closure"),
+    )
+    fidelity_direct = _aggregate_prf_from_rows(expected_valid_gold_bearing_rows, metric_key="direct")
+    fidelity_closure = _aggregate_prf_from_rows(expected_valid_gold_bearing_rows, metric_key="closure")
+    fidelity_direct_ci_low, fidelity_direct_ci_high = _bootstrap_ci(
+        expected_valid_gold_bearing_rows,
+        metric_fn=lambda sample: _metric_or_none(sample, metric_key="direct"),
+    )
+    fidelity_closure_ci_low, fidelity_closure_ci_high = _bootstrap_ci(
+        expected_valid_gold_bearing_rows,
         metric_fn=lambda sample: _metric_or_none(sample, metric_key="closure"),
     )
 
@@ -321,8 +380,11 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
             if report.get("conditional_trace_grounding_rate") is not None
             else _trace_grounded_rate(parsed_rows)
         ),
+        "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(parsed_rows),
+        "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(combined_entries),
         "validity_rate": report.get("validity_rate", 0.0),
         "parsed_expected_valid_tasks": len(expected_valid_parsed_rows),
+        "parsed_gold_bearing_tasks": len(expected_valid_gold_bearing_rows),
         "direct_precision": direct["precision"],
         "direct_recall": direct["recall"],
         "direct_f1": direct["f1"],
@@ -334,10 +396,22 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "closure_f1_ci_low": closure_ci_low,
         "closure_f1_ci_high": closure_ci_high,
         "closure_minus_direct_f1": closure["f1"] - direct["f1"],
+        "fidelity_direct_precision": fidelity_direct["precision"],
+        "fidelity_direct_recall": fidelity_direct["recall"],
+        "fidelity_direct_f1": fidelity_direct["f1"],
+        "fidelity_direct_f1_ci_low": fidelity_direct_ci_low,
+        "fidelity_direct_f1_ci_high": fidelity_direct_ci_high,
+        "fidelity_closure_precision": fidelity_closure["precision"],
+        "fidelity_closure_recall": fidelity_closure["recall"],
+        "fidelity_closure_f1": fidelity_closure["f1"],
+        "fidelity_closure_f1_ci_low": fidelity_closure_ci_low,
+        "fidelity_closure_f1_ci_high": fidelity_closure_ci_high,
+        "fidelity_closure_gap": fidelity_closure["f1"] - fidelity_direct["f1"],
         "closure_preservation_rate": _closure_preservation_rate(expected_valid_parsed_rows),
         "ambiguity_abstention_rate": _abstention_rate(ambiguous_rows),
         "ambiguity_overcommitment_rate": _overcommitment_rate(ambiguous_rows),
         "contradiction_detection_rate": _contradiction_detection_rate(contradiction_rows),
+        "contradiction_detection_rate_e2e": _contradiction_detection_rate(contradiction_entries),
         "contradiction_invalidity_rate": _invalidity_rate(contradiction_rows),
         "avg_first_violation_step": _average_first_violation_step(parsed_rows),
         "screening_warning": report["num_tasks"] <= 25,
@@ -379,6 +453,17 @@ def _group_tasks_by_dimension(
     for key in all_keys:
         parsed_rows = parsed_by_key.get(key, [])
         failed_rows = failures_by_key.get(key, [])
+        combined_rows = [
+            *[{**row, "parsed": True} for row in parsed_rows],
+            *[
+                {
+                    "parsed": False,
+                    "expected_valid": bool(failure.get("expected_valid", True)),
+                    "verification": {},
+                }
+                for failure in failed_rows
+            ],
+        ]
         expected_valid_rows = _expected_valid_parsed_rows(parsed_rows)
         gold_bearing_rows = [
             row for row in expected_valid_rows
@@ -403,6 +488,8 @@ def _group_tasks_by_dimension(
                     sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / len(parsed_rows)
                     if parsed_rows else None
                 ),
+                "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(parsed_rows),
+                "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(combined_rows),
                 "invalidity_rate": _invalidity_rate(parsed_rows),
                 "trace_grounding_rate": _trace_grounded_rate(parsed_rows),
                 "direct_f1": _metric_or_none(gold_bearing_rows, metric_key="direct"),
@@ -527,12 +614,30 @@ def _plot_bar(
     values: Sequence[float],
     title: str,
     ylabel: str,
+    is_rate: bool = False,
+    ylim: tuple[float, float] | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.bar(labels, values)
+    bars = ax.bar(labels, values, color="#4C78A8")
     ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.tick_params(axis="x", rotation=25)
+    if is_rate:
+        ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+        ax.set_ylim(*(ylim or (0.0, 1.05)))
+    elif ylim is not None:
+        ax.set_ylim(*ylim)
+    for bar, value in zip(bars, values):
+        if math.isnan(value):
+            continue
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + (0.015 if is_rate else 0.02),
+            f"{value:.0%}" if is_rate else f"{value:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
@@ -545,6 +650,7 @@ def _plot_grouped_bars(
     series: Mapping[str, Sequence[float]],
     title: str,
     ylabel: str,
+    is_rate: bool = False,
 ) -> None:
     fig, ax = plt.subplots(figsize=(9, 4.5))
     positions = list(range(len(labels)))
@@ -556,7 +662,10 @@ def _plot_grouped_bars(
     ax.set_xticklabels(labels, rotation=25)
     ax.set_title(title)
     ax.set_ylabel(ylabel)
-    ax.legend()
+    if is_rate:
+        ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+        ax.set_ylim(0.0, 1.05)
+    ax.legend(frameon=False)
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
@@ -579,6 +688,10 @@ def _plot_scatter(
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
+    ax.set_xlim(0.0, 1.05)
+    ax.set_ylim(0.0, 1.05)
+    ax.xaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+    ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
@@ -591,6 +704,7 @@ def _plot_stacked_bars(
     stacks: Mapping[str, Sequence[float]],
     title: str,
     ylabel: str,
+    is_rate: bool = False,
 ) -> None:
     fig, ax = plt.subplots(figsize=(9, 4.5))
     bottoms = [0.0] * len(labels)
@@ -600,7 +714,10 @@ def _plot_stacked_bars(
     ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.tick_params(axis="x", rotation=25)
-    ax.legend()
+    if is_rate:
+        ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+        ax.set_ylim(0.0, 1.05)
+    ax.legend(frameon=False)
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
@@ -608,13 +725,41 @@ def _plot_stacked_bars(
 
 def _plot_average_first_violation_step(path: Path, summary_rows: Sequence[Dict[str, Any]]) -> None:
     labels = [row["model_label"] for row in summary_rows]
-    values = [float(row["avg_first_violation_step"] or 0.0) for row in summary_rows]
+    raw_values = [row["avg_first_violation_step"] for row in summary_rows]
+    values = [float(value) if value is not None else math.nan for value in raw_values]
+    fig, ax = plt.subplots(figsize=(8, 4))
+    bars = ax.bar(
+        labels,
+        [0.0 if math.isnan(value) else value for value in values],
+        color=["#BAB0AC" if math.isnan(value) else "#59A14F" for value in values],
+    )
+    ax.set_title("Average First Violation Step")
+    ax.set_ylabel("Average step index")
+    ax.tick_params(axis="x", rotation=25)
+    upper = max((value for value in values if not math.isnan(value)), default=0.0)
+    ax.set_ylim(0.0, upper + max(0.4, upper * 0.2))
+    for bar, value in zip(bars, raw_values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            (0.02 if value is None else float(value) + 0.05),
+            "N/A" if value is None else f"{float(value):.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
+
+
+def _plot_validity_expectation_alignment(path: Path, summary_rows: Sequence[Dict[str, Any]]) -> None:
     _plot_bar(
         path,
-        labels=labels,
-        values=values,
-        title="Average First Violation Step",
-        ylabel="Average step index",
+        labels=[row["model_label"] for row in summary_rows],
+        values=[float(row["validity_expectation_alignment_rate_e2e"] or 0.0) for row in summary_rows],
+        title="Validity-Expectation Alignment",
+        ylabel="End-to-end alignment rate",
+        is_rate=True,
     )
 
 
@@ -633,6 +778,7 @@ def _generate_plots(
         values=[float(row["parse_success_rate"]) for row in summary_rows],
         title="Parse Success Rate by Model",
         ylabel="Rate",
+        is_rate=True,
     )
     _plot_bar(
         plots_dir / "conditional_validity_rate.png",
@@ -640,6 +786,7 @@ def _generate_plots(
         values=[float(row["conditional_validity_rate"] or 0.0) for row in summary_rows],
         title="Conditional Validity Rate by Model",
         ylabel="Rate",
+        is_rate=True,
     )
     _plot_bar(
         plots_dir / "conditional_trace_grounding_rate.png",
@@ -647,6 +794,11 @@ def _generate_plots(
         values=[float(row["conditional_trace_grounding_rate"] or 0.0) for row in summary_rows],
         title="Conditional Trace Grounding Rate by Model",
         ylabel="Rate",
+        is_rate=True,
+    )
+    _plot_validity_expectation_alignment(
+        plots_dir / "validity_expectation_alignment_rate.png",
+        summary_rows,
     )
     _plot_bar(
         plots_dir / "transport_failure_rate.png",
@@ -654,30 +806,33 @@ def _generate_plots(
         values=[float(row["transport_failure_rate"]) for row in summary_rows],
         title="Transport Failure Rate by Model",
         ylabel="Rate",
+        is_rate=True,
     )
     _plot_grouped_bars(
         plots_dir / "direct_vs_closure_f1.png",
         labels=labels,
         series={
-            "direct_f1": [float(row["direct_f1"]) for row in summary_rows],
-            "closure_f1": [float(row["closure_f1"]) for row in summary_rows],
+            "direct_f1": [float(row["fidelity_direct_f1"]) for row in summary_rows],
+            "closure_f1": [float(row["fidelity_closure_f1"]) for row in summary_rows],
         },
-        title="Direct vs Closure F1",
+        title="Direct vs Closure F1 (Gold-bearing Tasks)",
         ylabel="F1",
+        is_rate=True,
     )
     _plot_bar(
         plots_dir / "closure_gap.png",
         labels=labels,
-        values=[float(row["closure_minus_direct_f1"]) for row in summary_rows],
-        title="Closure Minus Direct F1",
+        values=[float(row["fidelity_closure_gap"]) for row in summary_rows],
+        title="Closure Minus Direct F1 (Gold-bearing Tasks)",
         ylabel="F1 gap",
+        ylim=(0.0, max(float(row["fidelity_closure_gap"]) for row in summary_rows) + 0.05),
     )
     _plot_scatter(
         plots_dir / "parse_success_vs_closure_scatter.png",
         x_values=[float(row["parse_success_rate"]) for row in summary_rows],
-        y_values=[float(row["closure_f1"]) for row in summary_rows],
+        y_values=[float(row["fidelity_closure_f1"]) for row in summary_rows],
         labels=labels,
-        title="Parse Success vs Closure F1",
+        title="Parse Success vs Closure F1 (Gold-bearing Tasks)",
         xlabel="Parse success rate",
         ylabel="Closure F1",
     )
@@ -687,8 +842,9 @@ def _generate_plots(
         plots_dir / "contradiction_detection_rate.png",
         labels=labels,
         values=[float(row["contradiction_detection_rate"] or 0.0) for row in summary_rows],
-        title="Contradiction Detection Rate",
+        title="Contradiction Detection Rate (Parsed Contradiction Tasks)",
         ylabel="Rate",
+        is_rate=True,
     )
     _plot_grouped_bars(
         plots_dir / "ambiguity_behaviour.png",
@@ -697,8 +853,9 @@ def _generate_plots(
             "abstention_rate": [float(row["ambiguity_abstention_rate"] or 0.0) for row in summary_rows],
             "overcommitment_rate": [float(row["ambiguity_overcommitment_rate"] or 0.0) for row in summary_rows],
         },
-        title="Ambiguity Behaviour",
+        title="Ambiguity Behaviour (Parsed Ambiguous Tasks)",
         ylabel="Rate",
+        is_rate=True,
     )
 
     category_parse_rows = [row for row in category_rows if row.get("category")]
@@ -714,6 +871,7 @@ def _generate_plots(
             series=parse_series,
             title="Category-wise Parse Success",
             ylabel="Rate",
+            is_rate=True,
         )
 
     fidelity_categories = sorted(
@@ -739,6 +897,7 @@ def _generate_plots(
             series=series,
             title="Closure F1 on Fidelity-bearing Categories",
             ylabel="F1",
+            is_rate=True,
         )
 
     parse_failure_types = sorted(
@@ -803,6 +962,7 @@ def _generate_plots(
                 stacks=stacks,
                 title=title,
                 ylabel="Affected-task rate",
+                is_rate=True,
             )
 
 
@@ -830,10 +990,14 @@ def _narrative_report(
         return "# Temporal Verification Evaluation Summary\n\nNo runs analysed.\n"
 
     best_parse = max(summary_rows, key=lambda row: float(row["parse_success_rate"]))
-    best_closure = max(summary_rows, key=lambda row: float(row["closure_f1"]))
+    best_closure = max(summary_rows, key=lambda row: float(row["fidelity_closure_f1"]))
+    best_alignment = max(
+        summary_rows,
+        key=lambda row: float(row["validity_expectation_alignment_rate_e2e"] or 0.0),
+    )
     best_ambiguity = max(summary_rows, key=lambda row: float(row["ambiguity_abstention_rate"] or 0.0))
     best_contradiction = max(summary_rows, key=lambda row: float(row["contradiction_detection_rate"] or 0.0))
-    largest_gap = max(summary_rows, key=lambda row: float(row["closure_minus_direct_f1"]))
+    largest_gap = max(summary_rows, key=lambda row: float(row["fidelity_closure_gap"]))
     screening_mode = any(bool(row["screening_warning"]) for row in summary_rows)
 
     report_lines = [
@@ -841,10 +1005,11 @@ def _narrative_report(
         "",
         f"- Runs analysed: `{len(summary_rows)}`",
         f"- Highest parse success: `{best_parse['model_label']}` at `{best_parse['parse_success_rate']:.3f}`",
-        f"- Highest closure F1: `{best_closure['model_label']}` at `{best_closure['closure_f1']:.3f}`",
+        f"- Highest fidelity closure F1: `{best_closure['model_label']}` at `{best_closure['fidelity_closure_f1']:.3f}`",
+        f"- Highest validity-expectation alignment: `{best_alignment['model_label']}` at `{float(best_alignment['validity_expectation_alignment_rate_e2e'] or 0.0):.3f}`",
         f"- Best ambiguity abstention: `{best_ambiguity['model_label']}` at `{float(best_ambiguity['ambiguity_abstention_rate'] or 0.0):.3f}`",
         f"- Best contradiction detection: `{best_contradiction['model_label']}` at `{float(best_contradiction['contradiction_detection_rate'] or 0.0):.3f}`",
-        f"- Largest closure-direct gap: `{largest_gap['model_label']}` at `{largest_gap['closure_minus_direct_f1']:.3f}`",
+        f"- Largest fidelity closure-direct gap: `{largest_gap['model_label']}` at `{largest_gap['fidelity_closure_gap']:.3f}`",
         "",
         "## Interpretation",
         "",
@@ -859,6 +1024,8 @@ def _narrative_report(
     report_lines.extend(
         [
             "- Parse robustness, transport stability, intrinsic graph validity, trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
+            "- `validity_expectation_alignment_rate_e2e` checks whether the verifier outcome matches the task intent end-to-end, so clean-but-wrong contradiction abstention does not look deceptively strong.",
+            "- `fidelity_direct_f1` and `fidelity_closure_f1` are computed on gold-bearing tasks only, excluding empty-gold ambiguity items from the fidelity headline.",
             "- Direct-vs-closure gaps indicate when a model recovers the implied temporal ordering while still missing the intended explicit representation.",
             "- Ambiguous and contradiction categories are consistency-oriented slices. They should not be interpreted through raw F1 alone.",
             "",
@@ -874,10 +1041,11 @@ def _narrative_report(
                 "parse_success_rate",
                 "transport_failure_rate",
                 "conditional_validity_rate",
+                "validity_expectation_alignment_rate_e2e",
                 "conditional_trace_grounding_rate",
-                "direct_f1",
-                "closure_f1",
-                "closure_minus_direct_f1",
+                "fidelity_direct_f1",
+                "fidelity_closure_f1",
+                "fidelity_closure_gap",
                 "ambiguity_overcommitment_rate",
                 "contradiction_detection_rate",
             ],
@@ -895,7 +1063,7 @@ def _narrative_report(
                 "model_label",
                 "category",
                 "parse_success_rate",
-                "conditional_validity_rate",
+                "validity_expectation_alignment_rate_e2e",
                 "trace_grounding_rate",
                 "direct_f1",
                 "closure_f1",
@@ -913,9 +1081,10 @@ def _narrative_report(
             "- `parse_success_rate.png`: pipeline robustness, not reasoning quality.",
             "- `transport_failure_rate.png`: infrastructure instability, not model behaviour.",
             "- `conditional_trace_grounding_rate.png`: whether reasoning annotations align with the final answer structure.",
-            "- `direct_vs_closure_f1.png`: representation fidelity versus ordering recovery.",
+            "- `validity_expectation_alignment_rate.png`: whether valid versus invalid outputs match task expectations end-to-end.",
+            "- `direct_vs_closure_f1.png`: representation fidelity versus ordering recovery on gold-bearing tasks only.",
             "- `ambiguity_behaviour.png`: abstention discipline versus overcommitment.",
-            "- `contradiction_detection_rate.png`: consistency-focused performance on contradiction tasks.",
+            "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
             "- `verification_task_incidence.png`: task-level prevalence of invariant failure modes.",
             "- `ltl_task_incidence.png`: trace-level corroboration of structural failures; do not read this as independent evidence from the invariant layer.",
         ]

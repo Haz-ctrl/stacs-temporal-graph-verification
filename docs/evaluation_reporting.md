@@ -9,15 +9,28 @@ The key run-level metrics answer different questions:
 - `parse_success_rate`: can the model reliably enter the structured evaluation pipeline?
 - `transport_failure_rate`: how much of the end-to-end failure is infrastructure rather than model behaviour?
 - `conditional_validity_rate`: among parsed outputs, how often is the structure intrinsically valid?
+- `validity_expectation_alignment_rate_e2e`: end-to-end, how often does the valid/invalid status match the task expectation?
 - `conditional_trace_grounding_rate`: among parsed outputs, how often do reasoning annotations align with the final answer structure?
 - `direct_f1`: how closely does the model match the intended explicit edge set?
 - `closure_f1`: how well does the model recover the implied temporal ordering, even if the explicit representation is incomplete?
+- `fidelity_direct_f1`: direct-edge F1 on gold-bearing tasks only
+- `fidelity_closure_f1`: closure F1 on gold-bearing tasks only
 - `closure_minus_direct_f1`: how large is the gap between ordering recovery and explicit fidelity?
 - `ambiguity_abstention_rate`: how often does the model refrain from unsupported commitments?
 - `ambiguity_overcommitment_rate`: how often does the model invent temporal commitments in ambiguous tasks?
 - `contradiction_detection_rate`: how often do contradiction tasks trigger meaningful temporal inconsistency signals?
 
 These should not be collapsed into a single “best model” score.
+
+Use `conditional_validity_rate` and `validity_expectation_alignment_rate_e2e` together.
+
+- A model can have high intrinsic validity by abstaining on contradiction tasks.
+- The alignment metric checks whether that validity status was actually the right one for the task.
+
+Use `fidelity_*` metrics when making fidelity claims.
+
+- The original run-level `direct_f1` and `closure_f1` preserve the full expected-valid task mix.
+- The `fidelity_*` variants remove empty-gold tasks so ambiguity slices do not dilute or distort fidelity headlines.
 
 ## Screening vs Final Evaluation
 

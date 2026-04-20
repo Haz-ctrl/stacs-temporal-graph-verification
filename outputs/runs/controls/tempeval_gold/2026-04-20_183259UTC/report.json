@@ -1,0 +1,84 @@
+{
+  "run_id": "2026-04-20_183259UTC",
+  "predictions_file": "outputs/runs/controls/tempeval_gold/2026-04-20_183259UTC/predictions.jsonl",
+  "pred_source": "gold",
+  "dataset": {
+    "path": "data/tempeval_eval.jsonl",
+    "dataset_version": "tempeval_eval",
+    "num_tasks": 496,
+    "expected_valid_tasks": 496,
+    "expected_invalid_tasks": 0
+  },
+  "code_version": "ff07517077602e204957708e1c6f6209e63b3541",
+  "model_metadata": {
+    "provider": "synthetic",
+    "model": "deepseek-r1:7b",
+    "prediction_mode": "gold",
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "run_config": {
+    "run_id": "2026-04-20_183259UTC",
+    "data_path": "data/tempeval_eval.jsonl",
+    "num_tasks": 496,
+    "pred_source": "gold",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 1,
+    "retry_backoff_s": 2.0,
+    "dataset_version": "tempeval_eval",
+    "code_version": "ff07517077602e204957708e1c6f6209e63b3541",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 496,
+  "num_failures": 0,
+  "failures": [],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 1.0,
+  "conditional_validity_rate": 1.0,
+  "conditional_trace_grounding_rate": 1.0,
+  "transport_failure_counts": {},
+  "parse_failure_counts": {},
+  "valid_count": 496,
+  "invalid_count": 0,
+  "trace_grounded_count": 496,
+  "trace_ungrounded_count": 0,
+  "validity_rate": 1.0,
+  "violation_counts": {},
+  "formula_violation_counts": {},
+  "first_violation_step_histogram": {},
+  "taxonomy_counts": {},
+  "overcommitment": {
+    "num_gold_empty_tasks": 0,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "correct": 496,
+      "pred_total": 496,
+      "gold_total": 496
+    },
+    "closure": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "correct": 398,
+      "pred_total": 398,
+      "gold_total": 398
+    }
+  },
+  "report_path": "outputs/runs/controls/tempeval_gold/2026-04-20_183259UTC/report.json"
+}

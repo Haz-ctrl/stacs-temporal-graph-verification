@@ -1,26 +1,26 @@
-run_id,model_label,category,num_tasks,num_parsed,num_failures,expected_valid_parsed_tasks,gold_bearing_parsed_tasks,parse_success_rate,conditional_validity_rate,invalidity_rate,trace_grounding_rate,direct_f1,closure_f1,closure_preservation_rate,abstention_rate,overcommitment_rate,contradiction_detection_rate,avg_first_violation_step,analysis_focus
-2026-04-11_133750UTC,DeepSeek R1 7B,ambiguous,5,3,2,3,0,0.6,1.0,0.0,1.0,,,0.6666666666666666,0.3333333333333333,0.6666666666666666,0.0,,consistency
-2026-04-11_133750UTC,DeepSeek R1 7B,contradiction,4,4,0,0,0,1.0,1.0,0.0,1.0,,,,0.0,0.0,0.0,,consistency
-2026-04-11_133750UTC,DeepSeek R1 7B,linear_chain,5,3,2,3,3,0.6,1.0,0.0,1.0,0.5,0.4444444444444444,0.3333333333333333,0.0,0.0,0.0,,fidelity
-2026-04-11_133750UTC,DeepSeek R1 7B,long_chain,1,1,0,1,1,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_133750UTC,DeepSeek R1 7B,transitive_reasoning,5,4,1,4,4,0.8,1.0,0.0,1.0,0.7142857142857143,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_134155UTC,Qwen 3.5 9B,ambiguous,5,4,1,4,0,0.8,0.75,0.25,0.75,,,1.0,0.5,0.5,0.0,5,consistency
-2026-04-11_134155UTC,Qwen 3.5 9B,contradiction,4,4,0,0,0,1.0,0.0,1.0,0.25,,,,0.0,0.0,1.0,1,consistency
-2026-04-11_134155UTC,Qwen 3.5 9B,linear_chain,5,5,0,5,5,1.0,1.0,0.0,1.0,0.7272727272727272,0.8275862068965518,0.6,0.0,0.0,0.0,,fidelity
-2026-04-11_134155UTC,Qwen 3.5 9B,long_chain,1,0,1,0,0,0.0,,,,,,,,,,,fidelity
-2026-04-11_134155UTC,Qwen 3.5 9B,transitive_reasoning,5,5,0,5,5,1.0,1.0,0.0,1.0,0.8571428571428571,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_140319UTC,Llama 3.1 8B,ambiguous,5,5,0,5,0,1.0,1.0,0.0,1.0,,,0.0,0.0,1.0,0.0,,consistency
-2026-04-11_140319UTC,Llama 3.1 8B,contradiction,4,4,0,0,0,1.0,0.0,1.0,1.0,,,,0.0,0.0,1.0,1,consistency
-2026-04-11_140319UTC,Llama 3.1 8B,linear_chain,5,5,0,5,5,1.0,0.8,0.2,0.8,0.0,0.21428571428571427,0.2,0.0,0.0,0.0,1,fidelity
-2026-04-11_140319UTC,Llama 3.1 8B,long_chain,1,1,0,1,1,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_140319UTC,Llama 3.1 8B,transitive_reasoning,5,5,0,5,5,1.0,1.0,0.0,1.0,0.7027027027027027,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_140512UTC,Mistral 7B,ambiguous,5,4,1,4,0,0.8,1.0,0.0,1.0,,,0.0,0.0,1.0,0.0,,consistency
-2026-04-11_140512UTC,Mistral 7B,contradiction,4,4,0,0,0,1.0,0.25,0.75,0.75,,,,0.0,0.0,0.75,1,consistency
-2026-04-11_140512UTC,Mistral 7B,linear_chain,5,5,0,5,5,1.0,0.8,0.2,0.8,0.4210526315789474,0.4615384615384615,0.2,0.0,0.0,0.2,1,fidelity
-2026-04-11_140512UTC,Mistral 7B,long_chain,1,1,0,1,1,1.0,1.0,0.0,1.0,0.0,0.0909090909090909,0.0,0.0,0.0,0.0,,fidelity
-2026-04-11_140512UTC,Mistral 7B,transitive_reasoning,5,5,0,5,5,1.0,0.6,0.4,0.6,0.5454545454545454,0.7368421052631579,0.6,0.0,0.0,0.0,1,fidelity
-2026-04-11_140642UTC,Gemma 3 12B,ambiguous,5,5,0,5,0,1.0,1.0,0.0,1.0,,,0.6,0.6,0.4,0.0,,consistency
-2026-04-11_140642UTC,Gemma 3 12B,contradiction,4,4,0,0,0,1.0,1.0,0.0,1.0,,,,1.0,0.0,0.0,,consistency
-2026-04-11_140642UTC,Gemma 3 12B,linear_chain,5,5,0,5,5,1.0,1.0,0.0,1.0,0.7,0.8000000000000002,0.6,0.0,0.0,0.0,,fidelity
-2026-04-11_140642UTC,Gemma 3 12B,long_chain,1,1,0,1,1,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
-2026-04-11_140642UTC,Gemma 3 12B,transitive_reasoning,5,5,0,5,5,1.0,0.8,0.2,0.8,0.7027027027027027,1.0,1.0,0.0,0.0,0.0,3,fidelity
+run_id,model_label,category,num_tasks,num_parsed,num_failures,expected_valid_parsed_tasks,gold_bearing_parsed_tasks,parse_success_rate,conditional_validity_rate,validity_expectation_alignment_rate,validity_expectation_alignment_rate_e2e,invalidity_rate,trace_grounding_rate,direct_f1,closure_f1,closure_preservation_rate,abstention_rate,overcommitment_rate,contradiction_detection_rate,avg_first_violation_step,analysis_focus
+2026-04-11_133750UTC,DeepSeek R1 7B,ambiguous,5,3,2,3,0,0.6,1.0,1.0,0.6,0.0,1.0,,,0.6666666666666666,0.3333333333333333,0.6666666666666666,0.0,,consistency
+2026-04-11_133750UTC,DeepSeek R1 7B,contradiction,4,4,0,0,0,1.0,1.0,0.0,0.0,0.0,1.0,,,,0.0,0.0,0.0,,consistency
+2026-04-11_133750UTC,DeepSeek R1 7B,linear_chain,5,3,2,3,3,0.6,1.0,1.0,0.6,0.0,1.0,0.5,0.4444444444444444,0.3333333333333333,0.0,0.0,0.0,,fidelity
+2026-04-11_133750UTC,DeepSeek R1 7B,long_chain,1,1,0,1,1,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_133750UTC,DeepSeek R1 7B,transitive_reasoning,5,4,1,4,4,0.8,1.0,1.0,0.8,0.0,1.0,0.7142857142857143,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_134155UTC,Qwen 3.5 9B,ambiguous,5,4,1,4,0,0.8,0.75,0.75,0.6,0.25,0.75,,,1.0,0.5,0.5,0.0,5,consistency
+2026-04-11_134155UTC,Qwen 3.5 9B,contradiction,4,4,0,0,0,1.0,0.0,1.0,1.0,1.0,0.25,,,,0.0,0.0,1.0,1,consistency
+2026-04-11_134155UTC,Qwen 3.5 9B,linear_chain,5,5,0,5,5,1.0,1.0,1.0,1.0,0.0,1.0,0.7272727272727272,0.8275862068965518,0.6,0.0,0.0,0.0,,fidelity
+2026-04-11_134155UTC,Qwen 3.5 9B,long_chain,1,0,1,0,0,0.0,,,0.0,,,,,,,,,,fidelity
+2026-04-11_134155UTC,Qwen 3.5 9B,transitive_reasoning,5,5,0,5,5,1.0,1.0,1.0,1.0,0.0,1.0,0.8571428571428571,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_140319UTC,Llama 3.1 8B,ambiguous,5,5,0,5,0,1.0,1.0,1.0,1.0,0.0,1.0,,,0.0,0.0,1.0,0.0,,consistency
+2026-04-11_140319UTC,Llama 3.1 8B,contradiction,4,4,0,0,0,1.0,0.0,1.0,1.0,1.0,1.0,,,,0.0,0.0,1.0,1,consistency
+2026-04-11_140319UTC,Llama 3.1 8B,linear_chain,5,5,0,5,5,1.0,0.8,0.8,0.8,0.2,0.8,0.0,0.21428571428571427,0.2,0.0,0.0,0.0,1,fidelity
+2026-04-11_140319UTC,Llama 3.1 8B,long_chain,1,1,0,1,1,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_140319UTC,Llama 3.1 8B,transitive_reasoning,5,5,0,5,5,1.0,1.0,1.0,1.0,0.0,1.0,0.7027027027027027,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_140512UTC,Mistral 7B,ambiguous,5,4,1,4,0,0.8,1.0,1.0,0.8,0.0,1.0,,,0.0,0.0,1.0,0.0,,consistency
+2026-04-11_140512UTC,Mistral 7B,contradiction,4,4,0,0,0,1.0,0.25,0.75,0.75,0.75,0.75,,,,0.0,0.0,0.75,1,consistency
+2026-04-11_140512UTC,Mistral 7B,linear_chain,5,5,0,5,5,1.0,0.8,0.8,0.8,0.2,0.8,0.4210526315789474,0.4615384615384615,0.2,0.0,0.0,0.2,1,fidelity
+2026-04-11_140512UTC,Mistral 7B,long_chain,1,1,0,1,1,1.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0909090909090909,0.0,0.0,0.0,0.0,,fidelity
+2026-04-11_140512UTC,Mistral 7B,transitive_reasoning,5,5,0,5,5,1.0,0.6,0.6,0.6,0.4,0.6,0.5454545454545454,0.7368421052631579,0.6,0.0,0.0,0.0,1,fidelity
+2026-04-11_140642UTC,Gemma 3 12B,ambiguous,5,5,0,5,0,1.0,1.0,1.0,1.0,0.0,1.0,,,0.6,0.6,0.4,0.0,,consistency
+2026-04-11_140642UTC,Gemma 3 12B,contradiction,4,4,0,0,0,1.0,1.0,0.0,0.0,0.0,1.0,,,,1.0,0.0,0.0,,consistency
+2026-04-11_140642UTC,Gemma 3 12B,linear_chain,5,5,0,5,5,1.0,1.0,1.0,1.0,0.0,1.0,0.7,0.8000000000000002,0.6,0.0,0.0,0.0,,fidelity
+2026-04-11_140642UTC,Gemma 3 12B,long_chain,1,1,0,1,1,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0,,fidelity
+2026-04-11_140642UTC,Gemma 3 12B,transitive_reasoning,5,5,0,5,5,1.0,0.8,0.8,0.8,0.2,0.8,0.7027027027027027,1.0,1.0,0.0,0.0,0.0,3,fidelity
