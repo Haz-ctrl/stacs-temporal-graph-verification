@@ -1,0 +1,183 @@
+{
+  "run_id": "2026-04-21_081944UTC",
+  "predictions_file": "outputs/runs/tempeval_full/2026-04-21_081944UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/tempeval_eval.jsonl",
+    "dataset_version": "tempeval_eval",
+    "num_tasks": 496,
+    "expected_valid_tasks": 496,
+    "expected_invalid_tasks": 0
+  },
+  "code_version": "c9cb69804b77f1d18f8c822daeba70953d07649f",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "gemma3:12b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-04-11T14:17:41.060507071+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-04-11T14:15:24.414113227+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-04-11T14:14:28.863953367+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-04-11T14:12:21.007585421+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-04-11T14:09:21.147061316+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "2026-04-21_081944UTC",
+    "data_path": "data/tempeval_eval.jsonl",
+    "num_tasks": 496,
+    "pred_source": "llm",
+    "model": "gemma3:12b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": true,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 1,
+    "retry_backoff_s": 2.0,
+    "dataset_version": "tempeval_eval",
+    "code_version": "c9cb69804b77f1d18f8c822daeba70953d07649f",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 496,
+  "num_failures": 0,
+  "failures": [],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 1.0,
+  "conditional_validity_rate": 0.9979838709677419,
+  "conditional_trace_grounding_rate": 0.9979838709677419,
+  "transport_failure_counts": {},
+  "parse_failure_counts": {},
+  "valid_count": 495,
+  "invalid_count": 1,
+  "trace_grounded_count": 495,
+  "trace_ungrounded_count": 1,
+  "validity_rate": 0.9979838709677419,
+  "violation_counts": {
+    "hallucinated_node": 1,
+    "unsupported_reasoning_reference": 1
+  },
+  "formula_violation_counts": {
+    "ltl_hallucinated_node": 1
+  },
+  "first_violation_step_histogram": {
+    "0": 1
+  },
+  "taxonomy_counts": {
+    "grounding": 2
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 0,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.354639175257732,
+      "recall": 0.3467741935483871,
+      "f1": 0.35066258919469934,
+      "correct": 172,
+      "pred_total": 485,
+      "gold_total": 496
+    },
+    "closure": {
+      "precision": 0.5484536082474227,
+      "recall": 0.6683417085427136,
+      "f1": 0.6024915062287657,
+      "correct": 266,
+      "pred_total": 485,
+      "gold_total": 398
+    }
+  },
+  "report_path": "outputs/runs/tempeval_full/2026-04-21_081944UTC/report.json"
+}
