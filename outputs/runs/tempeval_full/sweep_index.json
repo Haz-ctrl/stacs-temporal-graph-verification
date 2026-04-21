@@ -1,0 +1,41 @@
+{
+  "data_path": "data/tempeval_eval.jsonl",
+  "seed": 42,
+  "temperature": 0.0,
+  "timeout_s": 120,
+  "max_retries": 1,
+  "retry_backoff_s": 2.0,
+  "max_tasks": 0,
+  "runs": [
+    {
+      "run_id": "2026-04-20_193003UTC",
+      "run_dir": "outputs/runs/tempeval_full/2026-04-20_193003UTC",
+      "model": "deepseek-r1:7b",
+      "label": "DeepSeek R1 7B"
+    },
+    {
+      "run_id": "2026-04-20_205047UTC",
+      "run_dir": "outputs/runs/tempeval_full/2026-04-20_205047UTC",
+      "model": "qwen3.5:9b",
+      "label": "Qwen 3.5 9B"
+    },
+    {
+      "run_id": "2026-04-21_074248UTC",
+      "run_dir": "outputs/runs/tempeval_full/2026-04-21_074248UTC",
+      "model": "llama3.1:8b",
+      "label": "Llama 3.1 8B"
+    },
+    {
+      "run_id": "2026-04-21_080222UTC",
+      "run_dir": "outputs/runs/tempeval_full/2026-04-21_080222UTC",
+      "model": "mistral:7b",
+      "label": "Mistral 7B"
+    },
+    {
+      "run_id": "2026-04-21_081944UTC",
+      "run_dir": "outputs/runs/tempeval_full/2026-04-21_081944UTC",
+      "model": "gemma3:12b",
+      "label": "Gemma 3 12B"
+    }
+  ]
+}
