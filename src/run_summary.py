@@ -8,6 +8,7 @@ import random
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+import shutil
 from statistics import mean
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
 
@@ -285,6 +286,14 @@ def _metric_or_none(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Optio
     if aggregate["gold_total"] == 0:
         return None
     return aggregate["f1"]
+
+
+def _has_non_null_metric(rows: Sequence[Dict[str, Any]], key: str) -> bool:
+    return any(row.get(key) is not None for row in rows)
+
+
+def _has_meaningful_rate(rows: Sequence[Dict[str, Any]], key: str) -> bool:
+    return any(row.get(key) not in (None, 0, 0.0) for row in rows)
 
 
 def load_runs(run_dirs: Sequence[str | Path], *, manifest_path: str | Path | None = None) -> List[LoadedRun]:
@@ -770,8 +779,12 @@ def _generate_plots(
     failure_rows: Sequence[Dict[str, Any]],
 ) -> None:
     plots_dir = out_dir / "plots"
+    if plots_dir.exists():
+        shutil.rmtree(plots_dir)
     plots_dir.mkdir(parents=True, exist_ok=True)
     labels = [row["model_label"] for row in summary_rows]
+    has_ambiguity = any(row.get("category") == "ambiguous" for row in category_rows)
+    has_contradiction = any(row.get("category") == "contradiction" for row in category_rows)
     _plot_bar(
         plots_dir / "parse_success_rate.png",
         labels=labels,
@@ -838,29 +851,34 @@ def _generate_plots(
     )
     _plot_average_first_violation_step(plots_dir / "average_first_violation_step.png", summary_rows)
 
-    _plot_bar(
-        plots_dir / "contradiction_detection_rate.png",
-        labels=labels,
-        values=[float(row["contradiction_detection_rate"] or 0.0) for row in summary_rows],
-        title="Contradiction Detection Rate (Parsed Contradiction Tasks)",
-        ylabel="Rate",
-        is_rate=True,
-    )
-    _plot_grouped_bars(
-        plots_dir / "ambiguity_behaviour.png",
-        labels=labels,
-        series={
-            "abstention_rate": [float(row["ambiguity_abstention_rate"] or 0.0) for row in summary_rows],
-            "overcommitment_rate": [float(row["ambiguity_overcommitment_rate"] or 0.0) for row in summary_rows],
-        },
-        title="Ambiguity Behaviour (Parsed Ambiguous Tasks)",
-        ylabel="Rate",
-        is_rate=True,
-    )
+    if has_contradiction and _has_non_null_metric(summary_rows, "contradiction_detection_rate"):
+        _plot_bar(
+            plots_dir / "contradiction_detection_rate.png",
+            labels=labels,
+            values=[float(row["contradiction_detection_rate"] or 0.0) for row in summary_rows],
+            title="Contradiction Detection Rate (Parsed Contradiction Tasks)",
+            ylabel="Rate",
+            is_rate=True,
+        )
+    if has_ambiguity and (
+        _has_non_null_metric(summary_rows, "ambiguity_abstention_rate")
+        or _has_non_null_metric(summary_rows, "ambiguity_overcommitment_rate")
+    ):
+        _plot_grouped_bars(
+            plots_dir / "ambiguity_behaviour.png",
+            labels=labels,
+            series={
+                "abstention_rate": [float(row["ambiguity_abstention_rate"] or 0.0) for row in summary_rows],
+                "overcommitment_rate": [float(row["ambiguity_overcommitment_rate"] or 0.0) for row in summary_rows],
+            },
+            title="Ambiguity Behaviour (Parsed Ambiguous Tasks)",
+            ylabel="Rate",
+            is_rate=True,
+        )
 
     category_parse_rows = [row for row in category_rows if row.get("category")]
     category_names = sorted({row["category"] for row in category_parse_rows})
-    if category_names:
+    if len(category_names) > 1:
         parse_series: Dict[str, List[float]] = {}
         for label in labels:
             label_rows = {row["category"]: row for row in category_parse_rows if row["model_label"] == label}
@@ -883,7 +901,7 @@ def _generate_plots(
             and row.get("closure_f1") is not None
         }
     )
-    if fidelity_categories:
+    if len(fidelity_categories) > 1:
         series: Dict[str, List[float]] = {}
         for label in labels:
             label_rows = {row["category"]: row for row in category_rows if row["model_label"] == label}
@@ -989,15 +1007,18 @@ def _narrative_report(
     if not summary_rows:
         return "# Temporal Verification Evaluation Summary\n\nNo runs analysed.\n"
 
+    category_names = sorted({str(row["category"]) for row in category_rows if row.get("category")})
+    has_ambiguity = "ambiguous" in category_names
+    has_contradiction = "contradiction" in category_names
+    is_single_category = len(category_names) == 1
     best_parse = max(summary_rows, key=lambda row: float(row["parse_success_rate"]))
     best_closure = max(summary_rows, key=lambda row: float(row["fidelity_closure_f1"]))
     best_alignment = max(
         summary_rows,
         key=lambda row: float(row["validity_expectation_alignment_rate_e2e"] or 0.0),
     )
-    best_ambiguity = max(summary_rows, key=lambda row: float(row["ambiguity_abstention_rate"] or 0.0))
-    best_contradiction = max(summary_rows, key=lambda row: float(row["contradiction_detection_rate"] or 0.0))
     largest_gap = max(summary_rows, key=lambda row: float(row["fidelity_closure_gap"]))
+    worst_transport = max(summary_rows, key=lambda row: float(row["transport_failure_rate"]))
     screening_mode = any(bool(row["screening_warning"]) for row in summary_rows)
 
     report_lines = [
@@ -1007,13 +1028,24 @@ def _narrative_report(
         f"- Highest parse success: `{best_parse['model_label']}` at `{best_parse['parse_success_rate']:.3f}`",
         f"- Highest fidelity closure F1: `{best_closure['model_label']}` at `{best_closure['fidelity_closure_f1']:.3f}`",
         f"- Highest validity-expectation alignment: `{best_alignment['model_label']}` at `{float(best_alignment['validity_expectation_alignment_rate_e2e'] or 0.0):.3f}`",
-        f"- Best ambiguity abstention: `{best_ambiguity['model_label']}` at `{float(best_ambiguity['ambiguity_abstention_rate'] or 0.0):.3f}`",
-        f"- Best contradiction detection: `{best_contradiction['model_label']}` at `{float(best_contradiction['contradiction_detection_rate'] or 0.0):.3f}`",
         f"- Largest fidelity closure-direct gap: `{largest_gap['model_label']}` at `{largest_gap['fidelity_closure_gap']:.3f}`",
         "",
         "## Interpretation",
         "",
     ]
+    if has_ambiguity:
+        best_ambiguity = max(summary_rows, key=lambda row: float(row["ambiguity_abstention_rate"] or 0.0))
+        report_lines.insert(
+            6,
+            f"- Best ambiguity abstention: `{best_ambiguity['model_label']}` at `{float(best_ambiguity['ambiguity_abstention_rate'] or 0.0):.3f}`",
+        )
+    if has_contradiction:
+        best_contradiction = max(summary_rows, key=lambda row: float(row["contradiction_detection_rate"] or 0.0))
+        insert_at = 7 if has_ambiguity else 6
+        report_lines.insert(
+            insert_at,
+            f"- Best contradiction detection: `{best_contradiction['model_label']}` at `{float(best_contradiction['contradiction_detection_rate'] or 0.0):.3f}`",
+        )
     if screening_mode:
         report_lines.extend(
             [
@@ -1026,13 +1058,30 @@ def _narrative_report(
             "- Parse robustness, transport stability, intrinsic graph validity, trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
             "- `validity_expectation_alignment_rate_e2e` checks whether the verifier outcome matches the task intent end-to-end, so clean-but-wrong contradiction abstention does not look deceptively strong.",
             "- `fidelity_direct_f1` and `fidelity_closure_f1` are computed on gold-bearing tasks only, excluding empty-gold ambiguity items from the fidelity headline.",
+            "- Closure scoring only covers ordering-bearing relations. On datasets with many `SIMULTANEOUS` labels, closure F1 should be interpreted alongside direct F1 rather than in isolation.",
             "- Direct-vs-closure gaps indicate when a model recovers the implied temporal ordering while still missing the intended explicit representation.",
-            "- Ambiguous and contradiction categories are consistency-oriented slices. They should not be interpreted through raw F1 alone.",
+            (
+                "- Ambiguous and contradiction categories are consistency-oriented slices. They should not be interpreted through raw F1 alone."
+                if has_ambiguity or has_contradiction
+                else "- This dataset does not contain ambiguity or contradiction control slices, so consistency-specific plots are intentionally omitted."
+            ),
             "",
             "## Top-line Table",
             "",
         ]
     )
+    if is_single_category:
+        report_lines.insert(
+            report_lines.index("## Top-line Table"),
+            f"- This run set evaluates a single task family: `{category_names[0]}`. Category-wise plots should be read as dataset-wide summaries rather than cross-category diagnostics.",
+        )
+        report_lines.insert(report_lines.index("## Top-line Table"), "")
+    if float(worst_transport["transport_failure_rate"]) >= 0.05:
+        report_lines.insert(
+            report_lines.index("## Top-line Table"),
+            f"- `{worst_transport['model_label']}` has a transport failure rate of `{float(worst_transport['transport_failure_rate']):.3f}`. Comparative claims for that run should be treated as infrastructure-confounded until rerun with stronger retry settings.",
+        )
+        report_lines.insert(report_lines.index("## Top-line Table"), "")
     report_lines.extend(
         _markdown_table(
             summary_rows,
@@ -1046,33 +1095,39 @@ def _narrative_report(
                 "fidelity_direct_f1",
                 "fidelity_closure_f1",
                 "fidelity_closure_gap",
-                "ambiguity_overcommitment_rate",
-                "contradiction_detection_rate",
-            ],
+            ]
+            + (["ambiguity_overcommitment_rate"] if has_ambiguity else [])
+            + (["contradiction_detection_rate"] if has_contradiction else []),
         )
     )
-    report_lines.extend(["", "## Category Notes", ""])
     category_focus_rows = [
         row for row in category_rows
-        if row.get("category") in {"ambiguous", "contradiction", "linear_chain", "transitive_reasoning"}
-    ]
-    report_lines.extend(
-        _markdown_table(
-            category_focus_rows,
-            columns=[
-                "model_label",
-                "category",
-                "parse_success_rate",
-                "validity_expectation_alignment_rate_e2e",
-                "trace_grounding_rate",
-                "direct_f1",
-                "closure_f1",
-                "abstention_rate",
-                "overcommitment_rate",
-                "contradiction_detection_rate",
-            ],
+        if (
+            row.get("category") in {"ambiguous", "contradiction", "linear_chain", "transitive_reasoning"}
+            or is_single_category
         )
-    )
+    ]
+    if category_focus_rows:
+        category_columns = [
+            "model_label",
+            "category",
+            "parse_success_rate",
+            "validity_expectation_alignment_rate_e2e",
+            "trace_grounding_rate",
+            "direct_f1",
+            "closure_f1",
+        ]
+        if has_ambiguity:
+            category_columns.extend(["abstention_rate", "overcommitment_rate"])
+        if has_contradiction:
+            category_columns.append("contradiction_detection_rate")
+        report_lines.extend(["", "## Category Notes", ""])
+        report_lines.extend(
+            _markdown_table(
+                category_focus_rows,
+                columns=category_columns,
+            )
+        )
     report_lines.extend(
         [
             "",
@@ -1083,12 +1138,20 @@ def _narrative_report(
             "- `conditional_trace_grounding_rate.png`: whether reasoning annotations align with the final answer structure.",
             "- `validity_expectation_alignment_rate.png`: whether valid versus invalid outputs match task expectations end-to-end.",
             "- `direct_vs_closure_f1.png`: representation fidelity versus ordering recovery on gold-bearing tasks only.",
-            "- `ambiguity_behaviour.png`: abstention discipline versus overcommitment.",
-            "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
             "- `verification_task_incidence.png`: task-level prevalence of invariant failure modes.",
             "- `ltl_task_incidence.png`: trace-level corroboration of structural failures; do not read this as independent evidence from the invariant layer.",
         ]
     )
+    if has_ambiguity:
+        report_lines.insert(
+            report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
+            "- `ambiguity_behaviour.png`: abstention discipline versus overcommitment.",
+        )
+    if has_contradiction:
+        report_lines.insert(
+            report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
+            "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
+        )
     return "\n".join(report_lines) + "\n"
 
 

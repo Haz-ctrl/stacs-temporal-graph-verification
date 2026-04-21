@@ -28,6 +28,18 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
                 "expected_consistent": True,
             },
             {
+                "id": "con_001",
+                "category": "contradiction",
+                "question": "A happened before B, but B happened before A.",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [
+                    ["A happened", "B happened", "BEFORE"],
+                    ["B happened", "A happened", "BEFORE"],
+                ],
+                "expected_valid": False,
+                "expected_consistent": False,
+            },
+            {
                 "id": "lc_001",
                 "category": "linear_chain",
                 "question": "A happened before B.",
@@ -95,7 +107,7 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     assert gold_row["parse_success_ci_low"] is not None
     assert gold_row["validity_expectation_alignment_rate"] == 1.0
     assert gold_row["validity_expectation_alignment_rate_e2e"] == 1.0
-    assert gold_row["avg_first_violation_step"] is None
+    assert gold_row["avg_first_violation_step"] == 0
     assert gold_row["fidelity_direct_f1"] == 1.0
     assert gold_row["fidelity_closure_f1"] == 1.0
     ambiguous_row = next(
@@ -138,3 +150,39 @@ def test_summarise_runs_auto_loads_run_manifest(tmp_path: Path) -> None:
 
     result = summarise_runs([run.run_dir], out_dir=tmp_path / "analysis")
     assert result["summary"][0]["model_label"] == "gold-auto"
+
+
+def test_summarise_runs_omits_inapplicable_consistency_plots(tmp_path: Path) -> None:
+    dataset_path = tmp_path / "tempeval_like.jsonl"
+    _write_jsonl(
+        dataset_path,
+        [
+            {
+                "id": "te_001",
+                "category": "tempeval_relation",
+                "question": "Passage:\nA happened before B.\n\nDetermine the temporal relation.\n- A happened\n- B happened",
+                "events": ["A happened", "B happened"],
+                "gold_relations": [["A happened", "B happened", "BEFORE"]],
+                "expected_valid": True,
+                "expected_consistent": True,
+            }
+        ],
+    )
+
+    run = run_baseline(
+        BaselineRunConfig(
+            data_path=dataset_path,
+            pred_source="gold",
+            output_root=tmp_path / "runs",
+        )
+    )
+
+    out_dir = tmp_path / "analysis"
+    summarise_runs([run.run_dir], out_dir=out_dir)
+
+    report_text = (out_dir / "report.md").read_text(encoding="utf-8")
+    assert "does not contain ambiguity or contradiction control slices" in report_text
+    assert not (out_dir / "plots" / "ambiguity_behaviour.png").exists()
+    assert not (out_dir / "plots" / "contradiction_detection_rate.png").exists()
+    assert not (out_dir / "plots" / "category_parse_success.png").exists()
+    assert not (out_dir / "plots" / "fidelity_category_closure_f1.png").exists()
