@@ -13,7 +13,13 @@ from src.constraints import default_verifier
 from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
 from src.evaluation import aggregate_prf, score_prediction, task_score_to_json
-from src.ollama_client import OllamaClient, OllamaTransportError
+from src.ollama_client import (
+    DEFAULT_OLLAMA_MAX_RETRIES,
+    DEFAULT_OLLAMA_RETRY_BACKOFF_S,
+    DEFAULT_OLLAMA_TIMEOUT_S,
+    OllamaClient,
+    OllamaTransportError,
+)
 from src.prediction_schema import PredictionParseError
 from src.results import DatasetMetadata, RunReport, VerificationResult
 from src.schemas import ParsedPrediction, ReasoningStep, TemporalTask
@@ -36,9 +42,9 @@ class BaselineRunConfig:
     log_raw: bool = False
     validate_data: bool = True
     strict_data: bool = False
-    timeout_s: int = 120
-    max_retries: int = 1
-    retry_backoff_s: float = 2.0
+    timeout_s: int = DEFAULT_OLLAMA_TIMEOUT_S
+    max_retries: int = DEFAULT_OLLAMA_MAX_RETRIES
+    retry_backoff_s: float = DEFAULT_OLLAMA_RETRY_BACKOFF_S
     output_root: str | Path = Path("outputs") / "runs"
 
 
@@ -538,18 +544,23 @@ def parse_args() -> BaselineRunConfig:
     ap.add_argument("--log-raw", action="store_true", help="Log raw model output in predictions.jsonl.")
     ap.add_argument("--validate-data", action="store_true", help="Validate dataset before running.")
     ap.add_argument("--strict-data", action="store_true", help="Use stricter dataset validation.")
-    ap.add_argument("--timeout-s", type=int, default=120, help="Ollama request timeout in seconds.")
+    ap.add_argument(
+        "--timeout-s",
+        type=int,
+        default=DEFAULT_OLLAMA_TIMEOUT_S,
+        help="Ollama read timeout in seconds.",
+    )
     ap.add_argument(
         "--max-retries",
         type=int,
-        default=1,
+        default=DEFAULT_OLLAMA_MAX_RETRIES,
         help="Maximum number of transport attempts for each Ollama request.",
     )
     ap.add_argument(
         "--retry-backoff-s",
         type=float,
-        default=2.0,
-        help="Base backoff in seconds between transport retries.",
+        default=DEFAULT_OLLAMA_RETRY_BACKOFF_S,
+        help="Base backoff in seconds between exponential transport retries.",
     )
     ap.add_argument(
         "--output-root",

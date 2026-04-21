@@ -6,6 +6,11 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from scripts.run_llm_baseline import BaselineRunConfig, run_baseline
+from src.ollama_client import (
+    DEFAULT_OLLAMA_MAX_RETRIES,
+    DEFAULT_OLLAMA_RETRY_BACKOFF_S,
+    DEFAULT_OLLAMA_TIMEOUT_S,
+)
 
 
 def _load_manifest(path: str | Path) -> List[Dict[str, Any]]:
@@ -24,18 +29,23 @@ def main() -> None:
     parser.add_argument("--log-raw", action="store_true", help="Log raw outputs in run artefacts.")
     parser.add_argument("--max-tasks", type=int, default=0, help="Limit tasks per run (0 = full dataset).")
     parser.add_argument("--base-url", default="http://localhost:11434", help="Default Ollama base URL.")
-    parser.add_argument("--timeout-s", type=int, default=120, help="Ollama request timeout in seconds.")
+    parser.add_argument(
+        "--timeout-s",
+        type=int,
+        default=DEFAULT_OLLAMA_TIMEOUT_S,
+        help="Ollama read timeout in seconds.",
+    )
     parser.add_argument(
         "--max-retries",
         type=int,
-        default=1,
+        default=DEFAULT_OLLAMA_MAX_RETRIES,
         help="Maximum number of transport attempts for each Ollama request.",
     )
     parser.add_argument(
         "--retry-backoff-s",
         type=float,
-        default=2.0,
-        help="Base backoff in seconds between transport retries.",
+        default=DEFAULT_OLLAMA_RETRY_BACKOFF_S,
+        help="Base backoff in seconds between exponential transport retries.",
     )
     parser.add_argument(
         "--output-root",
