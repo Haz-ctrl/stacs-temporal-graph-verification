@@ -288,6 +288,33 @@ def _metric_or_none(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Optio
     return aggregate["f1"]
 
 
+def _closure_coverage(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
+    # Among gold-bearing tasks (those where the gold ordering produces at least one pair),
+    # what fraction did the model make a non-UNKNOWN ordering commitment for?
+    gold_bearing = [
+        r for r in rows
+        if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
+    ]
+    if not gold_bearing:
+        return None
+    committed = sum(
+        1 for r in gold_bearing
+        if r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
+    )
+    return committed / len(gold_bearing)
+
+
+def _committed_closure_prf(rows: Sequence[Dict[str, Any]]) -> Dict[str, float]:
+    # Micro-average PRF restricted to tasks where BOTH gold and pred produce ordering pairs.
+    # This is the "conditional on commitment" variant of closure F1.
+    committed = [
+        r for r in rows
+        if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
+        and r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
+    ]
+    return _aggregate_prf_from_rows(committed, metric_key="closure")
+
+
 def _has_non_null_metric(rows: Sequence[Dict[str, Any]], key: str) -> bool:
     return any(row.get(key) is not None for row in rows)
 
@@ -412,10 +439,14 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "fidelity_direct_f1_ci_high": fidelity_direct_ci_high,
         "fidelity_closure_precision": fidelity_closure["precision"],
         "fidelity_closure_recall": fidelity_closure["recall"],
+        # DEPRECATED alias: fidelity_closure_f1 == fidelity_closure_f1_full; use the latter in new code.
         "fidelity_closure_f1": fidelity_closure["f1"],
         "fidelity_closure_f1_ci_low": fidelity_closure_ci_low,
         "fidelity_closure_f1_ci_high": fidelity_closure_ci_high,
         "fidelity_closure_gap": fidelity_closure["f1"] - fidelity_direct["f1"],
+        "closure_coverage": _closure_coverage(expected_valid_gold_bearing_rows),
+        "fidelity_closure_f1_committed": _committed_closure_prf(expected_valid_gold_bearing_rows)["f1"],
+        "fidelity_closure_f1_full": fidelity_closure["f1"],
         "closure_preservation_rate": _closure_preservation_rate(expected_valid_parsed_rows),
         "ambiguity_abstention_rate": _abstention_rate(ambiguous_rows),
         "ambiguity_overcommitment_rate": _overcommitment_rate(ambiguous_rows),
@@ -1059,6 +1090,7 @@ def _narrative_report(
             "- `validity_expectation_alignment_rate_e2e` checks whether the verifier outcome matches the task intent end-to-end, so clean-but-wrong contradiction abstention does not look deceptively strong.",
             "- `fidelity_direct_f1` and `fidelity_closure_f1` are computed on gold-bearing tasks only, excluding empty-gold ambiguity items from the fidelity headline.",
             "- Closure scoring only covers ordering-bearing relations. On datasets with many `SIMULTANEOUS` labels, closure F1 should be interpreted alongside direct F1 rather than in isolation.",
+            "- Closure F1 is reported in two forms: `fidelity_closure_f1_full` (headline — treats uncommitted pairs as false negatives) and `fidelity_closure_f1_committed` (conditional on commitment only). Read `closure_coverage` alongside both.",
             "- Direct-vs-closure gaps indicate when a model recovers the implied temporal ordering while still missing the intended explicit representation.",
             (
                 "- Ambiguous and contradiction categories are consistency-oriented slices. They should not be interpreted through raw F1 alone."
@@ -1095,6 +1127,8 @@ def _narrative_report(
                 "fidelity_direct_f1",
                 "fidelity_closure_f1",
                 "fidelity_closure_gap",
+                "closure_coverage",
+                "fidelity_closure_f1_full",
             ]
             + (["ambiguity_overcommitment_rate"] if has_ambiguity else [])
             + (["contradiction_detection_rate"] if has_contradiction else []),
