@@ -1,0 +1,6 @@
+slice,num_tasks,label_accuracy
+all_tasks,496,0.2963709677419355
+verifier_valid,405,0.362962962962963
+verifier_invalid,91,0.0
+trace_grounded,405,0.362962962962963
+trace_ungrounded,91,0.0
