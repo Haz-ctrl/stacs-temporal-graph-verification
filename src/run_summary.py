@@ -18,6 +18,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 
+from src.analysis.axis_correlation import (
+    axis_correlation_prose,
+    compute_axis_correlation,
+    extract_flags,
+    plot_axis_correlation,
+    save_axis_correlation_csv,
+)
+
 
 BOOTSTRAP_ITERATIONS = 500
 BOOTSTRAP_SEED = 7
@@ -1034,6 +1042,7 @@ def _markdown_table(rows: Sequence[Dict[str, Any]], *, columns: Sequence[str]) -
 def _narrative_report(
     summary_rows: Sequence[Dict[str, Any]],
     category_rows: Sequence[Dict[str, Any]],
+    correlation_prose_blocks: Optional[Sequence[str]] = None,
 ) -> str:
     if not summary_rows:
         return "# Temporal Verification Evaluation Summary\n\nNo runs analysed.\n"
@@ -1186,6 +1195,20 @@ def _narrative_report(
             report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
             "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
         )
+    if correlation_prose_blocks:
+        report_lines.extend(["", "## Axis Correlation", ""])
+        report_lines.extend(
+            [
+                "Pairwise Pearson / phi correlations across intrinsic axes (parse_success, "
+                "verifier_valid, trace_grounded). High correlation indicates the axes provide "
+                "largely redundant signal; low correlation indicates they measure distinct things.",
+                "",
+            ]
+        )
+        report_lines.extend(correlation_prose_blocks)
+        report_lines.append(
+            "\nSee `axis_correlation_*.csv` and `axis_correlation_*.png` for full matrices."
+        )
     return "\n".join(report_lines) + "\n"
 
 
@@ -1231,8 +1254,20 @@ def summarise_runs(
             counterexample_text.append("")
     (out_path / "counterexamples.md").write_text("\n".join(counterexample_text), encoding="utf-8")
 
+    # Per-run axis correlation artefacts (CSV + heatmap PNG)
+    correlation_prose_blocks: List[str] = []
+    for run in runs:
+        flags = extract_flags(run.predictions, run.report.get("failures", []))
+        corr_result = compute_axis_correlation(flags)
+        run_slug = run.label.replace(" ", "_").replace("/", "-")
+        save_axis_correlation_csv(corr_result, out_path / f"axis_correlation_{run_slug}.csv")
+        plot_axis_correlation(corr_result, out_path / f"axis_correlation_{run_slug}.png")
+        prose = axis_correlation_prose(corr_result)
+        if prose:
+            correlation_prose_blocks.append(f"**{run.label}**: {prose}")
+
     (out_path / "report.md").write_text(
-        _narrative_report(summary_rows, category_rows),
+        _narrative_report(summary_rows, category_rows, correlation_prose_blocks),
         encoding="utf-8",
     )
 
