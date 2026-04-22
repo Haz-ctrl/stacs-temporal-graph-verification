@@ -1095,8 +1095,9 @@ def _narrative_report(
         )
     report_lines.extend(
         [
-            "- Parse robustness, transport stability, intrinsic graph validity, trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
+            "- Intrinsic graph validity and trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
             "- `validity_expectation_alignment_rate_e2e` checks whether the verifier outcome matches the task intent end-to-end, so clean-but-wrong contradiction abstention does not look deceptively strong.",
+            "- Intrinsic validity is a necessary-but-not-sufficient signal: no intrinsically invalid prediction was also label-correct, but intrinsically valid predictions still achieve only partial label accuracy. Both conditions must be checked.",
             "- `fidelity_direct_f1` and `fidelity_closure_f1` are computed on gold-bearing tasks only, excluding empty-gold ambiguity items from the fidelity headline.",
             "- Closure scoring only covers ordering-bearing relations. On datasets with many `SIMULTANEOUS` labels, closure F1 should be interpreted alongside direct F1 rather than in isolation.",
             "- Closure F1 is reported in two forms: `fidelity_closure_f1_full` (headline — treats uncommitted pairs as false negatives) and `fidelity_closure_f1_committed` (conditional on commitment only). Read `closure_coverage` alongside both.",
@@ -1107,42 +1108,64 @@ def _narrative_report(
                 else "- This dataset does not contain ambiguity or contradiction control slices, so consistency-specific plots are intentionally omitted."
             ),
             "",
-            "## Top-line Table",
+            "## Pipeline Diagnostics",
+            "",
+            "Parse robustness and transport stability are infrastructure signals, not reasoning quality indicators. They are separated here to avoid conflation with the reasoning metrics in the top-line table.",
             "",
         ]
     )
-    if is_single_category:
-        report_lines.insert(
-            report_lines.index("## Top-line Table"),
-            f"- This run set evaluates a single task family: `{category_names[0]}`. Category-wise plots should be read as dataset-wide summaries rather than cross-category diagnostics.",
+    report_lines.extend(
+        _markdown_table(
+            summary_rows,
+            columns=["model_label", "parse_success_rate", "transport_failure_rate"],
         )
-        report_lines.insert(report_lines.index("## Top-line Table"), "")
+    )
+    if is_single_category:
+        report_lines.extend(
+            [
+                "",
+                f"- This run set evaluates a single task family: `{category_names[0]}`. Category-wise plots should be read as dataset-wide summaries rather than cross-category diagnostics.",
+            ]
+        )
     if float(worst_transport["transport_failure_rate"]) >= 0.05:
-        report_lines.insert(
-            report_lines.index("## Top-line Table"),
+        report_lines.append(
             f"- `{worst_transport['model_label']}` has a transport failure rate of `{float(worst_transport['transport_failure_rate']):.3f}`. Comparative claims for that run should be treated as infrastructure-confounded until rerun with stronger retry settings.",
         )
-        report_lines.insert(report_lines.index("## Top-line Table"), "")
+    report_lines.extend(["", "## Top-line Table", ""])
     report_lines.extend(
         _markdown_table(
             summary_rows,
             columns=[
                 "model_label",
-                "parse_success_rate",
-                "transport_failure_rate",
                 "conditional_validity_rate",
                 "validity_expectation_alignment_rate_e2e",
                 "conditional_trace_grounding_rate",
                 "fidelity_direct_f1",
-                "fidelity_closure_f1",
+                "fidelity_closure_f1_full",
                 "fidelity_closure_gap",
                 "closure_coverage",
-                "fidelity_closure_f1_full",
+                "fidelity_closure_f1_committed",
             ]
             + (["ambiguity_overcommitment_rate"] if has_ambiguity else [])
             + (["contradiction_detection_rate"] if has_contradiction else []),
         )
     )
+    # Gemma-paradox note: a model with perfect intrinsic validity but zero contradiction
+    # detection demonstrates why intrinsic-only scoring is insufficient.
+    if has_contradiction:
+        paradox_models = [
+            row["model_label"] for row in summary_rows
+            if float(row.get("conditional_validity_rate") or 0.0) >= 0.99
+            and float(row.get("contradiction_detection_rate") or 0.0) == 0.0
+        ]
+        for paradox_model in paradox_models:
+            report_lines.append(
+                f"\n> **Note ({paradox_model})**: `conditional_validity_rate ≈ 1.0` and "
+                f"`contradiction_detection_rate = 0.0`. A model that abstains universally on "
+                f"contradiction items looks clean under intrinsic checks but fails the task. "
+                f"This demonstrates why intrinsic-only scoring is insufficient — both intrinsic "
+                f"validity and task correctness must be evaluated together."
+            )
     category_focus_rows = [
         row for row in category_rows
         if (
@@ -1154,6 +1177,7 @@ def _narrative_report(
         category_columns = [
             "model_label",
             "category",
+            "num_tasks",
             "parse_success_rate",
             "validity_expectation_alignment_rate_e2e",
             "trace_grounding_rate",
