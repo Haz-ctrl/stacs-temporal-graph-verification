@@ -78,3 +78,39 @@ Run outputs now also expose:
 - counterexample summaries that reference the failing subformula and implicated step
 
 This makes the verifier more useful for failure analysis and supervisor demos because temporal-spec failures can be localised to reasoning trace positions instead of only being reported as flat validity flags.
+
+## Supported LTL Fragment
+
+The LTL layer operates over a bounded, graph-grounded fragment of temporal logic. It is not a general-purpose LTL model checker.
+
+**Supported predicates** (evaluated against a step-indexed reasoning trace):
+
+- `before(a, b)` — edge (a, b, BEFORE) present in prediction graph at this step
+- `after(a, b)` — edge (a, b, AFTER) present
+- `simultaneous(a, b)` — edge (a, b, SIMULTANEOUS) present
+- `unknown(a, b)` — edge (a, b, UNKNOWN) present
+- `supports(edge)` — any reasoning step at or before this step supports the given edge
+- `mentions_event(e)` — event e is mentioned in a reasoning step at or before this step
+- `has_violation(kind)` — a violation of type `kind` has been recorded at this step
+
+**Supported operators** (over the step-indexed trace of reasoning steps):
+
+- `G φ` — φ holds at every step (globally)
+- `F φ` — φ holds at some step (eventually)
+- `X φ` — φ holds at the next step
+- `φ U ψ` — φ holds until ψ holds
+- Boolean connectives: `¬`, `∧`, `∨`
+
+**Not supported:**
+
+- General LTL over unbounded state spaces or infinite traces
+- Nested fixpoints (μ-calculus / CTL*)
+- Past-time operators (PLTL)
+- Full TimeML interval algebra end-to-end
+- Model checking over branching time or concurrent traces
+
+## Verifier Calibration
+
+The verifier constraint library has not been evaluated against an external gold standard for violation detection accuracy. Whether the constraints correctly fire on genuinely invalid predictions — and do not fire on valid ones — has not been measured against independent human annotations.
+
+This is a known limitation flagged for follow-up work. Until calibration is performed, `conditional_validity_rate` should be interpreted as the rate at which the verifier classifies predictions as valid, not as independently verified reasoning quality.

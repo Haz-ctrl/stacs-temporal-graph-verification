@@ -18,9 +18,9 @@ The verifier returns explicit violation objects and counterexample metadata. Thi
 
 ## What the Project Does Not Yet Fully Implement
 
-### Full formal verification
+### Graph-grounded LTL fragment (not full formal verification)
 
-The survey frames the project in terms of LTL and model-checking style verification. The repo currently implements a constraint library plus lightweight formal-spec direction, not a full general LTL parser and evaluator.
+The survey frames the project in terms of formal verification. The repo implements a graph-grounded LTL fragment over step-indexed reasoning traces — a constraint library plus a focused formal-spec layer — not a full general LTL parser or general-purpose model checker. Claims about LTL support should be scoped accordingly.
 
 ### External benchmark adapters
 
@@ -45,3 +45,15 @@ For papers such as Time-R1 and other temporal reasoning evaluation work, the cle
 - making temporal structure explicit for analysis
 
 The clearest current gap is that this project revision is stronger on verification and scoring structure than on large-scale benchmark breadth or full formal temporal logic support.
+
+## Explicitly Scoped-Out Work (Interim Submission)
+
+The following are not addressed at interim and are not framed as failures — they are scoped-out items for the final dissertation:
+
+1. **Verifier calibration against external annotations.** Whether the constraint library detects violations with high precision and recall against human-annotated examples has not been measured.
+
+2. **Confidence–verification correlation (RQ3).** The analysis layer that correlates per-step confidence signals with per-step violation flags is not yet implemented. The structured output schema captures confidence fields; the correlation analysis is deferred.
+
+3. **Long-horizon temporal QA (TORQUE-style benchmarks).** The current pipeline is evaluated on TempEval-3 event-event relations and a controlled synthetic set. Broader benchmark coverage is future work.
+
+TODO: extend literature review with additional temporal reasoning evaluation papers if available before final submission.
