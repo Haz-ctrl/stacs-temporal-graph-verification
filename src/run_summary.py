@@ -18,6 +18,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 
+from src.analysis.axis_correlation import (
+    axis_correlation_prose,
+    compute_axis_correlation,
+    extract_flags,
+    plot_axis_correlation,
+    save_axis_correlation_csv,
+)
+
 
 BOOTSTRAP_ITERATIONS = 500
 BOOTSTRAP_SEED = 7
@@ -288,6 +296,33 @@ def _metric_or_none(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Optio
     return aggregate["f1"]
 
 
+def _closure_coverage(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
+    # Among gold-bearing tasks (those where the gold ordering produces at least one pair),
+    # what fraction did the model make a non-UNKNOWN ordering commitment for?
+    gold_bearing = [
+        r for r in rows
+        if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
+    ]
+    if not gold_bearing:
+        return None
+    committed = sum(
+        1 for r in gold_bearing
+        if r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
+    )
+    return committed / len(gold_bearing)
+
+
+def _committed_closure_prf(rows: Sequence[Dict[str, Any]]) -> Dict[str, float]:
+    # Micro-average PRF restricted to tasks where BOTH gold and pred produce ordering pairs.
+    # This is the "conditional on commitment" variant of closure F1.
+    committed = [
+        r for r in rows
+        if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
+        and r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
+    ]
+    return _aggregate_prf_from_rows(committed, metric_key="closure")
+
+
 def _has_non_null_metric(rows: Sequence[Dict[str, Any]], key: str) -> bool:
     return any(row.get(key) is not None for row in rows)
 
@@ -412,10 +447,14 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "fidelity_direct_f1_ci_high": fidelity_direct_ci_high,
         "fidelity_closure_precision": fidelity_closure["precision"],
         "fidelity_closure_recall": fidelity_closure["recall"],
+        # DEPRECATED alias: fidelity_closure_f1 == fidelity_closure_f1_full; use the latter in new code.
         "fidelity_closure_f1": fidelity_closure["f1"],
         "fidelity_closure_f1_ci_low": fidelity_closure_ci_low,
         "fidelity_closure_f1_ci_high": fidelity_closure_ci_high,
         "fidelity_closure_gap": fidelity_closure["f1"] - fidelity_direct["f1"],
+        "closure_coverage": _closure_coverage(expected_valid_gold_bearing_rows),
+        "fidelity_closure_f1_committed": _committed_closure_prf(expected_valid_gold_bearing_rows)["f1"],
+        "fidelity_closure_f1_full": fidelity_closure["f1"],
         "closure_preservation_rate": _closure_preservation_rate(expected_valid_parsed_rows),
         "ambiguity_abstention_rate": _abstention_rate(ambiguous_rows),
         "ambiguity_overcommitment_rate": _overcommitment_rate(ambiguous_rows),
@@ -1003,6 +1042,7 @@ def _markdown_table(rows: Sequence[Dict[str, Any]], *, columns: Sequence[str]) -
 def _narrative_report(
     summary_rows: Sequence[Dict[str, Any]],
     category_rows: Sequence[Dict[str, Any]],
+    correlation_prose_blocks: Optional[Sequence[str]] = None,
 ) -> str:
     if not summary_rows:
         return "# Temporal Verification Evaluation Summary\n\nNo runs analysed.\n"
@@ -1055,10 +1095,12 @@ def _narrative_report(
         )
     report_lines.extend(
         [
-            "- Parse robustness, transport stability, intrinsic graph validity, trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
+            "- Intrinsic graph validity and trace grounding, exact direct-edge fidelity, closure-level reasoning, ambiguity discipline, and contradiction detection should be read as separate capabilities.",
             "- `validity_expectation_alignment_rate_e2e` checks whether the verifier outcome matches the task intent end-to-end, so clean-but-wrong contradiction abstention does not look deceptively strong.",
+            "- Intrinsic validity is a necessary-but-not-sufficient signal: no intrinsically invalid prediction was also label-correct, but intrinsically valid predictions still achieve only partial label accuracy. Both conditions must be checked.",
             "- `fidelity_direct_f1` and `fidelity_closure_f1` are computed on gold-bearing tasks only, excluding empty-gold ambiguity items from the fidelity headline.",
             "- Closure scoring only covers ordering-bearing relations. On datasets with many `SIMULTANEOUS` labels, closure F1 should be interpreted alongside direct F1 rather than in isolation.",
+            "- Closure F1 is reported in two forms: `fidelity_closure_f1_full` (headline — treats uncommitted pairs as false negatives) and `fidelity_closure_f1_committed` (conditional on commitment only). Read `closure_coverage` alongside both.",
             "- Direct-vs-closure gaps indicate when a model recovers the implied temporal ordering while still missing the intended explicit representation.",
             (
                 "- Ambiguous and contradiction categories are consistency-oriented slices. They should not be interpreted through raw F1 alone."
@@ -1066,40 +1108,64 @@ def _narrative_report(
                 else "- This dataset does not contain ambiguity or contradiction control slices, so consistency-specific plots are intentionally omitted."
             ),
             "",
-            "## Top-line Table",
+            "## Pipeline Diagnostics",
+            "",
+            "Parse robustness and transport stability are infrastructure signals, not reasoning quality indicators. They are separated here to avoid conflation with the reasoning metrics in the top-line table.",
             "",
         ]
     )
-    if is_single_category:
-        report_lines.insert(
-            report_lines.index("## Top-line Table"),
-            f"- This run set evaluates a single task family: `{category_names[0]}`. Category-wise plots should be read as dataset-wide summaries rather than cross-category diagnostics.",
+    report_lines.extend(
+        _markdown_table(
+            summary_rows,
+            columns=["model_label", "parse_success_rate", "transport_failure_rate"],
         )
-        report_lines.insert(report_lines.index("## Top-line Table"), "")
+    )
+    if is_single_category:
+        report_lines.extend(
+            [
+                "",
+                f"- This run set evaluates a single task family: `{category_names[0]}`. Category-wise plots should be read as dataset-wide summaries rather than cross-category diagnostics.",
+            ]
+        )
     if float(worst_transport["transport_failure_rate"]) >= 0.05:
-        report_lines.insert(
-            report_lines.index("## Top-line Table"),
+        report_lines.append(
             f"- `{worst_transport['model_label']}` has a transport failure rate of `{float(worst_transport['transport_failure_rate']):.3f}`. Comparative claims for that run should be treated as infrastructure-confounded until rerun with stronger retry settings.",
         )
-        report_lines.insert(report_lines.index("## Top-line Table"), "")
+    report_lines.extend(["", "## Top-line Table", ""])
     report_lines.extend(
         _markdown_table(
             summary_rows,
             columns=[
                 "model_label",
-                "parse_success_rate",
-                "transport_failure_rate",
                 "conditional_validity_rate",
                 "validity_expectation_alignment_rate_e2e",
                 "conditional_trace_grounding_rate",
                 "fidelity_direct_f1",
-                "fidelity_closure_f1",
+                "fidelity_closure_f1_full",
                 "fidelity_closure_gap",
+                "closure_coverage",
+                "fidelity_closure_f1_committed",
             ]
             + (["ambiguity_overcommitment_rate"] if has_ambiguity else [])
             + (["contradiction_detection_rate"] if has_contradiction else []),
         )
     )
+    # Gemma-paradox note: a model with perfect intrinsic validity but zero contradiction
+    # detection demonstrates why intrinsic-only scoring is insufficient.
+    if has_contradiction:
+        paradox_models = [
+            row["model_label"] for row in summary_rows
+            if float(row.get("conditional_validity_rate") or 0.0) >= 0.99
+            and float(row.get("contradiction_detection_rate") or 0.0) == 0.0
+        ]
+        for paradox_model in paradox_models:
+            report_lines.append(
+                f"\n> **Note ({paradox_model})**: `conditional_validity_rate ≈ 1.0` and "
+                f"`contradiction_detection_rate = 0.0`. A model that abstains universally on "
+                f"contradiction items looks clean under intrinsic checks but fails the task. "
+                f"This demonstrates why intrinsic-only scoring is insufficient — both intrinsic "
+                f"validity and task correctness must be evaluated together."
+            )
     category_focus_rows = [
         row for row in category_rows
         if (
@@ -1111,6 +1177,7 @@ def _narrative_report(
         category_columns = [
             "model_label",
             "category",
+            "num_tasks",
             "parse_success_rate",
             "validity_expectation_alignment_rate_e2e",
             "trace_grounding_rate",
@@ -1151,6 +1218,20 @@ def _narrative_report(
         report_lines.insert(
             report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
             "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
+        )
+    if correlation_prose_blocks:
+        report_lines.extend(["", "## Axis Correlation", ""])
+        report_lines.extend(
+            [
+                "Pairwise Pearson / phi correlations across intrinsic axes (parse_success, "
+                "verifier_valid, trace_grounded). High correlation indicates the axes provide "
+                "largely redundant signal; low correlation indicates they measure distinct things.",
+                "",
+            ]
+        )
+        report_lines.extend(correlation_prose_blocks)
+        report_lines.append(
+            "\nSee `axis_correlation_*.csv` and `axis_correlation_*.png` for full matrices."
         )
     return "\n".join(report_lines) + "\n"
 
@@ -1197,8 +1278,20 @@ def summarise_runs(
             counterexample_text.append("")
     (out_path / "counterexamples.md").write_text("\n".join(counterexample_text), encoding="utf-8")
 
+    # Per-run axis correlation artefacts (CSV + heatmap PNG)
+    correlation_prose_blocks: List[str] = []
+    for run in runs:
+        flags = extract_flags(run.predictions, run.report.get("failures", []))
+        corr_result = compute_axis_correlation(flags)
+        run_slug = run.label.replace(" ", "_").replace("/", "-")
+        save_axis_correlation_csv(corr_result, out_path / f"axis_correlation_{run_slug}.csv")
+        plot_axis_correlation(corr_result, out_path / f"axis_correlation_{run_slug}.png")
+        prose = axis_correlation_prose(corr_result)
+        if prose:
+            correlation_prose_blocks.append(f"**{run.label}**: {prose}")
+
     (out_path / "report.md").write_text(
-        _narrative_report(summary_rows, category_rows),
+        _narrative_report(summary_rows, category_rows, correlation_prose_blocks),
         encoding="utf-8",
     )
 
