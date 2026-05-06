@@ -1,0 +1,41 @@
+model_label,dataset,signal,description,n,spearman_rho,spearman_p,point_biserial_r,point_biserial_p
+DeepSeek R1 7B,synthetic,is_valid,Graph validity flag (binary),91,0.14953661355497677,0.15714561498381535,0.14953661355497672,0.1571456149838159
+DeepSeek R1 7B,synthetic,trace_grounded,Reasoning trace groundedness (binary),91,0.4444444444444444,1.0177546946625807e-05,0.44444444444444436,1.017754694662578e-05
+DeepSeek R1 7B,synthetic,violation_count,Total structural violation count,91,-0.38618244924939066,0.0001563276195781112,,
+DeepSeek R1 7B,synthetic,first_violation_step,Step index of first violation (NaN when none),8,0.2182178902359924,0.6036450565101361,,
+Qwen 3.5 9B,synthetic,is_valid,Graph validity flag (binary),114,0.26295029405356657,0.004705697462199813,0.2629502940535666,0.004705697462199827
+Qwen 3.5 9B,synthetic,trace_grounded,Reasoning trace groundedness (binary),114,0.5270462766947299,1.7008904231587686e-09,0.5270462766947299,1.700890423158751e-09
+Qwen 3.5 9B,synthetic,violation_count,Total structural violation count,114,-0.23226657634705206,0.012893234135740275,,
+Qwen 3.5 9B,synthetic,first_violation_step,Step index of first violation (NaN when none),14,0.0,1.0,,
+Llama 3.1 8B,synthetic,is_valid,Graph validity flag (binary),120,-0.2504122014340809,0.005806559775596579,-0.2504122014340809,0.005806559775596556
+Llama 3.1 8B,synthetic,trace_grounded,Reasoning trace groundedness (binary),120,0.39735970711951313,6.997871716441126e-06,0.39735970711951313,6.997871716441097e-06
+Llama 3.1 8B,synthetic,violation_count,Total structural violation count,120,0.056549695736947805,0.5395602383009006,,
+Llama 3.1 8B,synthetic,first_violation_step,Step index of first violation (NaN when none),25,-0.1931609687386522,0.35490701421144,,
+Mistral 7B,synthetic,is_valid,Graph validity flag (binary),117,-0.22824414451887748,0.013320125787655644,-0.22824414451887742,0.013320125787655736
+Mistral 7B,synthetic,trace_grounded,Reasoning trace groundedness (binary),117,-0.13498568633893793,0.14676116640717185,-0.13498568633893793,0.14676116640717263
+Mistral 7B,synthetic,violation_count,Total structural violation count,117,0.26939177180320945,0.0033126152035717897,,
+Mistral 7B,synthetic,first_violation_step,Step index of first violation (NaN when none),43,0.0,1.0,,
+Gemma 3 12B,synthetic,is_valid,Graph validity flag (binary),120,nan,nan,nan,nan
+Gemma 3 12B,synthetic,trace_grounded,Reasoning trace groundedness (binary),120,nan,nan,nan,nan
+Gemma 3 12B,synthetic,violation_count,Total structural violation count,120,nan,nan,,
+Gemma 3 12B,synthetic,first_violation_step,Step index of first violation (NaN when none),0,nan,nan,,
+DeepSeek R1 7B,tempeval,is_valid,Graph validity flag (binary),433,0.5191255963580417,3.0044195510702893e-31,0.5191255963580419,3.0044195510700086e-31
+DeepSeek R1 7B,tempeval,trace_grounded,Reasoning trace groundedness (binary),433,0.49749355172929083,1.8699774656383871e-28,0.4974935517292909,1.8699774656383508e-28
+DeepSeek R1 7B,tempeval,violation_count,Total structural violation count,433,-0.5062563550085504,1.458828265627107e-29,,
+DeepSeek R1 7B,tempeval,first_violation_step,Step index of first violation (NaN when none),234,0.6241515980843952,1.1343106140342853e-26,,
+Qwen 3.5 9B,tempeval,is_valid,Graph validity flag (binary),394,0.6274111428199416,1.6607608182885552e-44,0.6274111428199415,1.6607608182885537e-44
+Qwen 3.5 9B,tempeval,trace_grounded,Reasoning trace groundedness (binary),394,0.6274111428199416,1.6607608182885552e-44,0.6274111428199415,1.6607608182885537e-44
+Qwen 3.5 9B,tempeval,violation_count,Total structural violation count,394,-0.6274111428199416,1.6607608182885552e-44,,
+Qwen 3.5 9B,tempeval,first_violation_step,Step index of first violation (NaN when none),183,nan,nan,,
+Llama 3.1 8B,tempeval,is_valid,Graph validity flag (binary),496,0.2810315039753775,1.8665420106762076e-10,0.2810315039753776,1.8665420106762006e-10
+Llama 3.1 8B,tempeval,trace_grounded,Reasoning trace groundedness (binary),496,0.2810315039753775,1.8665420106762076e-10,0.2810315039753776,1.8665420106762006e-10
+Llama 3.1 8B,tempeval,violation_count,Total structural violation count,496,-0.2810315039753775,1.8665420106762076e-10,,
+Llama 3.1 8B,tempeval,first_violation_step,Step index of first violation (NaN when none),91,nan,nan,,
+Mistral 7B,tempeval,is_valid,Graph validity flag (binary),495,0.18566838765559482,3.230007217130066e-05,0.18566838765559487,3.230007217130033e-05
+Mistral 7B,tempeval,trace_grounded,Reasoning trace groundedness (binary),495,0.15711614643185404,0.0004504879484130861,0.15711614643185406,0.0004504879484130946
+Mistral 7B,tempeval,violation_count,Total structural violation count,495,-0.18851188704237526,2.4275971078861444e-05,,
+Mistral 7B,tempeval,first_violation_step,Step index of first violation (NaN when none),58,0.2737884723499266,0.03755858529887548,,
+Gemma 3 12B,tempeval,is_valid,Graph validity flag (binary),496,0.03274832704589314,0.4668003837929865,0.032748327045893144,0.4668003837929777
+Gemma 3 12B,tempeval,trace_grounded,Reasoning trace groundedness (binary),496,0.03274832704589314,0.4668003837929865,0.032748327045893144,0.4668003837929777
+Gemma 3 12B,tempeval,violation_count,Total structural violation count,496,-0.03274832704589314,0.4668003837929865,,
+Gemma 3 12B,tempeval,first_violation_step,Step index of first violation (NaN when none),1,nan,nan,,
