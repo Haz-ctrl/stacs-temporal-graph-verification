@@ -103,29 +103,27 @@ class TestAllocateRunDir:
     def test_sequence_suffix_format(self, tmp_path):
         """Should use two-digit sequence suffix format."""
         model_name = "test-model"
-        
-        # First allocation
-        run_id1, run_dir1 = allocate_run_dir(tmp_path, model_label=model_name)
-        
-        # Create colliding directory manually to simulate race condition
-        import time
-        time.sleep(0.01)  # Small delay to create new timestamp
-        
-        # Mock utc_stamp to return same value, forcing collision
-        with patch('scripts.run_llm_baseline.utc_stamp', return_value=run_id1):
+        fake_stamp = "2024-01-01_000000UTC"
+
+        # Pre-create the expected first directory to force a collision.
+        expected_first_dir = tmp_path / f"{model_name}_{fake_stamp}"
+        expected_first_dir.mkdir()
+
+        with patch('scripts.run_llm_baseline.utc_stamp', return_value=fake_stamp):
             run_id2, run_dir2 = allocate_run_dir(tmp_path, model_label=model_name)
 
         assert run_id2.endswith("_01")
         assert run_id2.startswith("test-model_")
 
     def test_empty_model_label_same_as_no_label(self, tmp_path):
-        """Empty string model label should behave like no label."""
-        run_id_with_empty, run_dir_with_empty = allocate_run_dir(tmp_path, model_label="")
-        run_id_no_label, run_dir_no_label = allocate_run_dir(tmp_path, model_label=None)
-        
-        # Both should produce timestamp-only IDs
-        assert "_" not in run_id_with_empty.split("_")[0] or len(run_id_with_empty.split("_")) == 1
-        assert run_dir_with_empty == run_dir_no_label
+        """Empty string model label should produce a bare timestamp run ID."""
+        fake_stamp = "2024-01-01_000000UTC"
+
+        with patch('scripts.run_llm_baseline.utc_stamp', return_value=fake_stamp):
+            run_id, run_dir = allocate_run_dir(tmp_path, model_label="")
+
+        assert run_id == fake_stamp
+        assert run_dir == tmp_path / fake_stamp
 
     def test_preserves_model_specific_characters(self, tmp_path):
         """Should preserve hyphens and underscores in model names."""

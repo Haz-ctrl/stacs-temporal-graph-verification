@@ -76,17 +76,16 @@ def write_json(path: Path, obj: Any) -> None:
 def allocate_run_dir(output_root: str | Path, model_label: str = "") -> tuple[str, Path]:
     root = Path(output_root)
     base_run_id = utc_stamp()
-    # Create run ID with model label prefix if provided
     if model_label:
-        # Sanitize model label for use in filenames (replace problematic characters)
         sanitized_label = model_label.replace("/", "-").replace(":", "-").replace(".", "-").replace(" ", "_")
         candidate_id = f"{sanitized_label}_{base_run_id}"
     else:
         candidate_id = base_run_id
+    base_candidate_id = candidate_id
     candidate_dir = root / candidate_id
     suffix = 1
     while candidate_dir.exists():
-        candidate_id = f"{sanitized_label}_{base_run_id}_{suffix:02d}" if model_label else f"{base_run_id}_{suffix:02d}"
+        candidate_id = f"{base_candidate_id}_{suffix:02d}"
         candidate_dir = root / candidate_id
         suffix += 1
     ensure_dir(candidate_dir)
