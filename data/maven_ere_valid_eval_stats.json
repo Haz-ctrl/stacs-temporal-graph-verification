@@ -1,0 +1,14 @@
+{
+  "split": "valid",
+  "input_path": "data/raw/MAVEN_ERE/valid.jsonl",
+  "num_documents": 710,
+  "num_tasks": 2000,
+  "kept_relation_counts": {
+    "BEFORE": 1984,
+    "SIMULTANEOUS": 16
+  },
+  "skipped_relation_counts": {
+    "CONTAINS": 330,
+    "OVERLAP": 24
+  }
+}

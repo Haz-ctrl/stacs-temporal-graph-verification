@@ -370,7 +370,7 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         metric_fn=lambda sample: sum(1 for item in sample if item["parsed"]) / len(sample),
     )
     conditional_ci_low, conditional_ci_high = _bootstrap_ci(
-        parsed_rows,
+        expected_valid_parsed_rows,
         metric_fn=lambda sample: sum(
             1 for row in sample if row.get("verification", {}).get("is_valid")
         ) / len(sample) if sample else None,

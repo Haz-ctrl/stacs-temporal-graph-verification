@@ -52,6 +52,11 @@ def main() -> None:
         default="outputs/runs",
         help="Directory under which per-run artefacts will be created.",
     )
+    parser.add_argument(
+        "--continue-on-error",
+        action="store_true",
+        help="Record per-model failures and continue with later manifest entries.",
+    )
     args = parser.parse_args()
 
     manifest = _load_manifest(args.manifest)
@@ -60,45 +65,75 @@ def main() -> None:
 
     run_manifest: Dict[str, Dict[str, Any]] = {}
     sweep_index: List[Dict[str, Any]] = []
+    failures: List[Dict[str, Any]] = []
 
     for entry in manifest:
         model = str(entry["model"])
-        result = run_baseline(
-            BaselineRunConfig(
-                data_path=args.data,
-                model=model,
-                base_url=str(entry.get("base_url", args.base_url)),
-                temperature=args.temperature,
-                seed=args.seed,
-                max_tasks=args.max_tasks,
-                pred_source="llm",
-                log_raw=args.log_raw,
-                timeout_s=args.timeout_s,
-                max_retries=args.max_retries,
-                retry_backoff_s=args.retry_backoff_s,
-                output_root=output_root,
+        entry_max_tasks = int(entry.get("max_tasks", args.max_tasks))
+        entry_timeout_s = int(entry.get("timeout_s", args.timeout_s))
+        entry_max_retries = int(entry.get("max_retries", args.max_retries))
+        entry_retry_backoff_s = float(entry.get("retry_backoff_s", args.retry_backoff_s))
+
+        try:
+            result = run_baseline(
+                BaselineRunConfig(
+                    data_path=args.data,
+                    model=model,
+                    base_url=str(entry.get("base_url", args.base_url)),
+                    temperature=args.temperature,
+                    seed=args.seed,
+                    max_tasks=entry_max_tasks,
+                    pred_source="llm",
+                    log_raw=args.log_raw,
+                    timeout_s=entry_timeout_s,
+                    max_retries=entry_max_retries,
+                    retry_backoff_s=entry_retry_backoff_s,
+                    output_root=output_root,
+                )
             )
-        )
-        meta = {
-            "model_label": entry.get("label", model),
-            "family": entry.get("family", ""),
-            "size_bucket": entry.get("size", ""),
-            "reasoning_tuned": entry.get("reasoning_tuned", ""),
-            "group": entry.get("group", ""),
-            "notes": entry.get("notes", ""),
-        }
-        run_manifest[result.run_id] = meta
-        sweep_index.append(
-            {
-                "run_id": result.run_id,
-                "run_dir": str(result.run_dir),
-                "model": model,
-                "label": meta["model_label"],
+            meta = {
+                "model_label": entry.get("label", model),
+                "family": entry.get("family", ""),
+                "size_bucket": entry.get("size", ""),
+                "reasoning_tuned": entry.get("reasoning_tuned", ""),
+                "group": entry.get("group", ""),
+                "notes": entry.get("notes", ""),
+                "status": "completed",
             }
-        )
+            run_manifest[result.run_id] = meta
+            sweep_index.append(
+                {
+                    "run_id": result.run_id,
+                    "run_dir": str(result.run_dir),
+                    "model": model,
+                    "label": meta["model_label"],
+                    "status": "completed",
+                }
+            )
+        except Exception as exc:
+            failure = {
+                "model": model,
+                "label": entry.get("label", model),
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+            failures.append(failure)
+            sweep_index.append(
+                {
+                    "run_id": "",
+                    "run_dir": "",
+                    "model": model,
+                    "label": entry.get("label", model),
+                    "status": "failed",
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                }
+            )
+            if not args.continue_on_error:
+                raise
 
     (output_root / "run_manifest.json").write_text(
-        json.dumps({"runs": run_manifest}, indent=2),
+        json.dumps({"runs": run_manifest, "failures": failures}, indent=2),
         encoding="utf-8",
     )
     (output_root / "sweep_index.json").write_text(
@@ -111,6 +146,8 @@ def main() -> None:
                 "max_retries": args.max_retries,
                 "retry_backoff_s": args.retry_backoff_s,
                 "max_tasks": args.max_tasks,
+                "continue_on_error": args.continue_on_error,
+                "failures": failures,
                 "runs": sweep_index,
             },
             indent=2,
