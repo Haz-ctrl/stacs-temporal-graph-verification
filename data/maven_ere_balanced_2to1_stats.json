@@ -1,0 +1,28 @@
+{
+  "split": "valid",
+  "input_path": "data/raw/MAVEN_ERE/valid.jsonl",
+  "num_documents": 710,
+  "num_tasks": 3186,
+  "before_multiplier": 2.0,
+  "event_event_only": true,
+  "pool_sizes": {
+    "BEFORE": 98866,
+    "SIMULTANEOUS": 1062
+  },
+  "sampled_counts": {
+    "BEFORE": 2124,
+    "SIMULTANEOUS": 1062
+  },
+  "label_fractions": {
+    "BEFORE": "2124/3186 (66.7%)",
+    "SIMULTANEOUS": "1062/3186 (33.3%)"
+  },
+  "skipped_relation_counts": {
+    "BEFORE:timex_filtered": 61361,
+    "BEGINS-ON": 73,
+    "CONTAINS": 25550,
+    "ENDS-ON": 34,
+    "OVERLAP": 1570,
+    "SIMULTANEOUS:timex_filtered": 412
+  }
+}
