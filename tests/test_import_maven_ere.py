@@ -54,7 +54,7 @@ def test_convert_valid_split_keeps_supported_relations(tmp_path: Path) -> None:
                 ],
                 "TIMEX": [{"id": "TIME_1", "mention": "today", "type": "DATE", "sent_id": 0, "offset": [0, 1]}],
                 "temporal_relations": {
-                    "BEFORE": [["EVENT_A", "EVENT_B"], ["EVENT_A", "TIME_1"]],
+                    "BEFORE": [["EVENT_A", "EVENT_B"], ["EVENT_B", "EVENT_A"]],
                     "CONTAINS": [["TIME_1", "EVENT_B"]],
                 },
                 "causal_relations": {"CAUSE": [], "PRECONDITION": []},
@@ -69,13 +69,12 @@ def test_convert_valid_split_keeps_supported_relations(tmp_path: Path) -> None:
         category="maven_ere_temporal",
         context_radius=1,
         coarsen_overlap=False,
-        max_docs=0,
         max_tasks=0,
         seed=42,
     )
 
     assert len(tasks) == 2
-    assert stats["kept_relation_counts"] == {"BEFORE": 2}
+    assert stats["sampled_counts"] == {"BEFORE": 2}
     assert stats["skipped_relation_counts"] == {"CONTAINS": 1}
     assert all(task["gold_relations"][0][2] == "BEFORE" for task in tasks)
     assert all(task["metadata"]["document_id"] == "doc-1" for task in tasks)
@@ -117,14 +116,13 @@ def test_convert_valid_split_can_coarsen_overlap(tmp_path: Path) -> None:
         category="maven_ere_temporal",
         context_radius=0,
         coarsen_overlap=True,
-        max_docs=0,
         max_tasks=0,
         seed=42,
     )
 
     assert len(tasks) == 1
     assert tasks[0]["gold_relations"] == [[tasks[0]["events"][0], tasks[0]["events"][1], "SIMULTANEOUS"]]
-    assert stats["kept_relation_counts"] == {"SIMULTANEOUS": 1}
+    assert stats["sampled_counts"] == {"SIMULTANEOUS": 1}
 
 
 def test_convert_test_candidates_generates_unlabeled_pairs(tmp_path: Path) -> None:
@@ -153,7 +151,6 @@ def test_convert_test_candidates_generates_unlabeled_pairs(tmp_path: Path) -> No
         context_radius=0,
         include_timex=True,
         sentence_window=-1,
-        max_docs=0,
         max_tasks=0,
     )
 

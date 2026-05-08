@@ -34,6 +34,14 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 SUPPORTED_TEMPORAL_LABELS = {"BEFORE", "SIMULTANEOUS"}
 ALL_TEMPORAL_LABELS = ("BEFORE", "OVERLAP", "CONTAINS", "SIMULTANEOUS", "ENDS-ON", "BEGINS-ON")
 
+# Default target relation counts for stratified sampling.
+# SIMULTANEOUS is the scarce class; BEFORE is capped relative to it.
+# None means "take all available".
+DEFAULT_TARGET_COUNTS: Dict[str, Optional[int]] = {
+    "SIMULTANEOUS": None,   # keep every EVENT-EVENT SIMULTANEOUS pair
+    "BEFORE": None,         # capped via --before-multiplier relative to SIMULTANEOUS
+}
+
 
 def _write_jsonl(path: Path, rows: Iterable[Dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -256,6 +264,10 @@ def _build_task(
     }
 
 
+def _is_event_node(node_id: str) -> bool:
+    return str(node_id).startswith("EVENT_")
+
+
 def convert_maven_ere_temporal_split(
     path: Path,
     *,
@@ -263,76 +275,146 @@ def convert_maven_ere_temporal_split(
     category: str,
     context_radius: int,
     coarsen_overlap: bool,
-    max_docs: int,
+    event_event_only: bool = True,
+    before_multiplier: float = 2.0,
     max_tasks: int,
     seed: int,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Convert a MAVEN-ERE train/valid split into canonical pairwise tasks.
+
+    Stratified sampling strategy
+    -----------------------------
+    Prior behaviour (global shuffle + truncate) produced heavily BEFORE-skewed
+    outputs because BEFORE pairs outnumber SIMULTANEOUS ~99:1.  This version
+    collects each relation type into its own pool, then:
+
+      1. Takes ALL SIMULTANEOUS pairs (the scarce class, fully preserved).
+      2. Samples BEFORE pairs up to ``before_multiplier * len(simultaneous_pool)``
+         drawn uniformly at random (fixed seed).
+      3. Merges and shuffles the result before writing.
+
+    This yields a dataset where BEFORE / SIMULTANEOUS ≈ before_multiplier : 1,
+    with a total size that is substantially larger than TempEval while remaining
+    statistically meaningful for per-label analysis.
+
+    EVENT-EVENT filtering
+    ----------------------
+    When ``event_event_only=True`` (default), relation pairs where either node
+    is a TIMEX are dropped.  This keeps task context homogeneous and avoids
+    time-expression surface forms (e.g. "1945") being treated as events.
+    """
     rng = random.Random(seed)
     docs = _load_jsonl(path)
-    if max_docs > 0:
-        docs = docs[:max_docs]
 
+    # ── Phase 1: collect all valid pairs into per-relation pools ──────────────
+    pools: Dict[str, List[Tuple[Dict[str, Any], str, str, str]]] = {
+        "BEFORE": [],
+        "SIMULTANEOUS": [],
+    }
+    skipped_relation_counts: Counter = Counter()
+    event_ids_by_doc: Dict[str, set] = {}
+
+    for record in docs:
+        doc_id = str(record["id"])
+        event_ids = {e["id"] for e in record.get("events", [])}
+        event_ids_by_doc[doc_id] = event_ids
+        grouped_mentions = _group_mentions_by_node(record)
+
+        for relation_name, pairs in dict(record.get("temporal_relations", {})).items():
+            mapped = _map_relation(relation_name, coarsen_overlap=coarsen_overlap)
+            if mapped is None or mapped not in pools:
+                skipped_relation_counts[relation_name] += len(pairs)
+                continue
+
+            for pair in list(pairs):
+                if len(pair) != 2:
+                    continue
+                src_id, tgt_id = str(pair[0]), str(pair[1])
+
+                # Optionally restrict to EVENT-EVENT pairs
+                if event_event_only and not (
+                    _is_event_node(src_id) and _is_event_node(tgt_id)
+                ):
+                    skipped_relation_counts[f"{relation_name}:timex_filtered"] += 1
+                    continue
+
+                if src_id not in grouped_mentions or tgt_id not in grouped_mentions:
+                    skipped_relation_counts[f"{relation_name}:missing_node"] += 1
+                    continue
+
+                pools[mapped].append((record, src_id, tgt_id, relation_name))
+
+    # ── Phase 2: stratified sampling ──────────────────────────────────────────
+    rng.shuffle(pools["SIMULTANEOUS"])
+    rng.shuffle(pools["BEFORE"])
+
+    sim_pool  = pools["SIMULTANEOUS"]
+    bef_pool  = pools["BEFORE"]
+
+    n_sim = len(sim_pool)
+
+    if n_sim == 0:
+        # No SIMULTANEOUS pairs available: fall back to keeping all BEFORE pairs.
+        # This preserves backward-compatible behaviour on datasets or test fixtures
+        # that contain only BEFORE relations.
+        sampled_pairs = list(bef_pool)
+    else:
+        n_bef_target = int(round(before_multiplier * n_sim))
+        n_bef_sampled = min(n_bef_target, len(bef_pool))
+        sampled_pairs = sim_pool + bef_pool[:n_bef_sampled]
+
+    rng.shuffle(sampled_pairs)
+
+    # Apply absolute task cap after stratification
+    if max_tasks > 0:
+        sampled_pairs = sampled_pairs[:max_tasks]
+
+    # ── Phase 3: build task records ───────────────────────────────────────────
     tasks: List[Dict[str, Any]] = []
+    kept_relation_counts: Counter = Counter()
+
+    for pair_index, (record, src_id, tgt_id, original_relation) in enumerate(sampled_pairs):
+        grouped_mentions = _group_mentions_by_node(record)
+        mapped = _map_relation(original_relation, coarsen_overlap=coarsen_overlap)
+        source_anchor, target_anchor = _choose_anchor_pair(
+            grouped_mentions[src_id],
+            grouped_mentions[tgt_id],
+        )
+        tasks.append(
+            _build_task(
+                record=record,
+                split=split,
+                pair_index=pair_index,
+                source_node_id=src_id,
+                target_node_id=tgt_id,
+                source_anchor=source_anchor,
+                target_anchor=target_anchor,
+                relation=mapped,
+                original_relation=original_relation,
+                category=category,
+                context_radius=context_radius,
+            )
+        )
+        kept_relation_counts[mapped] += 1  # type: ignore[arg-type]
+
+    total = len(tasks)
+    label_fracs = {
+        k: f"{v}/{total} ({v/total*100:.1f}%)" if total else "0"
+        for k, v in sorted(kept_relation_counts.items())
+    }
+
     stats: Dict[str, Any] = {
         "split": split,
         "input_path": str(path),
         "num_documents": len(docs),
-        "num_tasks": 0,
-        "kept_relation_counts": {},
-        "skipped_relation_counts": {},
+        "num_tasks": total,
+        "before_multiplier": before_multiplier,
+        "event_event_only": event_event_only,
+        "pool_sizes": {"BEFORE": len(bef_pool), "SIMULTANEOUS": n_sim},
+        "sampled_counts": dict(sorted(kept_relation_counts.items())),
+        "label_fractions": label_fracs,
+        "skipped_relation_counts": dict(sorted(skipped_relation_counts.items())),
     }
-    kept_relation_counts: Counter[str] = Counter()
-    skipped_relation_counts: Counter[str] = Counter()
-    pair_index = 0
-
-    for record in docs:
-        grouped_mentions = _group_mentions_by_node(record)
-        relation_items: List[Tuple[str, str, str]] = []
-        for relation_name, pairs in dict(record.get("temporal_relations", {})).items():
-            for pair in list(pairs):
-                if len(pair) != 2:
-                    continue
-                relation_items.append((relation_name, str(pair[0]), str(pair[1])))
-
-        rng.shuffle(relation_items)
-        for relation_name, source_node_id, target_node_id in relation_items:
-            mapped = _map_relation(relation_name, coarsen_overlap=coarsen_overlap)
-            if mapped is None:
-                skipped_relation_counts[relation_name] += 1
-                continue
-            if source_node_id not in grouped_mentions or target_node_id not in grouped_mentions:
-                skipped_relation_counts[f"{relation_name}:missing_node"] += 1
-                continue
-
-            source_anchor, target_anchor = _choose_anchor_pair(
-                grouped_mentions[source_node_id],
-                grouped_mentions[target_node_id],
-            )
-            pair_index += 1
-            tasks.append(
-                _build_task(
-                    record=record,
-                    split=split,
-                    pair_index=pair_index,
-                    source_node_id=source_node_id,
-                    target_node_id=target_node_id,
-                    source_anchor=source_anchor,
-                    target_anchor=target_anchor,
-                    relation=mapped,
-                    original_relation=relation_name,
-                    category=category,
-                    context_radius=context_radius,
-                )
-            )
-            kept_relation_counts[mapped] += 1
-            if max_tasks > 0 and len(tasks) >= max_tasks:
-                break
-        if max_tasks > 0 and len(tasks) >= max_tasks:
-            break
-
-    stats["num_tasks"] = len(tasks)
-    stats["kept_relation_counts"] = dict(sorted(kept_relation_counts.items()))
-    stats["skipped_relation_counts"] = dict(sorted(skipped_relation_counts.items()))
     return tasks, stats
 
 
@@ -368,7 +450,7 @@ def convert_maven_ere_test_candidates(
     context_radius: int,
     include_timex: bool,
     sentence_window: int,
-    max_docs: int,
+    max_docs: int = 0,
     max_tasks: int,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     docs = _load_jsonl(path)
@@ -451,6 +533,22 @@ def main() -> None:
         help="Map MAVEN-ERE OVERLAP to SIMULTANEOUS instead of skipping it.",
     )
     parser.add_argument(
+        "--no-event-event-only",
+        action="store_true",
+        help="Include EVENT-TIMEX and TIMEX-TIMEX pairs (default: EVENT-EVENT only).",
+    )
+    parser.add_argument(
+        "--before-multiplier",
+        type=float,
+        default=2.0,
+        help=(
+            "BEFORE pool is capped at this multiple of the SIMULTANEOUS pool size. "
+            "E.g. 2.0 → BEFORE:SIMULTANEOUS ≈ 2:1. "
+            "Use a large value (e.g. 999) to keep all BEFORE pairs. "
+            "Default: 2.0"
+        ),
+    )
+    parser.add_argument(
         "--include-timex",
         action="store_true",
         help="Include TIMEX candidates when generating unlabeled test pairs.",
@@ -461,9 +559,8 @@ def main() -> None:
         default=-1,
         help="For test conversion only: keep candidate pairs within this sentence distance. Use -1 for all pairs.",
     )
-    parser.add_argument("--max-docs", type=int, default=0, help="Maximum number of input documents to convert.")
-    parser.add_argument("--max-tasks", type=int, default=0, help="Maximum number of tasks to emit.")
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for relation iteration order.")
+    parser.add_argument("--max-tasks", type=int, default=0, help="Hard cap on output tasks applied after stratified sampling.")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for stratified sampling.")
     args = parser.parse_args()
 
     input_path = Path(args.input)
@@ -475,7 +572,7 @@ def main() -> None:
             context_radius=args.context_radius,
             include_timex=args.include_timex,
             sentence_window=args.test_sentence_window,
-            max_docs=args.max_docs,
+            max_docs=0,
             max_tasks=args.max_tasks,
         )
     else:
@@ -485,7 +582,8 @@ def main() -> None:
             category=args.category,
             context_radius=args.context_radius,
             coarsen_overlap=args.coarsen_overlap,
-            max_docs=args.max_docs,
+            event_event_only=not args.no_event_event_only,
+            before_multiplier=args.before_multiplier,
             max_tasks=args.max_tasks,
             seed=args.seed,
         )
