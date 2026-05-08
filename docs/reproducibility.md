@@ -95,14 +95,55 @@ python -m scripts.validate_dataset --data data/diagnostic_eval.jsonl --profile g
 
 Hand-authored stress tasks for ambiguity, temporal anchors, and richer relations.
 
-### Test of Time benchmark
+### MAVEN-ERE slice
 
-If you have the ToT source JSONL (Fatemi et al., arXiv:2406.09170):
+Validate the checked-in MAVEN-ERE validation slice:
 
 ```bash
-python -m scripts.import_test_of_time \
-  --input path/to/tot_source.jsonl \
-  --output data/tot_eval.jsonl
+python -m scripts.validate_dataset --data data/maven_ere_balanced_2to1.jsonl --profile generic
+```
+
+This checked-in slice was produced from the MAVEN-ERE `valid` split with:
+
+- `EVENT-EVENT` pairs only
+- supported labels only (`BEFORE`, `SIMULTANEOUS`)
+- `OVERLAP` left excluded by default
+- a `BEFORE` cap of `2.0x` the `SIMULTANEOUS` pool
+
+To rebuild it from raw MAVEN-ERE:
+
+```bash
+python -m scripts.import_maven_ere \
+  --input data/raw/MAVEN_ERE/valid.jsonl \
+  --split valid \
+  --output data/maven_ere_balanced_2to1.jsonl \
+  --stats-out data/maven_ere_balanced_2to1_stats.json \
+  --category maven_ere_temporal \
+  --context-radius 1 \
+  --before-multiplier 2.0 \
+  --seed 42
+```
+
+Useful importer flags:
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--coarsen-overlap` | off | Map MAVEN-ERE `OVERLAP` to `SIMULTANEOUS` |
+| `--no-event-event-only` | off | Also include EVENT-TIMEX and TIMEX-TIMEX |
+| `--max-tasks` | `0` | Hard cap after sampling |
+| `--stats-out` | empty | Write conversion statistics JSON |
+
+To generate unlabeled MAVEN-ERE test candidates for model inference:
+
+```bash
+python -m scripts.import_maven_ere \
+  --input data/raw/MAVEN_ERE/test.jsonl \
+  --split test \
+  --output data/maven_ere_test_candidates.jsonl \
+  --stats-out data/maven_ere_test_candidates_stats.json \
+  --category maven_ere_temporal \
+  --context-radius 1 \
+  --test-sentence-window 1
 ```
 
 ### Generating new synthetic data
@@ -130,6 +171,15 @@ python -m scripts.run_llm_baseline \
   --model qwen2.5:7b \
   --data data/temporal_reasoning_eval.jsonl \
   --pred-source llm \
+  --seed 42 \
+  --temperature 0.0 \
+  --max-tasks 0 \
+  --base-url http://localhost:11434 \
+  --timeout-s 120 \
+  --max-retries 3 \
+  --retry-backoff-s 2.0 \
+  --output-root outputs/runs \
+  --validate-data \
   --log-raw
 ```
 
@@ -143,7 +193,13 @@ Useful flags:
 | `--seed` | 42 | Random seed for non-LLM sources |
 | `--temperature` | 0.0 | Sampling temperature |
 | `--max-tasks` | 0 (all) | Limit tasks for screening runs |
+| `--base-url` | `http://localhost:11434` | Ollama endpoint |
+| `--timeout-s` | client default | Per-request read timeout |
+| `--max-retries` | client default | Transport retry attempts |
+| `--retry-backoff-s` | client default | Exponential backoff base |
 | `--log-raw` | off | Save raw model output per task |
+| `--validate-data` | on | Validate input JSONL before running |
+| `--strict-data` | off | Tighten dataset validation checks |
 | `--output-root` | `outputs/runs/` | Where to write run dirs |
 
 ### Sanity check without a model
@@ -198,6 +254,15 @@ A manifest is a JSON list of model configs:
 python -m scripts.run_model_sweep \
   --manifest manifests/lab_models.json \
   --data data/temporal_reasoning_eval.jsonl \
+  --seed 42 \
+  --temperature 0.0 \
+  --max-tasks 0 \
+  --base-url http://localhost:11434 \
+  --timeout-s 120 \
+  --max-retries 3 \
+  --retry-backoff-s 2.0 \
+  --output-root outputs/runs/canonical_full \
+  --continue-on-error \
   --log-raw
 ```
 
@@ -207,8 +272,53 @@ To sweep across a second dataset without repeating model pulls:
 python -m scripts.run_model_sweep \
   --manifest manifests/lab_models.json \
   --data data/tempeval_eval.jsonl \
-  --output-root outputs/runs/tempeval_full
+  --seed 42 \
+  --temperature 0.0 \
+  --base-url http://localhost:11434 \
+  --timeout-s 120 \
+  --max-retries 3 \
+  --retry-backoff-s 2.0 \
+  --output-root outputs/runs/tempeval_full \
+  --continue-on-error \
+  --log-raw
 ```
+
+To run the same sweep on MAVEN-ERE:
+
+```bash
+python -m scripts.run_model_sweep \
+  --manifest manifests/lab_models.json \
+  --data data/maven_ere_balanced_2to1.jsonl \
+  --seed 42 \
+  --temperature 0.0 \
+  --max-tasks 0 \
+  --base-url http://localhost:11434 \
+  --timeout-s 120 \
+  --max-retries 3 \
+  --retry-backoff-s 2.0 \
+  --output-root outputs/runs/maven_ere_full \
+  --continue-on-error \
+  --log-raw
+```
+
+Sweep-level flags:
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--manifest` | — | JSON list of model entries |
+| `--data` | `data/temporal_reasoning_eval.jsonl` | Dataset path for every manifest entry |
+| `--seed` | 42 | Shared random seed |
+| `--temperature` | 0.0 | Shared decoding temperature |
+| `--max-tasks` | 0 | Shared task limit unless overridden per entry |
+| `--base-url` | `http://localhost:11434` | Shared Ollama endpoint |
+| `--timeout-s` | client default | Shared read timeout unless overridden per entry |
+| `--max-retries` | client default | Shared transport retries unless overridden per entry |
+| `--retry-backoff-s` | client default | Shared retry backoff unless overridden per entry |
+| `--output-root` | `outputs/runs` | Root directory for created run dirs and sweep metadata |
+| `--log-raw` | off | Save raw model outputs |
+| `--continue-on-error` | off | Record failed models in `sweep_index.json` and continue |
+
+Manifest entries can also override `base_url`, `max_tasks`, `timeout_s`, `max_retries`, and `retry_backoff_s` per model.
 
 ---
 
@@ -228,6 +338,14 @@ For TempEval:
 python -m scripts.summarise_runs \
   --runs outputs/runs/tempeval_full \
   --out outputs/analysis/tempeval_full
+```
+
+For MAVEN-ERE:
+
+```bash
+python -m scripts.summarise_runs \
+  --runs outputs/runs/maven_ere_full \
+  --out outputs/analysis/maven_ere_full
 ```
 
 Output files:
@@ -309,6 +427,25 @@ The explorer shows:
 3. Create a dedicated output root: `--output-root outputs/runs/<new_group>`
 4. Run the sweep with `--data <path>`
 5. Point `summarise_runs.py` at the new output root
+
+---
+
+## MAVEN-ERE Submission Workflow
+
+For benchmark test submission generation:
+
+1. Convert raw test documents into pairwise inference tasks.
+2. Run `scripts.run_llm_baseline` on the converted test JSONL.
+3. Pack the resulting `predictions.jsonl` into CodaLab format.
+
+```bash
+python -m scripts.build_maven_ere_submission \
+  --test-docs data/raw/MAVEN_ERE/test.jsonl \
+  --predictions outputs/runs/<run_id>/predictions.jsonl \
+  --output-jsonl outputs/submissions/maven_ere/test_prediction.jsonl \
+  --output-zip outputs/submissions/maven_ere/submission.zip \
+  --simultaneous-label SIMULTANEOUS
+```
 
 ---
 
