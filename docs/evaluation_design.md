@@ -101,6 +101,97 @@ The LTL layer operates over a bounded, graph-grounded fragment of temporal logic
 - `φ U ψ` — φ holds until ψ holds
 - Boolean connectives: `¬`, `∧`, `∨`
 
+### Task-Specific Formulas (Generated Per Prediction)
+
+The default specification also generates formulas from each parsed prediction.
+These formulas depend on the event names and relations in the model output, so
+they are not stored as static specification entries.
+
+#### `ltl_unsupported_final_commitment`
+
+For every final predicted edge `(a, b, rel)` where `rel != UNKNOWN`, the verifier
+generates:
+
+```text
+F(supports(a,b,rel))
+```
+
+This means that at least one reasoning step must explicitly support the final
+commitment. It detects cases where the final answer asserts an informative edge
+that the reasoning trace never set up.
+
+This cannot be reduced to the existing `ReasoningSupportConstraint`. That
+invariant checks the reverse direction: every step support must be entailed by
+the final graph. The LTL formula checks whether every final commitment was
+grounded somewhere in the step-indexed trace.
+
+Example:
+
+- Final prediction: `("a", "b", "BEFORE")`
+- Reasoning steps: no step supports `("a", "b", "BEFORE")`
+- Result: `ltl_unsupported_final_commitment` fires
+
+If a reasoning step supports `("a", "b", "BEFORE")`, the formula passes. If the
+final edge is `UNKNOWN`, no formula is generated because abstentions do not need
+supporting temporal commitment.
+
+#### `ltl_trace_inversion`
+
+For every pair where a reasoning step supports `BEFORE(a,b)`, the verifier
+generates:
+
+```text
+G(supports(a,b,BEFORE) -> G(!supports(b,a,BEFORE)))
+```
+
+The implementation represents implication as:
+
+```text
+G(!supports(a,b,BEFORE) | G(!supports(b,a,BEFORE)))
+```
+
+This detects mid-trace inversions: once the trace commits to `a BEFORE b`, a
+later step must not support `b BEFORE a`.
+
+The invariant layer can miss this because invariants primarily inspect the final
+edge set and the final relation between step supports and final answers. A model
+can temporarily invert its reasoning and then remove the contradiction from the
+final prediction. The LTL formula still observes the step-indexed inconsistency.
+
+Example:
+
+- Step 1 supports `("a", "b", "BEFORE")`
+- Step 2 supports `("b", "a", "BEFORE")`
+- Result: `ltl_trace_inversion` fires
+
+If all later supports preserve `("a", "b", "BEFORE")`, or if there are no
+reasoning steps, no trace-inversion violation is raised.
+
+### Why the Two LTL Categories Are Distinct
+
+Category 1 is invariant-corroborating LTL:
+
+```text
+G(!has_violation(kind))
+```
+
+These formulas re-express invariant results as trace-level assertions for
+`contradiction`, `temporal_inconsistency`, and `hallucinated_node`. Their value
+is temporal localisation of known invariant failures: they show where a known
+structural violation appears in the reasoning trace and whether it persists to
+the final state.
+
+Category 2 is genuine trace-level LTL. These formulas use `supports()` and
+event-specific predicates to check properties the invariant layer cannot check
+by itself:
+
+- whether final commitments were trace-grounded, using `F`
+- whether the reasoning trace is internally consistent in its ordering
+  commitments, using `G` over step supports
+
+Run summaries therefore report `ltl_genuine_violation_rate` separately from
+`ltl_invariant_corroboration_rate`.
+
 **Not supported:**
 
 - General LTL over unbounded state spaces or infinite traces

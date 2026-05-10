@@ -4,7 +4,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
 
-from src.ltl import Atom, FormulaEvaluation, Globally, LTLEvaluator, Not, formula_to_dict, formula_to_string
+from src.ltl import Atom, Eventually, FormulaEvaluation, Globally, LTLEvaluator, Not, Or, formula_to_dict, formula_to_string
 from src.results import Counterexample, VerificationResult, Violation
 from src.specs import BaseInvariant, FormulaSpec, InvariantSpec, SpecContext, TemporalSpecification
 from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
@@ -543,15 +543,17 @@ class Verifier:
         self,
         *,
         context: SpecContext,
+        extra_formulas: Optional[List[FormulaSpec]] = None,
     ) -> Tuple[List[Violation], Optional[int]]:
-        if context.trace is None or not self.specification.formulas:
+        all_formulas = list(self.specification.formulas) + (extra_formulas or [])
+        if context.trace is None or not all_formulas:
             return [], None
 
         evaluator = LTLEvaluator(context.trace)
         formula_violations: List[Violation] = []
         first_violation_step: Optional[int] = None
 
-        for formula_spec in self.specification.formulas:
+        for formula_spec in all_formulas:
             evaluation: FormulaEvaluation = evaluator.evaluate(formula_spec.formula)
             if evaluation.satisfied:
                 continue
@@ -599,6 +601,65 @@ class Verifier:
 
         return formula_violations, first_violation_step
 
+    def _task_specific_formulas(
+        self,
+        pred_edges: Tuple[Edge3, ...],
+        reasoning_steps_tuple: Tuple[Any, ...],
+    ) -> List[FormulaSpec]:
+        if not reasoning_steps_tuple:
+            return []
+
+        formulas: List[FormulaSpec] = []
+        for src, tgt, rel in pred_edges:
+            if rel == "UNKNOWN":
+                continue
+            formulas.append(
+                FormulaSpec(
+                    name="ltl_unsupported_final_commitment",
+                    description=(
+                        f"Final edge ({src}, {tgt}, {rel}) must be grounded in at least one "
+                        "reasoning step (F(supports))."
+                    ),
+                    formula=Eventually(Atom("supports", (src, tgt, rel))),
+                    violation_type="ltl_unsupported_final_commitment",
+                    message=(
+                        f"LTL spec violated: final committed edge ({src}, {tgt}, {rel}) has "
+                        "no supporting reasoning step."
+                    ),
+                )
+            )
+
+        before_pairs: Set[Tuple[str, str]] = set()
+        for step in reasoning_steps_tuple:
+            for edge in getattr(step, "supports", []):
+                src, tgt, rel = _to_edge(edge)
+                if rel == "BEFORE":
+                    before_pairs.add((src, tgt))
+
+        for src, tgt in sorted(before_pairs):
+            formulas.append(
+                FormulaSpec(
+                    name="ltl_trace_inversion",
+                    description=(
+                        f"Once BEFORE({src},{tgt}) is supported in a reasoning step, "
+                        f"BEFORE({tgt},{src}) must not appear in any later step."
+                    ),
+                    formula=Globally(
+                        Or(
+                            Not(Atom("supports", (src, tgt, "BEFORE"))),
+                            Globally(Not(Atom("supports", (tgt, src, "BEFORE")))),
+                        )
+                    ),
+                    violation_type="ltl_trace_inversion",
+                    message=(
+                        "LTL spec violated: trace inversion detected - "
+                        f"BEFORE({src},{tgt}) supported then BEFORE({tgt},{src}) supported."
+                    ),
+                )
+            )
+
+        return formulas
+
     def verify(
         self,
         graph: TemporalGraph,
@@ -639,8 +700,13 @@ class Verifier:
             reasoning_steps=reasoning_steps_tuple,
             trace=trace,
         )
+        task_specific_formulas = self._task_specific_formulas(
+            pred_edges_tuple,
+            reasoning_steps_tuple,
+        )
         formula_violations, first_formula_violation_step = self._formula_violations(
-            context=formula_context
+            context=formula_context,
+            extra_formulas=task_specific_formulas,
         )
 
         all_violations = violations + formula_violations

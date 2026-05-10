@@ -1,21 +1,20 @@
 """
 Verifier-to-correctness correlation analysis for RQ3.
 
-Self-reported confidence is null across all collected runs, so this module
-implements the reachable half of the RQ3 analysis: measuring whether verifier
-signals alone predict binary task correctness via Spearman rank correlation
-and point-biserial correlation.
-
-The intended full design — comparing verification signals against model
-self-reported confidence — requires logprob capture that is not yet implemented.
-See docs/rq3_future_work.md for the complete design, including the logprob path
-and permutation-test significance approach.
+RQ3 is reframed as: Are verifier signals (including genuine LTL trace-level
+violations) correlated with task correctness, and how does the predictive power
+vary across models? The original comparison against self-reported confidence is
+not possible because models consistently return null confidence values. The
+analysis instead compares structural verifier signals against each other and
+against task correctness.
 
 Signals measured per task:
   - is_valid: binary graph validity flag from the verifier
   - trace_grounded: binary trace groundedness flag
   - violation_count: total structural violation count (sum of violation_counts dict)
   - first_violation_step: step index of first violation (NaN when no violation occurred)
+  - ltl_genuine_violation_count: unsupported final commitment + trace inversion count
+  - ltl_corroboration_count: invariant-corroborating LTL count
 
 Correctness: binary — 1 if score.direct.correct > 0, else 0. Tasks with no
 gold_relations are excluded from all computations.
@@ -36,6 +35,16 @@ _SIGNALS: Tuple[Tuple[str, str, bool], ...] = (
     ("trace_grounded", "Reasoning trace groundedness (binary)", True),
     ("violation_count", "Total structural violation count", False),
     ("first_violation_step", "Step index of first violation (NaN when none)", False),
+    (
+        "ltl_genuine_violation_count",
+        "Count of genuine LTL violations (unsupported_commitment + trace_inversion)",
+        False,
+    ),
+    (
+        "ltl_corroboration_count",
+        "Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination)",
+        False,
+    ),
 )
 
 
@@ -67,6 +76,24 @@ def _extract_verifier_signals(record: Mapping[str, Any]) -> Dict[str, float]:
     trace_grounded = 1.0 if bool(verification.get("trace_grounded", True)) else 0.0
     vc = verification.get("violation_counts", {})
     violation_count = float(sum(vc.values())) if isinstance(vc, dict) else 0.0
+    fvc = verification.get("formula_violation_counts", {})
+    genuine_ltl_count = (
+        float(
+            fvc.get("ltl_unsupported_final_commitment", 0)
+            + fvc.get("ltl_trace_inversion", 0)
+        )
+        if isinstance(fvc, dict)
+        else 0.0
+    )
+    corroboration_count = (
+        float(
+            fvc.get("ltl_contradiction", 0)
+            + fvc.get("ltl_temporal_inconsistency", 0)
+            + fvc.get("ltl_hallucinated_node", 0)
+        )
+        if isinstance(fvc, dict)
+        else 0.0
+    )
     fvs = verification.get("first_violation_step")
     first_violation_step = float(fvs) if fvs is not None else float("nan")
     return {
@@ -74,6 +101,8 @@ def _extract_verifier_signals(record: Mapping[str, Any]) -> Dict[str, float]:
         "trace_grounded": trace_grounded,
         "violation_count": violation_count,
         "first_violation_step": first_violation_step,
+        "ltl_genuine_violation_count": genuine_ltl_count,
+        "ltl_corroboration_count": corroboration_count,
     }
 
 

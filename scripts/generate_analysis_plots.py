@@ -541,7 +541,14 @@ def plot_rq3_spearman_heatmap(
     _write_csv(csv_path, rows)
     print(str(csv_path))
 
-    signal_names = ["is_valid", "trace_grounded", "violation_count", "first_violation_step"]
+    signal_names = [
+        "is_valid",
+        "trace_grounded",
+        "violation_count",
+        "first_violation_step",
+        "ltl_genuine_violation_count",
+        "ltl_corroboration_count",
+    ]
     row_labels = sorted({f"{r['model_label']} / {r['dataset']}" for r in rows})
 
     matrix: List[List[float]] = []
@@ -707,6 +714,63 @@ def plot_failure_scope_contribution(
 
 
 # ---------------------------------------------------------------------------
+# Plot 11: Genuine vs corroborating LTL incidence
+# ---------------------------------------------------------------------------
+
+
+def plot_genuine_ltl_violation_incidence(
+    summary_df: Sequence[Dict[str, Any]],
+    output_dir: Path,
+) -> None:
+    """Grouped bars for genuine and invariant-corroborating LTL rates."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    if not summary_df:
+        return
+
+    plots_dir = output_dir / "plots"
+    plots_dir.mkdir(parents=True, exist_ok=True)
+
+    models = [str(row.get("model_label", "unknown")) for row in summary_df]
+    genuine = [float(row.get("ltl_genuine_violation_rate") or 0.0) for row in summary_df]
+    corroborating = [
+        float(row.get("ltl_invariant_corroboration_rate") or 0.0)
+        for row in summary_df
+    ]
+
+    fig, ax = plt.subplots(figsize=(max(8, len(models) * 2.0), 5))
+    width = 0.35
+    pos = list(range(len(models)))
+    ax.bar(
+        [p - width / 2 for p in pos],
+        genuine,
+        width,
+        label="Genuine LTL (F/G trace-level)",
+        color="#4C78A8",
+    )
+    ax.bar(
+        [p + width / 2 for p in pos],
+        corroborating,
+        width,
+        label="Invariant-corroborating LTL",
+        color="#9D9D9D",
+    )
+    ax.set_xticks(pos)
+    ax.set_xticklabels(models, rotation=25, ha="right")
+    ax.set_ylabel("Violation rate")
+    ax.set_ylim(0.0, 1.05)
+    ax.set_title("Genuine vs. Corroborating LTL Violation Rates")
+    ax.legend(frameon=False, fontsize=8)
+    fig.tight_layout()
+    out_path = plots_dir / "genuine_ltl_incidence.png"
+    fig.savefig(out_path, dpi=120)
+    plt.close(fig)
+    print(str(out_path))
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -812,6 +876,9 @@ def main() -> None:
     n_plots += 1
 
     plot_failure_scope_contribution(canonical_summary, out_dir)
+    n_plots += 1
+
+    plot_genuine_ltl_violation_incidence(canonical_summary.get("summary", []), out_dir)
     n_plots += 1
 
     print(f"Generated {n_plots} plots to {out_dir}")

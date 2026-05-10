@@ -29,6 +29,15 @@ from src.analysis.axis_correlation import (
 
 BOOTSTRAP_ITERATIONS = 500
 BOOTSTRAP_SEED = 7
+GENUINE_LTL_TYPES = {
+    "ltl_unsupported_final_commitment",
+    "ltl_trace_inversion",
+}
+CORROBORATING_LTL_TYPES = {
+    "ltl_contradiction",
+    "ltl_temporal_inconsistency",
+    "ltl_hallucinated_node",
+}
 
 try:
     plt.style.use("seaborn-v0_8-whitegrid")
@@ -313,6 +322,22 @@ def _invalidity_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     return sum(1 for row in rows if not _row_verification(row).get("is_valid")) / len(rows)
 
 
+def _formula_type_rate(rows: Sequence[Dict[str, Any]], formula_types: set[str]) -> Optional[float]:
+    if not rows:
+        return None
+    affected = 0
+    for row in rows:
+        verification = _row_verification(row)
+        row_formula_types = {
+            str(item.get("type"))
+            for item in verification.get("formula_violations", [])
+            if isinstance(item, Mapping)
+        }
+        if row_formula_types & formula_types:
+            affected += 1
+    return affected / len(rows)
+
+
 def _validity_expectation_alignment_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
@@ -562,6 +587,8 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "contradiction_detection_rate": _contradiction_detection_rate(contradiction_rows),
         "contradiction_detection_rate_e2e": _contradiction_detection_rate(contradiction_entries),
         "contradiction_invalidity_rate": _invalidity_rate(contradiction_rows),
+        "ltl_genuine_violation_rate": _formula_type_rate(parsed_rows, GENUINE_LTL_TYPES),
+        "ltl_invariant_corroboration_rate": _formula_type_rate(parsed_rows, CORROBORATING_LTL_TYPES),
         "avg_first_violation_step": _average_first_violation_step(parsed_rows),
         "screening_warning": num_tasks <= 25,
     }
@@ -990,6 +1017,23 @@ def _generate_plots(
         ylabel="Closure F1",
     )
     _plot_average_first_violation_step(plots_dir / "average_first_violation_step.png", summary_rows)
+    _plot_grouped_bars(
+        plots_dir / "genuine_ltl_incidence.png",
+        labels=labels,
+        series={
+            "Genuine LTL (F/G trace-level)": [
+                float(row["ltl_genuine_violation_rate"] or 0.0)
+                for row in summary_rows
+            ],
+            "Invariant-corroborating LTL": [
+                float(row["ltl_invariant_corroboration_rate"] or 0.0)
+                for row in summary_rows
+            ],
+        },
+        title="Genuine vs. Corroborating LTL Violation Rates",
+        ylabel="Violation rate",
+        is_rate=True,
+    )
 
     if has_contradiction and _has_non_null_metric(summary_rows, "contradiction_detection_rate"):
         _plot_bar(
@@ -1251,6 +1295,27 @@ def _narrative_report(
             + (["contradiction_detection_rate"] if has_contradiction else []),
         )
     )
+    report_lines.extend(
+        [
+            "",
+            "## LTL Layer",
+            "",
+            "`ltl_genuine_violation_rate` counts task-specific trace formulas that are not reducible to the invariant layer: unsupported final commitments checked with `F(supports(...))`, and mid-trace inversions checked with nested `G` over step supports.",
+            "",
+            "`ltl_invariant_corroboration_rate` counts the three static formulas that mirror invariant failures (`ltl_contradiction`, `ltl_temporal_inconsistency`, `ltl_hallucinated_node`). These are useful for trace localisation but should be reported separately from genuine trace-level signal.",
+            "",
+        ]
+    )
+    report_lines.extend(
+        _markdown_table(
+            summary_rows,
+            columns=[
+                "model_label",
+                "ltl_genuine_violation_rate",
+                "ltl_invariant_corroboration_rate",
+            ],
+        )
+    )
     # Gemma-paradox note: a model with perfect intrinsic validity but zero contradiction
     # detection demonstrates why intrinsic-only scoring is insufficient.
     if has_contradiction:
@@ -1307,7 +1372,8 @@ def _narrative_report(
             "- `validity_expectation_alignment_rate.png`: whether valid versus invalid outputs match task expectations end-to-end.",
             "- `direct_vs_closure_f1.png`: representation fidelity versus ordering recovery on gold-bearing tasks only.",
             "- `verification_task_incidence.png`: task-level prevalence of invariant failure modes.",
-            "- `ltl_task_incidence.png`: trace-level corroboration of structural failures; do not read this as independent evidence from the invariant layer.",
+            "- `ltl_task_incidence.png`: task-level prevalence of all LTL formula failures.",
+            "- `genuine_ltl_incidence.png`: separates genuine trace-level LTL signal from invariant-corroborating LTL.",
         ]
     )
     if has_ambiguity:

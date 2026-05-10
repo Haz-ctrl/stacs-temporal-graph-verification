@@ -32,6 +32,7 @@ def _make_record(*, correct: int = 0, gold_relations=None, is_valid: bool = True
             "is_valid": is_valid,
             "trace_grounded": True,
             "violation_counts": {},
+            "formula_violation_counts": {},
             "first_violation_step": None,
         },
         "score": {
@@ -78,6 +79,7 @@ def test_extract_signals_violation_count_summed() -> None:
             "is_valid": False,
             "trace_grounded": False,
             "violation_counts": {"cycle": 2, "contradiction": 1},
+            "formula_violation_counts": {},
             "first_violation_step": 3,
         }
     }
@@ -91,6 +93,27 @@ def test_extract_signals_nan_when_no_violation() -> None:
     record = _make_record()
     sigs = _extract_verifier_signals(record)
     assert math.isnan(sigs["first_violation_step"])
+
+
+def test_extract_signals_ltl_counts_split() -> None:
+    record = {
+        "verification": {
+            "is_valid": False,
+            "trace_grounded": True,
+            "violation_counts": {},
+            "formula_violation_counts": {
+                "ltl_unsupported_final_commitment": 2,
+                "ltl_trace_inversion": 1,
+                "ltl_contradiction": 1,
+                "ltl_temporal_inconsistency": 1,
+                "ltl_hallucinated_node": 3,
+            },
+            "first_violation_step": 1,
+        }
+    }
+    sigs = _extract_verifier_signals(record)
+    assert sigs["ltl_genuine_violation_count"] == 3.0
+    assert sigs["ltl_corroboration_count"] == 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -174,6 +197,7 @@ def _make_prediction_record(*, task_id: str, correct: int, is_valid: bool, viola
             "is_valid": is_valid,
             "trace_grounded": is_valid,
             "violation_counts": {"cycle": violation_count} if violation_count else {},
+            "formula_violation_counts": {},
             "first_violation_step": 1 if violation_count else None,
         },
         "score": {
@@ -182,7 +206,7 @@ def _make_prediction_record(*, task_id: str, correct: int, is_valid: bool, viola
     }
 
 
-def test_analyse_run_returns_four_signals(tmp_path: Path) -> None:
+def test_analyse_run_returns_six_signals(tmp_path: Path) -> None:
     records = [
         _make_prediction_record(task_id=f"t{i}", correct=i % 2, is_valid=bool(i % 2))
         for i in range(10)
@@ -192,9 +216,16 @@ def test_analyse_run_returns_four_signals(tmp_path: Path) -> None:
 
     results = analyse_run(preds_path)
 
-    assert len(results) == 4
+    assert len(results) == 6
     signal_names = {r.signal for r in results}
-    assert signal_names == {"is_valid", "trace_grounded", "violation_count", "first_violation_step"}
+    assert signal_names == {
+        "is_valid",
+        "trace_grounded",
+        "violation_count",
+        "first_violation_step",
+        "ltl_genuine_violation_count",
+        "ltl_corroboration_count",
+    }
 
 
 def test_analyse_run_excludes_empty_gold(tmp_path: Path) -> None:
@@ -203,7 +234,13 @@ def test_analyse_run_excludes_empty_gold(tmp_path: Path) -> None:
         {
             "id": "no_gold",
             "gold_relations": [],
-            "verification": {"is_valid": True, "trace_grounded": True, "violation_counts": {}, "first_violation_step": None},
+            "verification": {
+                "is_valid": True,
+                "trace_grounded": True,
+                "violation_counts": {},
+                "formula_violation_counts": {},
+                "first_violation_step": None,
+            },
             "score": {"direct": {"correct": 0, "pred_total": 0, "gold_total": 0}},
         },
     ] * 5  # pad to n >= 5 for non-nan results
@@ -264,8 +301,15 @@ def test_batch_analyse_flat_list(tmp_path: Path) -> None:
 
     rows = batch_analyse([(preds_path, "model_A", "synthetic")])
 
-    assert len(rows) == 4
+    assert len(rows) == 6
     assert all(r["model_label"] == "model_A" for r in rows)
     assert all(r["dataset"] == "synthetic" for r in rows)
     signals = {r["signal"] for r in rows}
-    assert signals == {"is_valid", "trace_grounded", "violation_count", "first_violation_step"}
+    assert signals == {
+        "is_valid",
+        "trace_grounded",
+        "violation_count",
+        "first_violation_step",
+        "ltl_genuine_violation_count",
+        "ltl_corroboration_count",
+    }

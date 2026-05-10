@@ -127,8 +127,8 @@ def test_reasoning_support_violation_when_step_support_missing_from_predictions(
     reasoning_steps = [
         ReasoningStep(
             step_id=1,
-            text="From the prompt, B happened before C.",
-            supports=[("B", "C", "BEFORE")],
+            text="From the prompt, A happened before B, and B happened before C.",
+            supports=[("A", "B", "BEFORE"), ("B", "C", "BEFORE")],
         )
     ]
 
@@ -157,8 +157,12 @@ def test_reasoning_support_accepts_closure_implied_supports() -> None:
     reasoning_steps = [
         ReasoningStep(
             step_id=2,
-            text="Therefore A happened before C.",
-            supports=[("A", "C", "BEFORE")],
+            text="A happened before B, B happened before C, and therefore A happened before C.",
+            supports=[
+                ("A", "B", "BEFORE"),
+                ("B", "C", "BEFORE"),
+                ("A", "C", "BEFORE"),
+            ],
         )
     ]
 
