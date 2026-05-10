@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+# Make `src` importable when this script is invoked directly from the repo root.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.run_summary import summarise_runs
 
@@ -39,6 +43,11 @@ def main() -> None:
         default="",
         help="Optional run manifest JSON mapping run IDs to labels and groups.",
     )
+    parser.add_argument(
+        "--predictions-file",
+        default="predictions.jsonl",
+        help="Prediction JSONL filename inside each run directory.",
+    )
     args = parser.parse_args()
 
     run_dirs = _resolve_run_dirs(args.runs)
@@ -46,6 +55,7 @@ def main() -> None:
         run_dirs,
         out_dir=args.out,
         manifest_path=args.manifest or None,
+        predictions_filename=args.predictions_file,
     )
     print(f"Summarised {len(run_dirs)} runs -> {args.out}")
 

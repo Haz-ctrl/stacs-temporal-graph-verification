@@ -42,6 +42,7 @@ class LoadedRun:
     report: Dict[str, Any]
     predictions: List[Dict[str, Any]]
     manifest_meta: Dict[str, Any]
+    predictions_path: Path
 
     @property
     def run_id(self) -> str:
@@ -140,6 +141,72 @@ def _aggregate_prf_from_rows(rows: Sequence[Dict[str, Any]], *, metric_key: str)
         "pred_total": pred_total,
         "gold_total": gold_total,
     }
+
+
+def _metric_totals_from_failure(failure: Mapping[str, Any], *, metric_key: str) -> Optional[Dict[str, int]]:
+    score = failure.get("score_as_empty_prediction")
+    if isinstance(score, Mapping):
+        metric = score.get(metric_key)
+        if isinstance(metric, Mapping):
+            return {
+                "correct": int(metric.get("correct", 0)),
+                "pred_total": int(metric.get("pred_total", 0)),
+                "gold_total": int(metric.get("gold_total", 0)),
+            }
+    if metric_key == "direct":
+        return {
+            "correct": 0,
+            "pred_total": 0,
+            "gold_total": int(failure.get("gold_relation_count", 0)),
+        }
+    return None
+
+
+def _aggregate_prf_end_to_end(
+    entries: Sequence[Dict[str, Any]],
+    *,
+    metric_key: str,
+) -> tuple[Dict[str, float], bool]:
+    correct = 0
+    pred_total = 0
+    gold_total = 0
+    complete = True
+    for entry in entries:
+        if entry.get("parsed", True):
+            prediction = entry.get("prediction")
+            if not isinstance(prediction, Mapping):
+                continue
+            metric = prediction.get("score", {}).get(metric_key, {})
+            correct += int(metric.get("correct", 0))
+            pred_total += int(metric.get("pred_total", 0))
+            gold_total += int(metric.get("gold_total", 0))
+            continue
+
+        failure = entry.get("failure")
+        if not isinstance(failure, Mapping):
+            continue
+        metric = _metric_totals_from_failure(failure, metric_key=metric_key)
+        if metric is None:
+            complete = False
+            continue
+        correct += metric["correct"]
+        pred_total += metric["pred_total"]
+        gold_total += metric["gold_total"]
+
+    precision = (correct / pred_total) if pred_total else 0.0
+    recall = (correct / gold_total) if gold_total else 0.0
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    return (
+        {
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "correct": correct,
+            "pred_total": pred_total,
+            "gold_total": gold_total,
+        },
+        complete,
+    )
 
 
 def _bootstrap_ci(
@@ -331,20 +398,27 @@ def _has_meaningful_rate(rows: Sequence[Dict[str, Any]], key: str) -> bool:
     return any(row.get(key) not in (None, 0, 0.0) for row in rows)
 
 
-def load_runs(run_dirs: Sequence[str | Path], *, manifest_path: str | Path | None = None) -> List[LoadedRun]:
+def load_runs(
+    run_dirs: Sequence[str | Path],
+    *,
+    manifest_path: str | Path | None = None,
+    predictions_filename: str = "predictions.jsonl",
+) -> List[LoadedRun]:
     resolved_manifest_path = Path(manifest_path) if manifest_path is not None else _auto_manifest_path(run_dirs)
     manifest = _load_manifest(resolved_manifest_path)
     loaded: List[LoadedRun] = []
     for run_dir_like in run_dirs:
         run_dir = Path(run_dir_like)
         report = _read_json(run_dir / "report.json")
-        predictions = _read_jsonl(run_dir / "predictions.jsonl")
+        predictions_path = run_dir / predictions_filename
+        predictions = _read_jsonl(predictions_path)
         loaded.append(
             LoadedRun(
                 run_dir=run_dir,
                 report=report,
                 predictions=predictions,
                 manifest_meta=dict(manifest.get(str(report["run_id"]), {})),
+                predictions_path=predictions_path,
             )
         )
     return loaded
@@ -363,8 +437,31 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
     contradiction_rows = [row for row in parsed_rows if row.get("category") == "contradiction"]
     contradiction_entries = [row for row in combined_entries if row.get("category") == "contradiction"]
 
-    direct = report["metrics_expected_valid_only"]["direct"]
-    closure = report["metrics_expected_valid_only"]["closure"]
+    direct = _aggregate_prf_from_rows(expected_valid_parsed_rows, metric_key="direct")
+    closure = _aggregate_prf_from_rows(expected_valid_parsed_rows, metric_key="closure")
+    expected_valid_entries = [
+        entry for entry in combined_entries
+        if entry.get("expected_valid", True)
+    ]
+    direct_e2e, direct_e2e_complete = _aggregate_prf_end_to_end(
+        expected_valid_entries,
+        metric_key="direct",
+    )
+    closure_e2e, closure_e2e_complete = _aggregate_prf_end_to_end(
+        expected_valid_entries,
+        metric_key="closure",
+    )
+    num_tasks = int(report.get("num_tasks", len(parsed_rows)))
+    num_failures = int(report.get("num_failures", max(num_tasks - len(parsed_rows), 0)))
+    parse_success_rate = len(parsed_rows) / max(num_tasks, 1)
+    conditional_validity_rate = (
+        sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / len(parsed_rows)
+        if parsed_rows else None
+    )
+    conditional_trace_grounding_rate = _trace_grounded_rate(parsed_rows)
+    validity_rate = (
+        sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / max(num_tasks, 1)
+    )
     parse_ci_low, parse_ci_high = _bootstrap_ci(
         combined_entries,
         metric_fn=lambda sample: sum(1 for item in sample if item["parsed"]) / len(sample),
@@ -404,29 +501,25 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "group": run.manifest_meta.get("group", ""),
         "dataset_version": report["dataset"]["dataset_version"],
         "pred_source": report["pred_source"],
-        "num_tasks": report["num_tasks"],
-        "num_failures": report["num_failures"],
+        "num_tasks": num_tasks,
+        "num_failures": num_failures,
         "parse_success_count": len(parsed_rows),
         "repair_hit_count": report.get("repair_hit_count", 0),
         "repair_hit_rate": report.get("repair_hit_rate", 0.0),
-        "parse_success_rate": report.get("parse_success_rate", 0.0),
+        "parse_success_rate": parse_success_rate,
         "parse_success_ci_low": parse_ci_low,
         "parse_success_ci_high": parse_ci_high,
         "transport_failure_rate": (
             sum(int(value) for value in report.get("transport_failure_counts", {}).values())
-            / max(int(report.get("num_tasks", 0)), 1)
+            / max(num_tasks, 1)
         ),
-        "conditional_validity_rate": report.get("conditional_validity_rate"),
+        "conditional_validity_rate": conditional_validity_rate,
         "conditional_validity_ci_low": conditional_ci_low,
         "conditional_validity_ci_high": conditional_ci_high,
-        "conditional_trace_grounding_rate": (
-            report.get("conditional_trace_grounding_rate")
-            if report.get("conditional_trace_grounding_rate") is not None
-            else _trace_grounded_rate(parsed_rows)
-        ),
+        "conditional_trace_grounding_rate": conditional_trace_grounding_rate,
         "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(parsed_rows),
         "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(combined_entries),
-        "validity_rate": report.get("validity_rate", 0.0),
+        "validity_rate": validity_rate,
         "parsed_expected_valid_tasks": len(expected_valid_parsed_rows),
         "parsed_gold_bearing_tasks": len(expected_valid_gold_bearing_rows),
         "direct_precision": direct["precision"],
@@ -434,12 +527,20 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "direct_f1": direct["f1"],
         "direct_f1_ci_low": direct_ci_low,
         "direct_f1_ci_high": direct_ci_high,
+        "direct_e2e_precision": direct_e2e["precision"],
+        "direct_e2e_recall": direct_e2e["recall"],
+        "direct_e2e_f1": direct_e2e["f1"],
+        "direct_e2e_complete": direct_e2e_complete,
         "closure_precision": closure["precision"],
         "closure_recall": closure["recall"],
         "closure_f1": closure["f1"],
         "closure_f1_ci_low": closure_ci_low,
         "closure_f1_ci_high": closure_ci_high,
         "closure_minus_direct_f1": closure["f1"] - direct["f1"],
+        "closure_e2e_precision": closure_e2e["precision"] if closure_e2e_complete else None,
+        "closure_e2e_recall": closure_e2e["recall"] if closure_e2e_complete else None,
+        "closure_e2e_f1": closure_e2e["f1"] if closure_e2e_complete else None,
+        "closure_e2e_complete": closure_e2e_complete,
         "fidelity_direct_precision": fidelity_direct["precision"],
         "fidelity_direct_recall": fidelity_direct["recall"],
         "fidelity_direct_f1": fidelity_direct["f1"],
@@ -462,7 +563,7 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "contradiction_detection_rate_e2e": _contradiction_detection_rate(contradiction_entries),
         "contradiction_invalidity_rate": _invalidity_rate(contradiction_rows),
         "avg_first_violation_step": _average_first_violation_step(parsed_rows),
-        "screening_warning": report["num_tasks"] <= 25,
+        "screening_warning": num_tasks <= 25,
     }
 
 
@@ -1241,8 +1342,13 @@ def summarise_runs(
     *,
     out_dir: str | Path,
     manifest_path: str | Path | None = None,
+    predictions_filename: str = "predictions.jsonl",
 ) -> Dict[str, Any]:
-    runs = load_runs(run_dirs, manifest_path=manifest_path)
+    runs = load_runs(
+        run_dirs,
+        manifest_path=manifest_path,
+        predictions_filename=predictions_filename,
+    )
     summary_rows = [_run_row(run) for run in runs]
     category_rows = [row for run in runs for row in _group_tasks_by_dimension(run, dimension="category")]
     difficulty_rows = [row for run in runs for row in _group_tasks_by_dimension(run, dimension="difficulty")]

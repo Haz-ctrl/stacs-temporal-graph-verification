@@ -137,6 +137,11 @@ python -m scripts.run_model_sweep \
   --continue-on-error
 ```
 
+By default the sweep also summarises completed runs into
+`outputs/analysis/<sweep-name>` when the output root is under `outputs/runs`.
+Use `--analysis-out <path>` to choose a different analysis directory, or
+`--skip-analysis` if you only want raw run artefacts.
+
 Summarise a set of completed runs into tables and plots:
 
 ```bash

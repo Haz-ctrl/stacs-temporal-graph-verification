@@ -25,7 +25,9 @@ Return ONLY valid JSON in this exact schema:
 }}
 
 Rules:
-- Use only the provided event names exactly as written.
+- You MUST copy event names exactly as listed under "Allowed events", including the
+  identifier in brackets (e.g. "started [ei3]"). Do NOT paraphrase, shorten, or
+  omit the bracketed identifier from any event name.
 - Allowed relation labels are: BEFORE, AFTER, SIMULTANEOUS, UNKNOWN.
 - Do not include markdown fences.
 - Do not include explanatory text outside the JSON.

@@ -11,6 +11,7 @@ from src.ollama_client import (
     DEFAULT_OLLAMA_RETRY_BACKOFF_S,
     DEFAULT_OLLAMA_TIMEOUT_S,
 )
+from src.run_summary import summarise_runs
 
 
 def _load_manifest(path: str | Path) -> List[Dict[str, Any]]:
@@ -18,6 +19,12 @@ def _load_manifest(path: str | Path) -> List[Dict[str, Any]]:
     if not isinstance(raw, list):
         raise ValueError("Sweep manifest must be a JSON list.")
     return [dict(entry) for entry in raw]
+
+
+def _default_analysis_out(output_root: Path) -> Path:
+    if output_root.parent.name == "runs":
+        return output_root.parent.parent / "analysis" / output_root.name
+    return output_root / "analysis"
 
 
 def main() -> None:
@@ -56,6 +63,19 @@ def main() -> None:
         "--continue-on-error",
         action="store_true",
         help="Record per-model failures and continue with later manifest entries.",
+    )
+    parser.add_argument(
+        "--analysis-out",
+        default="",
+        help=(
+            "Output directory for sweep summary tables and plots. Defaults to "
+            "outputs/analysis/<sweep-name> when --output-root is under outputs/runs."
+        ),
+    )
+    parser.add_argument(
+        "--skip-analysis",
+        action="store_true",
+        help="Do not summarise completed runs after the sweep.",
     )
     args = parser.parse_args()
 
@@ -155,6 +175,30 @@ def main() -> None:
         encoding="utf-8",
     )
     print(f"Completed {len(sweep_index)} runs -> {output_root}")
+
+    completed_run_dirs = [
+        Path(item["run_dir"])
+        for item in sweep_index
+        if item.get("status") == "completed" and item.get("run_dir")
+    ]
+    summariseable_run_dirs = [
+        run_dir for run_dir in completed_run_dirs
+        if (run_dir / "report.json").exists() and (run_dir / "predictions.jsonl").exists()
+    ]
+    if args.skip_analysis:
+        return
+    if not summariseable_run_dirs:
+        print("Skipped analysis: no completed runs with report.json and predictions.jsonl.")
+        return
+
+    analysis_out = Path(args.analysis_out) if args.analysis_out else _default_analysis_out(output_root)
+    summarise_runs(
+        summariseable_run_dirs,
+        out_dir=analysis_out,
+        manifest_path=output_root / "run_manifest.json",
+        predictions_filename="predictions.jsonl",
+    )
+    print(f"Summarised {len(summariseable_run_dirs)} completed runs -> {analysis_out}")
 
 
 if __name__ == "__main__":

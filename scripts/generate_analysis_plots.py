@@ -2,7 +2,7 @@
 Generate supplementary analysis plots from existing run outputs.
 
 No inference re-run required. All plots read from summary.json (produced by
-summarise_runs.py) and predictions.jsonl files in the run directories.
+summarise_runs.py) and prediction JSONL files in the run directories.
 
 Usage:
     python scripts/generate_analysis_plots.py \
@@ -57,15 +57,15 @@ def _load_manifest(base_dir: Path) -> Dict[str, Dict[str, Any]]:
     return {}
 
 
-def _find_run_dirs(base_dir: Path) -> List[Path]:
-    """Find run directories (containing predictions.jsonl) under base_dir."""
+def _find_run_dirs(base_dir: Path, *, predictions_filename: str = "predictions.jsonl") -> List[Path]:
+    """Find run directories containing the requested prediction JSONL file."""
     if not base_dir.is_dir():
         return []
-    if (base_dir / "predictions.jsonl").exists():
+    if (base_dir / predictions_filename).exists():
         return [base_dir]
     return sorted(
         child for child in base_dir.iterdir()
-        if child.is_dir() and (child / "predictions.jsonl").exists()
+        if child.is_dir() and (child / predictions_filename).exists()
     )
 
 
@@ -86,6 +86,8 @@ def _model_label_from_report(
 def _load_predictions_by_model(
     run_dirs: List[Path],
     manifest: Dict[str, Dict[str, Any]],
+    *,
+    predictions_filename: str = "predictions.jsonl",
 ) -> Dict[str, List[Dict[str, Any]]]:
     result: Dict[str, List[Dict[str, Any]]] = {}
     for run_dir in run_dirs:
@@ -94,7 +96,7 @@ def _load_predictions_by_model(
             continue
         report = _read_json(report_path)
         label = _model_label_from_report(report, manifest)
-        preds = _read_jsonl(run_dir / "predictions.jsonl")
+        preds = _read_jsonl(run_dir / predictions_filename)
         if label not in result:
             result[label] = []
         result[label].extend(preds)
@@ -504,6 +506,8 @@ def plot_rq3_spearman_heatmap(
     canonical_manifest: Dict[str, Dict[str, Any]],
     tempeval_manifest: Dict[str, Dict[str, Any]],
     out_dir: Path,
+    *,
+    predictions_filename: str = "predictions.jsonl",
 ) -> None:
     """Spearman ρ heatmap of verifier signals vs task correctness (RQ3)."""
     import matplotlib
@@ -514,14 +518,14 @@ def plot_rq3_spearman_heatmap(
 
     run_spec: List[Tuple[Path, str, str]] = []
     for run_dir in canonical_run_dirs:
-        preds = run_dir / "predictions.jsonl"
+        preds = run_dir / predictions_filename
         report_file = run_dir / "report.json"
         if preds.exists() and report_file.exists():
             report = _read_json(report_file)
             label = _model_label_from_report(report, canonical_manifest)
             run_spec.append((preds, label, "synthetic"))
     for run_dir in tempeval_run_dirs:
-        preds = run_dir / "predictions.jsonl"
+        preds = run_dir / predictions_filename
         report_file = run_dir / "report.json"
         if preds.exists() and report_file.exists():
             report = _read_json(report_file)
@@ -736,6 +740,11 @@ def main() -> None:
         default="outputs/analysis/supplementary_plots",
         help="Output directory for supplementary plots.",
     )
+    parser.add_argument(
+        "--predictions-file",
+        default="predictions.jsonl",
+        help="Prediction JSONL filename inside each run directory.",
+    )
     args = parser.parse_args()
 
     canonical_dir = Path(args.canonical_dir)
@@ -748,14 +757,22 @@ def main() -> None:
     canonical_summary = _read_json(canonical_analysis / "summary.json")
     tempeval_summary = _read_json(tempeval_analysis / "summary.json")
 
-    canonical_run_dirs = _find_run_dirs(canonical_dir)
-    tempeval_run_dirs = _find_run_dirs(tempeval_dir)
+    canonical_run_dirs = _find_run_dirs(
+        canonical_dir,
+        predictions_filename=args.predictions_file,
+    )
+    tempeval_run_dirs = _find_run_dirs(
+        tempeval_dir,
+        predictions_filename=args.predictions_file,
+    )
 
     canonical_manifest = _load_manifest(canonical_dir)
     tempeval_manifest = _load_manifest(tempeval_dir)
 
     canonical_predictions_by_model = _load_predictions_by_model(
-        canonical_run_dirs, canonical_manifest
+        canonical_run_dirs,
+        canonical_manifest,
+        predictions_filename=args.predictions_file,
     )
 
     n_plots = 0
@@ -787,6 +804,7 @@ def main() -> None:
         canonical_manifest,
         tempeval_manifest,
         out_dir,
+        predictions_filename=args.predictions_file,
     )
     n_plots += 1
 

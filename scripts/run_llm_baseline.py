@@ -12,7 +12,7 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple
 from src.constraints import default_verifier
 from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
-from src.evaluation import aggregate_prf, score_prediction, task_score_to_json
+from src.evaluation import aggregate_prf, normalise_pred_labels, score_prediction, task_score_to_json
 from src.ollama_client import (
     DEFAULT_OLLAMA_MAX_RETRIES,
     DEFAULT_OLLAMA_RETRY_BACKOFF_S,
@@ -327,6 +327,17 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                 if json_repaired:
                     repair_hit_count += 1
 
+                # Normalise predicted event labels before verification and scoring.
+                # Some models strip the [eiN] identifier from event names; remapping
+                # them to the canonical task-event form prevents false invalidity
+                # flags and restores correct F1 computation.
+                pred_events, pred_edges, reasoning_steps = normalise_pred_labels(
+                    pred_events=pred_events,
+                    pred_edges=pred_edges,
+                    reasoning_steps=reasoning_steps,
+                    task_events=list(task.events),
+                )
+
                 graph = TemporalGraph()
                 graph.add_events(task.events)
                 graph.add_events(pred_events)
@@ -442,14 +453,21 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     transport_failure_counts[category] = transport_failure_counts.get(category, 0) + 1
                 else:
                     parse_failure_counts[category] = parse_failure_counts.get(category, 0) + 1
+                empty_prediction_score = score_prediction(
+                    allowed_events=task.events,
+                    gold_edges=task.gold_relations,
+                    pred_edges=[],
+                )
                 failure_record: Dict[str, Any] = {
                     "id": task.id,
                     "category": category,
                     "task_category": task.category,
                     "num_events": len(task.events),
                     "gold_relation_count": len(task.gold_relations),
+                    "gold_relations": edges_to_jsonl(task.gold_relations),
                     "expected_valid": task.expected_valid,
                     "error": repr(exc),
+                    "score_as_empty_prediction": task_score_to_json(empty_prediction_score),
                 }
                 if config.log_raw and isinstance(exc, PredictionParseError) and exc.raw_output is not None:
                     failure_record["raw_output"] = exc.raw_output

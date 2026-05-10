@@ -6,8 +6,10 @@ from src.evaluation import (
     closure_prf,
     compute_prf,
     direct_edge_prf,
+    normalise_pred_labels,
     score_prediction,
 )
+from src.schemas import ReasoningStep
 
 
 def test_canonical_edge_set_normalises_relations() -> None:
@@ -225,3 +227,171 @@ def test_aggregate_prf_matches_compute_prf() -> None:
     from src.evaluation import aggregate_prf, compute_prf
 
     assert aggregate_prf(2, 4, 5) == compute_prf(2, 4, 5)
+
+
+def test_direct_edge_prf_after_is_symmetric_with_reversed_before() -> None:
+    """AFTER(A, B) and BEFORE(B, A) are semantically identical; direct F1 must be 1.0."""
+    gold = [("A [ei1]", "B [ei2]", "AFTER")]
+    pred = [("B [ei2]", "A [ei1]", "BEFORE")]
+
+    result = direct_edge_prf(gold, pred)
+
+    assert result.f1 == 1.0
+    assert result.precision == 1.0
+    assert result.recall == 1.0
+
+
+def test_direct_edge_prf_after_wrong_direction_scores_zero() -> None:
+    """AFTER(A, B) and BEFORE(A, B) are contradictory; direct F1 must be 0.0."""
+    gold = [("A [ei1]", "B [ei2]", "AFTER")]
+    pred = [("A [ei1]", "B [ei2]", "BEFORE")]
+
+    result = direct_edge_prf(gold, pred)
+
+    assert result.f1 == 0.0
+
+
+def test_direct_edge_prf_before_symmetric_with_reversed_after() -> None:
+    """BEFORE(A, B) and AFTER(B, A) are semantically identical; direct F1 must be 1.0."""
+    gold = [("A [ei1]", "B [ei2]", "BEFORE")]
+    pred = [("B [ei2]", "A [ei1]", "AFTER")]
+
+    result = direct_edge_prf(gold, pred)
+
+    assert result.f1 == 1.0
+
+
+def test_direct_edge_prf_simultaneous_is_symmetric() -> None:
+    """SIMULTANEOUS(A, B) and SIMULTANEOUS(B, A) are semantically identical."""
+    gold = [("A [ei1]", "B [ei2]", "SIMULTANEOUS")]
+    pred = [("B [ei2]", "A [ei1]", "SIMULTANEOUS")]
+
+    result = direct_edge_prf(gold, pred)
+
+    assert result.f1 == 1.0
+    assert result.precision == 1.0
+    assert result.recall == 1.0
+
+
+def test_score_prediction_direct_diagnostics_use_symmetric_edges() -> None:
+    """Equivalent AFTER/BEFORE orientations must not be reported missing/spurious."""
+    score = score_prediction(
+        allowed_events=["A [ei1]", "B [ei2]"],
+        gold_edges=[("A [ei1]", "B [ei2]", "AFTER")],
+        pred_edges=[("B [ei2]", "A [ei1]", "BEFORE")],
+    )
+
+    assert score.direct.f1 == 1.0
+    assert score.missing_direct_edges == []
+    assert score.spurious_direct_edges == []
+
+
+def test_normalise_pred_labels_remaps_stripped_trigger_word() -> None:
+    """Model emits bare trigger word; should be remapped to canonical label."""
+    task_events = ["started [ei3]", "ended [ei6]"]
+    pred_events = ["started", "ended"]
+    pred_edges = [("started", "ended", "BEFORE")]
+    reasoning_steps: list[ReasoningStep] = []
+
+    norm_events, norm_edges, norm_steps = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=reasoning_steps,
+        task_events=task_events,
+    )
+
+    assert norm_events == ["started [ei3]", "ended [ei6]"]
+    assert norm_edges == [("started [ei3]", "ended [ei6]", "BEFORE")]
+    assert norm_steps == []
+
+
+def test_normalise_pred_labels_remaps_case_mismatch() -> None:
+    """Model emits wrong capitalisation in [eiN] label; should be remapped."""
+    task_events = ["bailed [ei6]", "havoc [ei4]"]
+    pred_events = ["bAILED [ei6]", "havoc [ei4]"]
+    pred_edges = [("bAILED [ei6]", "havoc [ei4]", "BEFORE")]
+    reasoning_steps: list[ReasoningStep] = []
+
+    norm_events, norm_edges, _ = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=reasoning_steps,
+        task_events=task_events,
+    )
+
+    assert norm_events == ["bailed [ei6]", "havoc [ei4]"]
+    assert norm_edges == [("bailed [ei6]", "havoc [ei4]", "BEFORE")]
+
+
+def test_normalise_pred_labels_leaves_genuine_hallucination_unchanged() -> None:
+    """A node that has no match in task_events should not be remapped."""
+    task_events = ["started [ei3]", "ended [ei6]"]
+    pred_events = ["started", "invented_event_not_in_task"]
+    pred_edges = [("started", "invented_event_not_in_task", "BEFORE")]
+    reasoning_steps: list[ReasoningStep] = []
+
+    norm_events, norm_edges, _ = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=reasoning_steps,
+        task_events=task_events,
+    )
+
+    assert norm_events[0] == "started [ei3]"
+    assert norm_events[1] == "invented_event_not_in_task"
+    assert norm_edges == [("started [ei3]", "invented_event_not_in_task", "BEFORE")]
+
+
+def test_normalise_pred_labels_remaps_reasoning_step_supports() -> None:
+    """Remapping must be applied to support edges inside reasoning steps."""
+    task_events = ["started [ei3]", "ended [ei6]"]
+    pred_events = ["started", "ended"]
+    pred_edges = [("started", "ended", "BEFORE")]
+    step = ReasoningStep(
+        step_id=1,
+        text="started happened before ended",
+        supports=[("started", "ended", "BEFORE")],
+    )
+
+    _, _, norm_steps = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=[step],
+        task_events=task_events,
+    )
+
+    assert len(norm_steps) == 1
+    assert norm_steps[0].supports == [("started [ei3]", "ended [ei6]", "BEFORE")]
+
+
+def test_normalise_pred_labels_no_op_when_labels_already_canonical() -> None:
+    """When pred labels already match task events exactly, nothing changes."""
+    task_events = ["started [ei3]", "ended [ei6]"]
+    pred_events = ["started [ei3]", "ended [ei6]"]
+    pred_edges = [("started [ei3]", "ended [ei6]", "BEFORE")]
+
+    norm_events, norm_edges, _ = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=[],
+        task_events=task_events,
+    )
+
+    assert norm_events == task_events
+    assert norm_edges == pred_edges
+
+
+def test_normalise_pred_labels_ambiguous_trigger_is_not_remapped() -> None:
+    """Two events sharing the same trigger word -> trigger-only lookup omitted."""
+    task_events = ["said [ei9]", "said [ei20]"]
+    pred_events = ["said"]
+    pred_edges: list = []
+
+    norm_events, _, _ = normalise_pred_labels(
+        pred_events=pred_events,
+        pred_edges=pred_edges,
+        reasoning_steps=[],
+        task_events=task_events,
+    )
+
+    assert norm_events == ["said"]

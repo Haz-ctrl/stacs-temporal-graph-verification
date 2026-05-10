@@ -3,161 +3,369 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verifier Explorer</title>
+<title>Temporal Graph Verifier — University of St Andrews</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:      #0f1117;
-    --surface: #1a1d27;
-    --border:  #2a2d3e;
-    --text:    #c9d1d9;
-    --muted:   #6e7681;
-    --accent:  #58a6ff;
-    --green:   #3fb950;
-    --red:     #f85149;
-    --amber:   #d29922;
-    --purple:  #bc8cff;
-    --cyan:    #39d0d8;
-    --pill-valid:   #1a3a2a;
-    --pill-invalid: #3a1a1a;
-  }
+:root {
+  /* St Andrews institutional palette */
+  --sta-navy:    #002147;
+  --sta-blue:    #4B9CD3;
+  --sta-gold:    #B68D2E;
+  --sta-light:   #E8F0F8;
 
-  html, body { height: 100%; font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg); color: var(--text); }
+  /* Tool palette (dark surface) */
+  --bg:          #0d1117;
+  --surface:     #161b22;
+  --surface2:    #1c2128;
+  --border:      #30363d;
+  --text:        #e6edf3;
+  --muted:       #7d8590;
+  --accent:      #4B9CD3;
 
-  /* ── Layout ── */
-  #app { display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 48px 1fr; height: 100vh; }
-  #toolbar { grid-column: 1 / -1; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; padding: 0 14px; }
-  #sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-  #main { overflow-y: auto; padding: 20px; }
+  /* Semantic */
+  --green:   #3fb950;
+  --red:     #f85149;
+  --amber:   #d29922;
+  --purple:  #a371f7;
+  --cyan:    #39d0d8;
 
-  /* ── Toolbar ── */
-  #toolbar h1 { font-size: 14px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
-  #file-input { display: none; }
-  .btn { background: var(--border); color: var(--text); border: 1px solid var(--muted); border-radius: 4px; padding: 4px 10px; cursor: pointer; font-family: inherit; font-size: 12px; }
-  .btn:hover { background: var(--accent); color: var(--bg); }
-  #stats-toggle { margin-left: auto; }
+  --pill-valid:   #0d2817;
+  --pill-invalid: #2d1111;
+}
 
-  /* ── Filters ── */
-  #filters { padding: 8px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; }
-  #filters input, #filters select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; font-family: inherit; font-size: 12px; width: 100%; }
-  #filters select { appearance: none; }
+html, body { height: 100%; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; background: var(--bg); color: var(--text); overflow: hidden; }
 
-  /* ── Task list ── */
-  #task-list { flex: 1; overflow-y: auto; }
-  .task-item { padding: 7px 10px; cursor: pointer; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 10px 1fr auto; gap: 6px; align-items: center; }
-  .task-item:hover { background: var(--surface); }
-  .task-item.active { background: #1c2333; }
-  .task-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-pass { background: var(--green); }
-  .dot-fail { background: var(--red); }
-  .dot-na   { background: var(--muted); }
-  .task-id { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
-  .cat-chip { font-size: 10px; background: var(--border); color: var(--muted); padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+/* ── App shell ── */
+#app { display: grid; grid-template-rows: auto auto 1fr; height: 100vh; }
 
-  /* ── Detail panel ── */
-  .panel-section { margin-bottom: 18px; }
-  .panel-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+/* ── Institutional header ── */
+#inst-header {
+  background: var(--sta-navy);
+  padding: 0 20px;
+  display: flex; align-items: center; gap: 16px;
+  height: 52px;
+  border-bottom: 3px solid var(--sta-gold);
+  flex-shrink: 0;
+}
+.sta-crest {
+  width: 32px; height: 32px; flex-shrink: 0;
+}
+.inst-text { flex: 1; min-width: 0; }
+.inst-title { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: 0.01em; }
+.inst-sub { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.03em; margin-top: 1px; }
+.inst-badge {
+  background: var(--sta-gold);
+  color: var(--sta-navy);
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 3px;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
 
-  /* Verdict pill */
-  .verdict-pill { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: 600; }
-  .pill-valid   { background: var(--pill-valid);   color: var(--green); }
-  .pill-invalid { background: var(--pill-invalid); color: var(--red); }
+/* ── Toolbar ── */
+#toolbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px;
+  height: 42px;
+  flex-shrink: 0;
+}
+#toolbar-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent); }
+#file-input { display: none; }
+.btn {
+  background: transparent; color: var(--muted); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 11px; cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.02em; transition: all .15s;
+}
+.btn:hover { background: var(--sta-blue); color: #fff; border-color: var(--sta-blue); }
+.btn.active { background: var(--sta-navy); color: var(--sta-blue); border-color: var(--sta-blue); }
+#load-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+#toolbar-right { margin-left: auto; display: flex; gap: 8px; }
 
-  /* Metric grid */
-  .metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
-  .metric-box { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
-  .metric-box .label { font-size: 10px; color: var(--muted); }
-  .metric-box .value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+/* ── Main layout ── */
+#content { display: grid; grid-template-columns: 310px 1fr; overflow: hidden; }
 
-  /* SVG graph */
-  #graph-svg { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; min-height: 160px; display: block; }
+/* ── Sidebar ── */
+#sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+#run-summary { padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+#run-summary h4 { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+.mini-metric { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.mini-metric .mk { font-size: 11px; color: var(--muted); }
+.mini-metric .mv { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text); }
+.mini-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 1px; margin-bottom: 6px; }
+.mini-bar-fill { height: 3px; border-radius: 2px; background: var(--accent); }
 
-  /* Violations */
-  .violation-card { background: var(--surface); border: 1px solid #f851492a; border-left: 3px solid var(--red); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; font-size: 11px; }
-  .violation-card .vtype { font-weight: 600; color: var(--red); }
-  .violation-card .vlayer { color: var(--muted); font-size: 10px; margin-top: 2px; }
-  .violation-card .vmsg  { color: var(--text); margin-top: 4px; word-break: break-word; }
+#filters { padding: 8px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; }
+#filters input, #filters select {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 4px; padding: 5px 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; width: 100%;
+}
+#filters select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237d8590'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+#filter-count { font-size: 10px; color: var(--muted); padding: 0 2px; }
 
-  /* Relation table */
-  table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  th { text-align: left; padding: 4px 6px; color: var(--muted); font-weight: 400; border-bottom: 1px solid var(--border); }
-  td { padding: 4px 6px; border-bottom: 1px solid var(--border); }
-  .row-match   { background: #1a3a2a22; }
-  .row-missing { background: #3a1a1a22; color: var(--red); }
-  .row-spurious{ background: #3a2a0a22; color: var(--amber); }
+/* ── Task list ── */
+#task-list { flex: 1; overflow-y: auto; }
+.task-item {
+  padding: 7px 10px; cursor: pointer; border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: 10px 1fr auto; gap: 6px; align-items: center;
+  transition: background .1s;
+}
+.task-item:hover  { background: var(--surface2); }
+.task-item.active { background: #0d1d35; border-left: 2px solid var(--sta-blue); }
+.task-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-pass { background: var(--green); }
+.dot-fail { background: var(--red); }
+.dot-na   { background: var(--muted); }
+.dot-warn { background: var(--amber); }
+.task-id  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-chip { font-size: 9px; background: var(--border); color: var(--muted); padding: 2px 5px; border-radius: 3px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
 
-  /* Trace */
-  .trace-step { display: flex; gap: 8px; margin-bottom: 6px; }
-  .step-num { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
-  .step-warn { background: var(--amber); color: var(--bg); }
-  .step-body { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; font-size: 11px; flex: 1; white-space: pre-wrap; word-break: break-word; }
+/* ── Main panel ── */
+#main { overflow-y: auto; background: var(--bg); }
+#empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; color: var(--muted); gap: 16px; padding: 40px;
+}
+#empty .empty-icon { font-size: 40px; opacity: 0.3; }
+#empty .empty-title { font-size: 15px; font-weight: 600; color: var(--text); }
+#empty .empty-sub { font-size: 12px; text-align: center; max-width: 360px; line-height: 1.6; }
+#empty .research-note {
+  margin-top: 20px; border: 1px solid var(--border); border-left: 3px solid var(--sta-gold);
+  border-radius: 4px; padding: 14px 16px; background: var(--surface);
+  max-width: 500px; width: 100%;
+}
+#empty .research-note h4 { font-size: 11px; font-weight: 600; color: var(--sta-gold); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+#empty .research-note p { font-size: 11px; color: var(--muted); line-height: 1.65; }
+#empty .research-note p + p { margin-top: 6px; }
 
-  /* Question block */
-  #question-text { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 10px 12px; font-size: 12px; white-space: pre-wrap; word-break: break-word; line-height: 1.55; color: var(--text); max-height: 240px; overflow-y: auto; }
+/* ── Stats panel ── */
+#stats-panel { padding: 20px; max-width: 900px; }
+.stats-section { margin-bottom: 24px; }
+.stats-section h3 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin-bottom: 12px;
+  border-bottom: 1px solid var(--border); padding-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px 14px; position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent);
+}
+.stat-card.green::before  { background: var(--green); }
+.stat-card.red::before    { background: var(--red); }
+.stat-card.amber::before  { background: var(--amber); }
+.stat-card.gold::before   { background: var(--sta-gold); }
+.stat-card .sc-label { font-size: 10px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.stat-card .sc-value { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; color: var(--text); margin: 4px 0 2px; }
+.stat-card .sc-sub { font-size: 10px; color: var(--muted); }
 
-  /* Stats panel */
-  #stats-panel { padding: 20px; }
-  #stats-panel h2 { font-size: 14px; color: var(--accent); margin-bottom: 16px; }
-  .stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-  .stat-row .sk { color: var(--muted); }
-  .bar-track { background: var(--border); border-radius: 2px; height: 14px; margin: 2px 0 6px; }
-  .bar-fill  { background: var(--accent); border-radius: 2px; height: 14px; font-size: 9px; color: var(--bg); padding-left: 4px; line-height: 14px; overflow: hidden; white-space: nowrap; }
+/* Bar chart rows */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.bar-row .br-label { font-size: 11px; color: var(--text); min-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-row .br-track { flex: 1; background: var(--border); border-radius: 2px; height: 12px; }
+.bar-row .br-fill  { height: 12px; border-radius: 2px; background: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--bg); padding-left: 5px; line-height: 12px; white-space: nowrap; overflow: hidden; }
+.bar-row .br-val   { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); min-width: 35px; text-align: right; }
 
-  /* Empty state */
-  #empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); gap: 10px; }
-  #empty .hint { font-size: 11px; }
+/* F1 comparison */
+.f1-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 4px; align-items: center; margin-bottom: 6px; font-size: 11px; }
+.f1-label { color: var(--muted); }
+.f1-bar { display: flex; align-items: center; gap: 6px; }
+.f1-track { flex: 1; background: var(--border); border-radius: 2px; height: 10px; }
+.f1-fill-direct  { height: 10px; border-radius: 2px; background: var(--sta-blue); }
+.f1-fill-closure { height: 10px; border-radius: 2px; background: var(--sta-gold); }
+.f1-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; min-width: 38px; color: var(--text); }
+
+/* Category breakdown table */
+.cat-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.cat-table th { text-align: left; padding: 5px 8px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+.cat-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
+.cat-table tr:hover td { background: var(--surface2); }
+
+/* ── Detail panel ── */
+#detail-panel { padding: 20px; max-width: 880px; }
+.panel-section { margin-bottom: 20px; }
+.panel-section h3 {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin-bottom: 10px;
+  border-bottom: 1px solid var(--border); padding-bottom: 5px;
+}
+
+/* Verdict header */
+.task-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.task-header-meta { flex: 1; }
+.task-header-id { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: var(--text); }
+.task-header-cat { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.verdict-badge {
+  padding: 5px 14px; border-radius: 5px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; white-space: nowrap;
+}
+.badge-valid   { background: var(--pill-valid);   color: var(--green); border: 1px solid #1a4a2a; }
+.badge-invalid { background: var(--pill-invalid); color: var(--red);   border: 1px solid #4a1a1a; }
+
+/* Metric grid */
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.metric-box { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 9px 11px; }
+.metric-box .mbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.metric-box .mbv { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; margin-top: 3px; }
+.mbv-good { color: var(--green); }
+.mbv-bad  { color: var(--red); }
+.mbv-warn { color: var(--amber); }
+.mbv-neu  { color: var(--text); }
+
+/* Graph */
+#graph-svg { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; display: block; }
+
+/* Violations */
+.violation-card {
+  background: var(--surface); border: 1px solid rgba(248,81,73,0.2);
+  border-left: 3px solid var(--red); border-radius: 5px;
+  padding: 10px 12px; margin-bottom: 7px;
+}
+.violation-card .vtype { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--red); }
+.violation-card .vmeta { font-size: 10px; color: var(--muted); margin-top: 2px; display: flex; gap: 12px; }
+.violation-card .vmsg  { font-size: 11px; color: var(--text); margin-top: 6px; line-height: 1.5; }
+.violation-card .vdetail { margin-top: 6px; padding: 6px 8px; background: var(--bg); border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); }
+
+/* Relations table */
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+thead th { text-align: left; padding: 5px 8px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+tbody td { padding: 5px 8px; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
+.row-match   { background: #0d2817; }
+.row-missing { background: #2d1111; color: var(--red); }
+.row-spurious{ background: #2d1f00; color: var(--amber); }
+.badge-match   { color: var(--green); }
+.badge-missing { color: var(--red); }
+.badge-spurious{ color: var(--amber); }
+
+/* Trace */
+.trace-step { display: flex; gap: 10px; margin-bottom: 8px; }
+.step-num {
+  min-width: 24px; height: 24px; border-radius: 50%;
+  background: var(--border); display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; flex-shrink: 0;
+}
+.step-viol  { background: var(--red); color: #fff; }
+.step-body  {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
+  padding: 8px 10px; font-size: 11px; flex: 1; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+}
+.step-viol-body { border-left: 3px solid var(--red); }
+.step-supports { margin-top: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); }
+
+/* Question */
+.question-block {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
+  padding: 12px 14px; font-size: 12px; line-height: 1.65; color: var(--text);
+  max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+}
+
+/* Legend */
+.legend { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+.legend-dot { width: 10px; height: 3px; border-radius: 2px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
 <div id="app">
+
+  <!-- Institutional header -->
+  <div id="inst-header">
+    <img width="3%" src="logo.png" alt="University Crest">
+    <div class="inst-text">
+      <div class="inst-title">University of St Andrews · School of Computer Science</div>
+      <div class="inst-sub">MSci Dissertation · Verifying Language Model Reasoning Using Temporal Graph Constraints</div>
+    </div>
+    <div class="inst-badge">RESEARCH ARTEFACT</div>
+  </div>
+
   <!-- Toolbar -->
   <div id="toolbar">
-    <h1>Verifier Explorer</h1>
-    <label class="btn" for="file-input">Load predictions.jsonl</label>
+    <span id="toolbar-title">Temporal Graph Verifier Explorer</span>
+    <label class="btn" for="file-input">⊕ Load prediction JSONL</label>
     <input type="file" id="file-input" accept=".jsonl,.json">
-    <span id="load-status" style="font-size:11px;color:var(--muted)"></span>
-    <button class="btn" id="stats-toggle">Statistics</button>
+    <span id="load-status"></span>
+    <div id="toolbar-right">
+      <button class="btn" id="btn-overview">Overview</button>
+      <button class="btn" id="btn-stats">Statistics</button>
+      <button class="btn" id="btn-about">About</button>
+    </div>
   </div>
 
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <div id="filters">
-      <input type="text" id="search-input" placeholder="Search id or question…">
-      <select id="cat-filter"><option value="">All categories</option></select>
-      <select id="verdict-filter">
-        <option value="">All verdicts</option>
-        <option value="valid">is_valid = true</option>
-        <option value="invalid">is_valid = false</option>
-      </select>
-    </div>
-    <div id="task-list"></div>
-  </div>
+  <!-- Content -->
+  <div id="content">
 
-  <!-- Main panel -->
-  <div id="main">
-    <div id="empty">
-      <div>No file loaded.</div>
-      <div class="hint">Click "Load predictions.jsonl" to open a run output.</div>
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="run-summary" style="display:none">
+        <h4>Run Summary</h4>
+        <div id="summary-metrics"></div>
+      </div>
+      <div id="filters">
+        <input type="text" id="search-input" placeholder="Search task id or text…">
+        <select id="cat-filter"><option value="">All categories</option></select>
+        <select id="verdict-filter">
+          <option value="">All verdicts</option>
+          <option value="valid">Verifier: VALID</option>
+          <option value="invalid">Verifier: INVALID</option>
+        </select>
+        <select id="score-filter">
+          <option value="">All scores</option>
+          <option value="correct">Has gold match</option>
+          <option value="wrong">No gold match</option>
+        </select>
+        <div id="filter-count"></div>
+      </div>
+      <div id="task-list"></div>
     </div>
-    <div id="stats-panel" style="display:none"></div>
-    <div id="detail-panel" style="display:none"></div>
+
+    <!-- Main panel -->
+    <div id="main">
+      <div id="empty">
+        <div class="empty-icon">⊞</div>
+        <div class="empty-title">No predictions loaded</div>
+        <div class="empty-sub">Click <strong>Load prediction JSONL</strong> to open <code>predictions.jsonl</code> or <code>predictions_rescored.jsonl</code> from a run directory.</div>
+        <div class="research-note">
+          <h4>About this tool</h4>
+          <p>The <strong>Temporal Graph Verifier Explorer</strong> is a diagnostic instrument developed as part of an MSci dissertation at the University of St Andrews. It allows per-task inspection of structured LLM outputs verified against a temporal graph constraint library and a graph-grounded LTL fragment.</p>
+          <p>Each task record encodes the model's predicted events, typed temporal relations, step-indexed reasoning trace, and verification verdicts across seven axes: parse robustness, structural validity, trace grounding, representation fidelity, closure ordering, ambiguity discipline, and contradiction detection.</p>
+          <p>Supervised by Dr Ognjen Arandjelović · 210002894</p>
+        </div>
+      </div>
+      <div id="overview-panel"  style="display:none; padding:20px; max-width:900px;"></div>
+      <div id="stats-panel"    style="display:none; padding:20px; max-width:900px;"></div>
+      <div id="about-panel"    style="display:none; padding:20px; max-width:700px;"></div>
+      <div id="detail-panel"   style="display:none; padding:20px; max-width:880px;"></div>
+    </div>
+
   </div>
 </div>
 
 <script>
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    State
-───────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 let ALL_TASKS = [];
 let ACTIVE_IDX = null;
-let SHOW_STATS = false;
+let ACTIVE_PANEL = 'empty'; // empty | overview | stats | about | detail
 
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    File loading
-───────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 document.getElementById('file-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -170,25 +378,25 @@ document.getElementById('file-input').addEventListener('change', function(e) {
       try { ALL_TASKS.push(JSON.parse(line)); } catch (_) { errors++; }
     }
     document.getElementById('load-status').textContent =
-      `${ALL_TASKS.length} tasks loaded` + (errors ? ` (${errors} parse errors)` : '');
-    populateCategoryFilter();
+      `${ALL_TASKS.length} tasks` + (errors ? ` · ${errors} parse errors` : '');
+    populateFilters();
+    renderSidebarSummary();
     renderList();
-    SHOW_STATS = false;
-    showPanel('list');
+    document.getElementById('run-summary').style.display = '';
+    showPanel('overview');
     this.value = '';
   }.bind(this);
   reader.readAsText(file);
 });
 
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    Filters
-───────────────────────────────────────────────────────────────── */
-function populateCategoryFilter() {
-  const cats = [...new Set(ALL_TASKS.map(t => t.category || ''))].sort();
+═══════════════════════════════════════════════════════════════ */
+function populateFilters() {
+  const cats = [...new Set(ALL_TASKS.map(t => t.category || ''))].filter(Boolean).sort();
   const sel = document.getElementById('cat-filter');
   sel.innerHTML = '<option value="">All categories</option>';
   cats.forEach(c => {
-    if (!c) return;
     const o = document.createElement('option');
     o.value = c; o.textContent = c;
     sel.appendChild(o);
@@ -199,140 +407,472 @@ function filteredTasks() {
   const q  = document.getElementById('search-input').value.toLowerCase();
   const cat = document.getElementById('cat-filter').value;
   const verdict = document.getElementById('verdict-filter').value;
+  const score = document.getElementById('score-filter').value;
   return ALL_TASKS.map((t, i) => ({ t, i })).filter(({ t }) => {
     if (cat && t.category !== cat) return false;
     if (verdict === 'valid'   && !t.verification?.is_valid) return false;
     if (verdict === 'invalid' && t.verification?.is_valid)  return false;
+    if (score === 'correct' && !(t.score?.direct?.correct > 0)) return false;
+    if (score === 'wrong'   &&  (t.score?.direct?.correct > 0)) return false;
     if (q && !String(t.id || '').toLowerCase().includes(q) &&
              !String(t.question || '').toLowerCase().includes(q)) return false;
     return true;
   });
 }
 
-['search-input','cat-filter','verdict-filter'].forEach(id => {
-  document.getElementById(id).addEventListener('input', renderList);
+['search-input','cat-filter','verdict-filter','score-filter'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { renderList(); });
 });
 
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
+   Sidebar summary strip
+═══════════════════════════════════════════════════════════════ */
+function renderSidebarSummary() {
+  const n = ALL_TASKS.length;
+  const valid = ALL_TASKS.filter(t => t.verification?.is_valid).length;
+  const grounded = ALL_TASKS.filter(t => t.verification?.trace_grounded).length;
+  const directF1s  = ALL_TASKS.map(t => t.score?.direct?.f1).filter(v => v != null);
+  const closureF1s = ALL_TASKS.map(t => t.score?.closure?.f1).filter(v => v != null);
+  const avgD = directF1s.length  ? avg(directF1s) : null;
+  const avgC = closureF1s.length ? avg(closureF1s) : null;
+
+  const el = document.getElementById('summary-metrics');
+  el.innerHTML = `
+    ${miniMetric('Tasks', n)}
+    ${miniBar(valid/n)}
+    ${miniMetric('Validity rate', pct(valid/n))}
+    ${miniBar(grounded/n)}
+    ${miniMetric('Trace grounded', pct(grounded/n))}
+    ${avgD != null ? miniMetric('Avg direct F1', avgD.toFixed(3)) : ''}
+    ${avgC != null ? miniMetric('Avg closure F1', avgC.toFixed(3)) : ''}
+  `;
+}
+
+function miniMetric(k, v) {
+  return `<div class="mini-metric"><span class="mk">${k}</span><span class="mv">${v}</span></div>`;
+}
+function miniBar(ratio) {
+  return `<div class="mini-bar"><div class="mini-bar-fill" style="width:${(ratio*100).toFixed(1)}%"></div></div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Task list
-───────────────────────────────────────────────────────────────── */
-function dotClass(task) {
-  if (!task.gold_relations || task.gold_relations.length === 0) return 'dot-na';
+═══════════════════════════════════════════════════════════════ */
+function taskDotClass(task) {
+  if (!task.verification) return 'dot-na';
+  if (!task.verification.is_valid) return 'dot-fail';
   const correct = task.score?.direct?.correct ?? 0;
+  const total   = (task.gold_relations || []).length;
+  if (total === 0) return 'dot-warn';
   return correct > 0 ? 'dot-pass' : 'dot-fail';
 }
 
 function renderList() {
   const container = document.getElementById('task-list');
   const items = filteredTasks();
+  document.getElementById('filter-count').textContent = `${items.length} of ${ALL_TASKS.length} shown`;
   container.innerHTML = '';
   if (!items.length) {
-    container.innerHTML = '<div style="padding:10px;color:var(--muted);font-size:11px">No tasks match.</div>';
+    container.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:11px">No tasks match filters.</div>';
     return;
   }
+  const frag = document.createDocumentFragment();
   items.forEach(({ t, i }) => {
     const el = document.createElement('div');
     el.className = 'task-item' + (i === ACTIVE_IDX ? ' active' : '');
     el.dataset.idx = i;
     el.innerHTML =
-      `<span class="task-dot ${dotClass(t)}"></span>` +
+      `<span class="task-dot ${taskDotClass(t)}"></span>` +
       `<span class="task-id" title="${esc(t.id || '')}">${esc(t.id || '(no id)')}</span>` +
       `<span class="cat-chip">${esc(t.category || '—')}</span>`;
     el.addEventListener('click', () => selectTask(i));
-    container.appendChild(el);
+    frag.appendChild(el);
   });
+  container.appendChild(frag);
 }
 
 function selectTask(idx) {
   ACTIVE_IDX = idx;
-  SHOW_STATS = false;
   renderList();
-  showPanel('detail');
   renderDetail(ALL_TASKS[idx]);
+  showPanel('detail');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   Panel switching
-───────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   Panel routing
+═══════════════════════════════════════════════════════════════ */
+const PANELS = ['empty','overview','stats','about','detail'];
 function showPanel(which) {
-  document.getElementById('empty').style.display = 'none';
-  document.getElementById('stats-panel').style.display = 'none';
-  document.getElementById('detail-panel').style.display = 'none';
-  if (which === 'detail') document.getElementById('detail-panel').style.display = '';
-  else if (which === 'stats') document.getElementById('stats-panel').style.display = '';
-  else document.getElementById('empty').style.display = '';
+  ACTIVE_PANEL = which;
+  PANELS.forEach(p => {
+    const el = document.getElementById(p + '-panel') || document.getElementById(p);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById(which + '-panel') || document.getElementById(which);
+  if (target) target.style.display = '';
+  ['btn-overview','btn-stats','btn-about'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  if (which === 'overview') document.getElementById('btn-overview')?.classList.add('active');
+  if (which === 'stats')    document.getElementById('btn-stats')?.classList.add('active');
+  if (which === 'about')    document.getElementById('btn-about')?.classList.add('active');
 }
 
-document.getElementById('stats-toggle').addEventListener('click', () => {
+document.getElementById('btn-overview').addEventListener('click', () => {
   if (!ALL_TASKS.length) return;
-  SHOW_STATS = !SHOW_STATS;
-  if (SHOW_STATS) { renderStats(); showPanel('stats'); }
-  else if (ACTIVE_IDX !== null) showPanel('detail');
-  else showPanel('empty');
+  renderOverview(); showPanel('overview');
+});
+document.getElementById('btn-stats').addEventListener('click', () => {
+  if (!ALL_TASKS.length) return;
+  renderStats(); showPanel('stats');
+});
+document.getElementById('btn-about').addEventListener('click', () => {
+  renderAbout(); showPanel('about');
 });
 
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
+   Overview panel
+═══════════════════════════════════════════════════════════════ */
+function renderOverview() {
+  const n = ALL_TASKS.length;
+  const validN    = ALL_TASKS.filter(t => t.verification?.is_valid).length;
+  const groundN   = ALL_TASKS.filter(t => t.verification?.trace_grounded).length;
+  const parseN    = ALL_TASKS.filter(t => t.json_repaired === false || t.parse_success !== false).length;
+  const directF1s  = ALL_TASKS.map(t => t.score?.direct?.f1).filter(v => v != null);
+  const closureF1s = ALL_TASKS.map(t => t.score?.closure?.f1).filter(v => v != null);
+  const avgD = directF1s.length  ? avg(directF1s) : null;
+  const avgC = closureF1s.length ? avg(closureF1s) : null;
+
+  // Violation types
+  const vCounts = {};
+  ALL_TASKS.forEach(t => {
+    [...(t.verification?.violations || []), ...(t.verification?.formula_violations || [])]
+      .forEach(vi => { vCounts[vi.type] = (vCounts[vi.type] || 0) + 1; });
+  });
+  const topViolations = Object.entries(vCounts).sort((a,b)=>b[1]-a[1]);
+
+  // Category breakdown
+  const catStats = {};
+  ALL_TASKS.forEach(t => {
+    const c = t.category || '(none)';
+    if (!catStats[c]) catStats[c] = { n:0, valid:0, hasF1:0, f1sum:0, closureSum:0 };
+    catStats[c].n++;
+    if (t.verification?.is_valid) catStats[c].valid++;
+    const f1 = t.score?.direct?.f1;
+    const cf1 = t.score?.closure?.f1;
+    if (f1 != null) { catStats[c].hasF1++; catStats[c].f1sum += f1; }
+    if (cf1 != null) catStats[c].closureSum += cf1;
+  });
+
+  // F1 by category for chart
+  const catEntries = Object.entries(catStats).sort((a,b)=>b[1].n-a[1].n);
+  const maxCat = Math.max(...catEntries.map(([,s])=>s.n));
+
+  const el = document.getElementById('overview-panel');
+  el.innerHTML = `
+    <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px">
+      Run Overview
+      <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:10px">${n} tasks</span>
+    </h2>
+
+    <!-- Key metrics -->
+    <div class="stats-grid" style="margin-bottom:22px">
+      ${statCard('Tasks loaded', n, '', 'gold')}
+      ${statCard('Validity rate', pct(validN/n), `${validN} of ${n} tasks`, validN/n > 0.7 ? 'green' : 'red')}
+      ${statCard('Trace grounded', pct(groundN/n), `${groundN} tasks`, groundN/n > 0.7 ? 'green' : 'amber')}
+      ${avgD != null ? statCard('Avg Direct F1', avgD.toFixed(3), 'across gold-bearing tasks', '') : ''}
+      ${avgC != null ? statCard('Avg Closure F1', avgC.toFixed(3), 'transitive equiv.', '') : ''}
+    </div>
+
+    <!-- F1 by category -->
+    <div class="stats-section">
+      <h3>Direct F1 vs Closure F1 by Category</h3>
+      <div style="margin-bottom:8px;display:flex;gap:16px;font-size:10px">
+        <span><span style="display:inline-block;width:12px;height:3px;background:var(--sta-blue);vertical-align:middle;border-radius:2px;margin-right:4px"></span>Direct F1</span>
+        <span><span style="display:inline-block;width:12px;height:3px;background:var(--sta-gold);vertical-align:middle;border-radius:2px;margin-right:4px"></span>Closure F1</span>
+      </div>
+      ${catEntries.map(([cat, s]) => {
+        const d = s.hasF1 ? s.f1sum/s.hasF1 : null;
+        const c = s.hasF1 ? s.closureSum/s.hasF1 : null;
+        return `<div class="f1-row">
+          <span class="f1-label">${esc(cat)}</span>
+          <div class="f1-bar">
+            <div class="f1-track"><div class="f1-fill-direct"  style="width:${d != null ? (d*100).toFixed(1) : 0}%"></div></div>
+            <span class="f1-num">${d != null ? d.toFixed(3) : '—'}</span>
+          </div>
+          <div class="f1-bar">
+            <div class="f1-track"><div class="f1-fill-closure" style="width:${c != null ? (c*100).toFixed(1) : 0}%"></div></div>
+            <span class="f1-num">${c != null ? c.toFixed(3) : '—'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Violation taxonomy -->
+    ${topViolations.length ? `
+    <div class="stats-section">
+      <h3>Violation Taxonomy <span style="font-weight:400;font-size:10px;color:var(--muted)">(${topViolations.reduce((s,[,c])=>s+c,0)} total events across ${ALL_TASKS.filter(t=>t.verification?.violations?.length||t.verification?.formula_violations?.length).length} tasks)</span></h3>
+      ${topViolations.map(([type, count]) => {
+        const rate = count / n;
+        return `<div class="bar-row">
+          <span class="br-label" style="font-family:'IBM Plex Mono',monospace;font-size:10px">${esc(type)}</span>
+          <div class="br-track"><div class="br-fill" style="width:${(rate*100).toFixed(1)}%;background:var(--red)">${count}</div></div>
+          <span class="br-val">${pct(rate)}</span>
+        </div>`;
+      }).join('')}
+    </div>` : '<div class="stats-section"><h3>Violations</h3><p style="font-size:12px;color:var(--green)">✓ No violations detected in this run.</p></div>'}
+
+    <!-- Category table -->
+    <div class="stats-section">
+      <h3>Per-Category Breakdown</h3>
+      <table class="cat-table">
+        <thead><tr><th>Category</th><th>N</th><th>Valid %</th><th>Avg Direct F1</th><th>Avg Closure F1</th></tr></thead>
+        <tbody>
+          ${catEntries.map(([cat, s]) => {
+            const vr = s.valid/s.n;
+            const d = s.hasF1 ? (s.f1sum/s.hasF1).toFixed(3) : '—';
+            const c = s.hasF1 ? (s.closureSum/s.hasF1).toFixed(3) : '—';
+            return `<tr>
+              <td>${esc(cat)}</td>
+              <td style="color:var(--muted)">${s.n}</td>
+              <td style="color:${vr>0.7?'var(--green)':vr>0.4?'var(--amber)':'var(--red)'}">${pct(vr)}</td>
+              <td style="font-family:'IBM Plex Mono',monospace">${d}</td>
+              <td style="font-family:'IBM Plex Mono',monospace">${c}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Statistics panel (full breakdown)
+═══════════════════════════════════════════════════════════════ */
+function renderStats() {
+  const n = ALL_TASKS.length;
+
+  // Axis rates
+  const validN   = ALL_TASKS.filter(t => t.verification?.is_valid).length;
+  const groundN  = ALL_TASKS.filter(t => t.verification?.trace_grounded).length;
+
+  // Coverage / abstention
+  const hasGold  = ALL_TASKS.filter(t => (t.gold_relations||[]).length > 0);
+  const contradN = ALL_TASKS.filter(t => t.verification?.violations?.some(v => v.type==='contradiction')).length;
+  const cycleN   = ALL_TASKS.filter(t => t.verification?.violations?.some(v => v.type==='cycle')).length;
+  const hallucN  = ALL_TASKS.filter(t => t.verification?.violations?.some(v => v.type==='hallucinated_node' || v.type==='ltl_hallucinated_node')).length;
+
+  // F1 distributions
+  const directF1s  = ALL_TASKS.map(t => t.score?.direct?.f1).filter(v => v != null);
+  const closureF1s = ALL_TASKS.map(t => t.score?.closure?.f1).filter(v => v != null);
+
+  // Histogram buckets
+  function buckets(vals, nb=5) {
+    if (!vals.length) return [];
+    const step = 1/nb;
+    const bs = [];
+    for (let i=0;i<nb;i++) {
+      const lo=i*step, hi=(i+1)*step;
+      bs.push({ lo, hi, count: vals.filter(v=>v>=lo&&v<hi+(i===nb-1?0.001:0)).length });
+    }
+    return bs;
+  }
+
+  const directBuckets  = buckets(directF1s);
+  const closureBuckets = buckets(closureF1s);
+  const maxBucket = Math.max(...directBuckets.map(b=>b.count), ...closureBuckets.map(b=>b.count), 1);
+
+  // First violation step distribution
+  const fvSteps = ALL_TASKS.map(t => t.verification?.first_violation_step).filter(v => v != null);
+  const fvCounts = {};
+  fvSteps.forEach(s => { fvCounts[s] = (fvCounts[s]||0)+1; });
+
+  const el = document.getElementById('stats-panel');
+  el.innerHTML = `
+    <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px">Detailed Statistics</h2>
+
+    <!-- Axis metrics -->
+    <div class="stats-section">
+      <h3>Verification Axis Rates</h3>
+      <div class="stats-grid">
+        ${statCard('Valid', pct(validN/n), `${validN} / ${n}`, validN/n>0.7?'green':'red')}
+        ${statCard('Trace grounded', pct(groundN/n), `${groundN} / ${n}`, groundN/n>0.7?'green':'amber')}
+        ${statCard('Contradictions', contradN, `tasks flagged`, contradN>0?'red':'green')}
+        ${statCard('Cycle violations', cycleN, `tasks flagged`, cycleN>0?'red':'green')}
+        ${statCard('Hallucinated nodes', hallucN, `tasks flagged`, hallucN>0?'amber':'green')}
+      </div>
+    </div>
+
+    <!-- F1 distributions -->
+    <div class="stats-section">
+      <h3>Direct F1 Distribution <span style="font-weight:400;font-size:10px">(n=${directF1s.length} tasks with gold)</span></h3>
+      ${directBuckets.map(b=>`<div class="bar-row">
+        <span class="br-label">[${b.lo.toFixed(1)}, ${b.hi.toFixed(1)})</span>
+        <div class="br-track"><div class="br-fill" style="width:${(b.count/maxBucket*100).toFixed(1)}%;background:var(--sta-blue)">${b.count}</div></div>
+        <span class="br-val">${b.count}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="stats-section">
+      <h3>Closure F1 Distribution <span style="font-weight:400;font-size:10px">(n=${closureF1s.length} tasks with gold)</span></h3>
+      ${closureBuckets.map(b=>`<div class="bar-row">
+        <span class="br-label">[${b.lo.toFixed(1)}, ${b.hi.toFixed(1)})</span>
+        <div class="br-track"><div class="br-fill" style="width:${(b.count/maxBucket*100).toFixed(1)}%;background:var(--sta-gold)">${b.count}</div></div>
+        <span class="br-val">${b.count}</span>
+      </div>`).join('')}
+    </div>
+
+    ${fvSteps.length ? `
+    <div class="stats-section">
+      <h3>First Violation Step Distribution <span style="font-weight:400;font-size:10px">(${fvSteps.length} tasks with violations)</span></h3>
+      ${Object.entries(fvCounts).sort((a,b)=>Number(a[0])-Number(b[0])).map(([step, cnt])=>`
+      <div class="bar-row">
+        <span class="br-label">Step ${step}</span>
+        <div class="br-track"><div class="br-fill" style="width:${(cnt/fvSteps.length*100).toFixed(1)}%;background:var(--red)">${cnt}</div></div>
+        <span class="br-val">${cnt}</span>
+      </div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   About panel
+═══════════════════════════════════════════════════════════════ */
+function renderAbout() {
+  document.getElementById('about-panel').innerHTML = `
+    <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px">About This Tool</h2>
+    <div style="line-height:1.75;color:var(--text);font-size:12px;max-width:640px">
+      <h3 style="font-size:13px;font-weight:600;color:var(--sta-blue);margin-bottom:8px">Research Context</h3>
+      <p>This tool is a diagnostic artefact developed for the MSci Computer Science dissertation <em>"Verifying Language Model Reasoning Using Temporal Graph Constraints: A Structured Evaluation Approach"</em> at the University of St Andrews, supervised by Dr Ognjen Arandjelović.</p>
+      <p style="margin-top:10px">The framework evaluates five open-weight models (DeepSeek R1 7B, Qwen 3.5 9B, Llama 3.1 8B, Mistral 7B, Gemma 3 12B) on TempEval-3, MAVEN-ERE, and a controlled synthetic dataset. Inference is performed via an Ollama client using a structured JSON prompt template.</p>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--sta-blue);margin:18px 0 8px">Verification Axes</h3>
+      <table class="cat-table">
+        <thead><tr><th>Axis</th><th>What it measures</th><th>Layer</th></tr></thead>
+        <tbody>
+          <tr><td>Parse robustness</td><td>Can the model emit valid structured JSON?</td><td>Pipeline</td></tr>
+          <tr><td>Structural validity</td><td>Is the temporal graph internally consistent?</td><td>Invariant</td></tr>
+          <tr><td>Trace grounding</td><td>Do reasoning steps cite declared relations?</td><td>Invariant</td></tr>
+          <tr><td>Representation fidelity</td><td>Do predicted edges match gold (direct)?</td><td>Gold scoring</td></tr>
+          <tr><td>Closure ordering</td><td>Does transitive closure match gold ordering?</td><td>Gold scoring</td></tr>
+          <tr><td>Ambiguity discipline</td><td>Does model abstain on under-specified inputs?</td><td>Behavioural</td></tr>
+          <tr><td>Contradiction detection</td><td>Does model flag self-contradictory inputs?</td><td>Behavioural</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--sta-blue);margin:18px 0 8px">Dot Colour Legend (task list)</h3>
+      <div class="legend" style="flex-direction:column;gap:6px">
+        <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span> Gold match — at least one correct predicted edge</div>
+        <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block"></span> No gold match — prediction incorrect or missing</div>
+        <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block"></span> No gold — ambiguous or contradiction task (no F1 scoring)</div>
+        <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--muted);display:inline-block"></span> No verification data</div>
+      </div>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--sta-blue);margin:18px 0 8px">Files to load</h3>
+      <p>Load any prediction JSONL file from <code>outputs/runs/*/</code>, including <code>predictions.jsonl</code> or <code>predictions_rescored.jsonl</code>. Each run covers one model on one dataset. The canonical synthetic set is under <code>canonical_full/</code>; TempEval under <code>tempeval_full/</code>.</p>
+
+      <p style="margin-top:18px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:12px">
+        University of St Andrews · School of Computer Science · 210002894 · May 2026
+      </p>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Detail panel
-───────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
 function renderDetail(task) {
   const v = task.verification || {};
   const score = task.score || {};
-  const direct = score.direct || {};
+  const direct  = score.direct  || {};
   const closure = score.closure || {};
 
-  const verdictClass = v.is_valid ? 'pill-valid' : 'pill-invalid';
-  const verdictText  = v.is_valid ? 'VALID' : 'INVALID';
+  const isValid = v.is_valid;
+  const allViols = [...(v.violations || []), ...(v.formula_violations || [])];
+  const violTotal = allViols.length;
 
-  // violation count
-  const vc = v.violation_counts || {};
-  const violationTotal = Object.values(vc).reduce((s, n) => s + n, 0);
+  const gold = task.gold_relations || [];
+  const pred = task.pred_edges     || [];
 
+  // metrics
   const metrics = [
-    ['Verdict',          `<span class="verdict-pill ${verdictClass}">${verdictText}</span>`],
-    ['Trace grounded',   v.trace_grounded ? '<span style="color:var(--green)">yes</span>' : '<span style="color:var(--red)">no</span>'],
-    ['Violations',       String(violationTotal)],
-    ['First viol. step', v.first_violation_step != null ? String(v.first_violation_step) : '—'],
-    ['Direct F1',        fmtF1(direct.f1)],
-    ['Closure F1',       fmtF1(closure.f1)],
+    { label: 'Verdict',       value: isValid ? 'VALID' : 'INVALID', cls: isValid ? 'mbv-good' : 'mbv-bad' },
+    { label: 'Trace grounded', value: v.trace_grounded ? 'yes' : 'no', cls: v.trace_grounded ? 'mbv-good' : 'mbv-bad' },
+    { label: 'Violations',    value: String(violTotal), cls: violTotal > 0 ? 'mbv-bad' : 'mbv-good' },
+    { label: 'First viol. step', value: v.first_violation_step != null ? String(v.first_violation_step) : '—', cls: 'mbv-neu' },
+    { label: 'Direct F1',     value: direct.f1  != null ? Number(direct.f1).toFixed(3)  : '—', cls: 'mbv-neu' },
+    { label: 'Closure F1',    value: closure.f1 != null ? Number(closure.f1).toFixed(3) : '—', cls: 'mbv-neu' },
+    { label: 'Gold edges',    value: String(gold.length), cls: 'mbv-neu' },
+    { label: 'Pred edges',    value: String(pred.length), cls: 'mbv-neu' },
   ];
 
-  const metricsHtml = metrics.map(([l, v]) =>
-    `<div class="metric-box"><div class="label">${l}</div><div class="value">${v}</div></div>`
+  const metricsHtml = metrics.map(m =>
+    `<div class="metric-box"><div class="mbl">${esc(m.label)}</div><div class="mbv ${m.cls}">${esc(m.value)}</div></div>`
   ).join('');
 
   const graphSvg = buildGraphSvg(task, v);
-  const violationsHtml = renderViolations([...(v.violations || []), ...(v.formula_violations || [])]);
-  const relTableHtml = renderRelTable(task);
+  const violHtml = renderViolations(allViols);
+  const relHtml  = renderRelTable(task);
   const traceHtml = renderTrace(task, v);
-  const questionHtml = `<div id="question-text">${esc(task.question || '(no question)')}</div>`;
 
   document.getElementById('detail-panel').innerHTML = `
+    <!-- Header -->
+    <div class="task-header">
+      <div class="task-header-meta">
+        <div class="task-header-id">${esc(task.id || '(no id)')}</div>
+        <div class="task-header-cat">
+          Category: <strong>${esc(task.category || '—')}</strong>
+          · Expected valid: <strong>${task.expected_valid != null ? String(task.expected_valid) : '—'}</strong>
+          · Expected consistent: <strong>${task.expected_consistent != null ? String(task.expected_consistent) : '—'}</strong>
+        </div>
+      </div>
+      <span class="verdict-badge ${isValid ? 'badge-valid' : 'badge-invalid'}">${isValid ? '✓ VALID' : '✗ INVALID'}</span>
+    </div>
+
+    <!-- Metrics -->
     <div class="panel-section">
-      <h3>Task — ${esc(task.id || '?')} &nbsp;·&nbsp; ${esc(task.category || '—')}</h3>
+      <h3>Verification Metrics</h3>
       <div class="metric-grid">${metricsHtml}</div>
     </div>
+
+    <!-- Question -->
     <div class="panel-section">
-      <h3>Temporal Graph</h3>
+      <h3>Input Question</h3>
+      <div class="question-block">${esc(task.question || '(no question text)')}</div>
+    </div>
+
+    <!-- Graph -->
+    <div class="panel-section">
+      <h3>Predicted Temporal Graph</h3>
+      <div class="legend" style="margin-bottom:8px">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--sta-blue)"></span>BEFORE</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>SIMULTANEOUS</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>AFTER</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--muted)"></span>UNKNOWN</div>
+        ${violTotal > 0 ? '<div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Flagged edge</div>' : ''}
+      </div>
       ${graphSvg}
     </div>
-    ${(v.violations?.length || v.formula_violations?.length) ? `
+
+    <!-- Violations -->
+    ${allViols.length ? `
     <div class="panel-section">
-      <h3>Violations (${(v.violations||[]).length + (v.formula_violations||[]).length})</h3>
-      ${violationsHtml}
+      <h3>Violations (${allViols.length})</h3>
+      ${violHtml}
     </div>` : ''}
+
+    <!-- Relations table -->
     <div class="panel-section">
       <h3>Gold vs Predicted Relations</h3>
-      ${relTableHtml}
+      ${relHtml}
     </div>
-    ${task.reasoning_steps?.length ? `
+
+    <!-- Trace -->
+    ${(task.reasoning_steps||[]).length ? `
     <div class="panel-section">
       <h3>Reasoning Trace (${task.reasoning_steps.length} steps)</h3>
       ${traceHtml}
     </div>` : ''}
-    <div class="panel-section">
-      <h3>Question</h3>
-      ${questionHtml}
-    </div>
   `;
 }
 
@@ -340,111 +880,117 @@ function renderDetail(task) {
 function buildGraphSvg(task, v) {
   const events = task.events || [];
   const predEdges = task.pred_edges || [];
-  if (!events.length) return '<svg id="graph-svg" height="60"><text x="10" y="30" fill="#6e7681" font-size="11">No events</text></svg>';
+  if (!events.length) return '<svg id="graph-svg" height="60"><text x="12" y="30" fill="var(--muted)" font-size="11" font-family="IBM Plex Sans,sans-serif">No events declared.</text></svg>';
 
   const n = events.length;
-  const W = 700, nodeR = 22, yBase = 80, yStep = 90;
-  const cols = Math.min(n, 5);
+  const W = 800, nodeR = 26, padX = 60, padY = 50;
+  const cols = Math.min(n, 4);
   const rows = Math.ceil(n / cols);
-  const H = Math.max(160, rows * yStep + 40);
-  const colW = W / (cols + 1);
+  const colW = (W - padX*2) / (cols > 1 ? cols-1 : 1);
+  const rowH = 100;
+  const H = Math.max(160, padY*2 + (rows-1)*rowH);
 
-  // Node positions
   const pos = {};
   events.forEach((e, i) => {
     const col = i % cols, row = Math.floor(i / cols);
-    pos[e] = { x: colW * (col + 1), y: yBase + row * yStep };
+    pos[e] = {
+      x: cols > 1 ? padX + col * colW : W/2,
+      y: padY + row * rowH
+    };
   });
 
-  // Identify contradicting edges
-  const violations = [...(v.violations || []), ...(v.formula_violations || [])];
-  const hasContradiction = violations.some(vi =>
-    vi.type === 'contradiction' || vi.type === 'ltl_contradiction' ||
-    vi.type === 'cycle' || vi.type === 'temporal_inconsistency'
-  );
+  // Violation edges
+  const violEdges = new Set();
+  v.violations?.forEach(vi => {
+    (vi.details?.pairs || []).forEach(([a,b]) => { violEdges.add(a+'|||'+b); violEdges.add(b+'|||'+a); });
+  });
 
-  const edgeColor = { BEFORE: '#58a6ff', AFTER: '#bc8cff', SIMULTANEOUS: '#3fb950', UNKNOWN: '#6e7681' };
-
-  function edgeKey(a, b) { return `${a}|||${b}`; }
-  const goldSet = new Set((task.gold_relations || []).map(([a, b]) => edgeKey(a, b)));
+  const edgeColor = { BEFORE: '#4B9CD3', AFTER: '#a371f7', SIMULTANEOUS: '#3fb950', UNKNOWN: '#6e7681' };
 
   let edgesHtml = '';
   predEdges.forEach(([src, tgt, rel]) => {
     const sp = pos[src], tp = pos[tgt];
     if (!sp || !tp) return;
-    const colour = hasContradiction ? '#f85149' : (edgeColor[rel] || '#6e7681');
+    const isViol = violEdges.has(src+'|||'+tgt);
+    const colour = isViol ? '#f85149' : (edgeColor[rel] || '#6e7681');
     const isDashed = rel === 'SIMULTANEOUS';
     const strokeDash = isDashed ? 'stroke-dasharray="5,3"' : '';
-    const mx = (sp.x + tp.x) / 2, my = (sp.y + tp.y) / 2 - 18;
+    // curve for arcs
+    const mx = (sp.x + tp.x)/2, my = (sp.y + tp.y)/2 - 20;
+    const dx = tp.x - sp.x, dy = tp.y - sp.y;
+    const len = Math.sqrt(dx*dx+dy*dy);
+    const ux = dx/len, uy = dy/len;
+    const ex = tp.x - ux*nodeR, ey = tp.y - uy*nodeR;
+    const sx = sp.x + ux*nodeR, sy = sp.y + uy*nodeR;
     edgesHtml += `
-      <line x1="${sp.x}" y1="${sp.y}" x2="${tp.x}" y2="${tp.y}"
-            stroke="${colour}" stroke-width="1.5" ${strokeDash} marker-end="url(#arrowhead)" opacity="0.75"/>
-      <text x="${mx}" y="${my}" text-anchor="middle" fill="${colour}" font-size="9" font-family="JetBrains Mono,monospace">${esc(rel)}</text>`;
+      <defs><marker id="arr-${esc(rel)}" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="${colour}" opacity="0.8"/></marker></defs>
+      <line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"
+            stroke="${colour}" stroke-width="${isViol?2:1.5}" ${strokeDash} marker-end="url(#arr-${esc(rel)})" opacity="${isViol?1:0.7}"/>
+      <text x="${mx.toFixed(1)}" y="${(my-2).toFixed(1)}" text-anchor="middle" fill="${colour}" font-size="9" font-family="IBM Plex Mono,monospace" opacity="0.9">${esc(rel)}</text>`;
   });
 
-  let nodesHtml = events.map(e => {
+  const nodesHtml = events.map(e => {
     const p = pos[e];
-    return `<circle cx="${p.x}" cy="${p.y}" r="${nodeR}" fill="#1a1d27" stroke="#2a2d3e" stroke-width="1.5"/>
-            <text x="${p.x}" y="${p.y + 4}" text-anchor="middle" fill="#c9d1d9" font-size="9"
-                  font-family="JetBrains Mono,monospace">${esc(truncate(e, 14))}</text>`;
+    return `<circle cx="${p.x}" cy="${p.y}" r="${nodeR}" fill="var(--surface2)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="${p.x}" y="${p.y-4}" text-anchor="middle" fill="var(--text)" font-size="8" font-family="IBM Plex Mono,monospace">${esc(truncate(e,16))}</text>`;
   }).join('');
 
-  return `<svg id="graph-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="height:${H}px">
-    <defs>
-      <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
-        <polygon points="0 0, 6 2, 0 4" fill="#6e7681"/>
-      </marker>
-    </defs>
-    ${edgesHtml}
-    ${nodesHtml}
-  </svg>`;
+  return `<svg id="graph-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="height:${H}px;min-height:120px">${edgesHtml}${nodesHtml}</svg>`;
 }
 
 /* ── Violations ── */
 function renderViolations(violations) {
-  if (!violations.length) return '<div style="color:var(--muted);font-size:11px">None</div>';
-  return violations.map(vi => `
-    <div class="violation-card">
+  if (!violations.length) return '<p style="color:var(--green);font-size:12px">✓ No violations.</p>';
+  return violations.map(vi => {
+    const detailHtml = vi.details && Object.keys(vi.details).length
+      ? `<div class="vdetail">${esc(JSON.stringify(vi.details, null, 2))}</div>` : '';
+    return `<div class="violation-card">
       <div class="vtype">${esc(vi.type || '?')}</div>
-      <div class="vlayer">layer: ${esc(vi.layer || '?')}</div>
+      <div class="vmeta">
+        <span>layer: ${esc(vi.layer || '?')}</span>
+        ${vi.constraint ? `<span>constraint: ${esc(vi.constraint)}</span>` : ''}
+        ${vi.spec_source ? `<span>source: ${esc(vi.spec_source)}</span>` : ''}
+      </div>
       <div class="vmsg">${esc(vi.message || '')}</div>
-    </div>`
-  ).join('');
+      ${detailHtml}
+    </div>`;
+  }).join('');
 }
 
-/* ── Relation table ── */
+/* ── Relations table ── */
 function renderRelTable(task) {
   const gold = task.gold_relations || [];
-  const pred = task.pred_edges || [];
+  const pred = task.pred_edges     || [];
 
-  function edgeKey(a, b, r) { return `${a}|||${b}|||${r}`; }
-  const goldKeys = new Set(gold.map(([a,b,r]) => edgeKey(a,b,r)));
-  const predKeys = new Set(pred.map(([a,b,r]) => edgeKey(a,b,r)));
-  const goldPairs = new Set(gold.map(([a,b]) => `${a}|||${b}`));
-  const predPairs = new Set(pred.map(([a,b]) => `${a}|||${b}`));
+  if (!gold.length && !pred.length) {
+    return '<p style="color:var(--muted);font-size:11px">No relations (empty gold and prediction).</p>';
+  }
+
+  function eKey(a,b,r) { return `${a}|||${b}|||${r}`; }
+  function canonicalKey(a,b,r) {
+    if (r === 'AFTER') return eKey(b,a,'BEFORE');
+    if (r === 'SIMULTANEOUS' && b < a) return eKey(b,a,r);
+    return eKey(a,b,r);
+  }
+  const goldKeys = new Set(gold.map(([a,b,r]) => canonicalKey(a,b,r)));
+  const predKeys = new Set(pred.map(([a,b,r]) => canonicalKey(a,b,r)));
 
   const rows = [];
-
-  // Gold rows
   gold.forEach(([a,b,r]) => {
-    const matched = predKeys.has(edgeKey(a,b,r));
-    rows.push({ cls: matched ? 'row-match' : 'row-missing', src: a, tgt: b, rel: r, badge: matched ? '✓ match' : '✗ missing' });
+    const matched = predKeys.has(canonicalKey(a,b,r));
+    rows.push({ cls: matched ? 'row-match' : 'row-missing', src:a, tgt:b, rel:r,
+      badge: matched ? '<span class="badge-match">✓ match</span>' : '<span class="badge-missing">✗ missing</span>' });
   });
-
-  // Spurious pred rows
   pred.forEach(([a,b,r]) => {
-    if (!goldKeys.has(edgeKey(a,b,r))) {
-      rows.push({ cls: 'row-spurious', src: a, tgt: b, rel: r, badge: '△ spurious' });
-    }
+    if (!goldKeys.has(canonicalKey(a,b,r)))
+      rows.push({ cls: 'row-spurious', src:a, tgt:b, rel:r, badge: '<span class="badge-spurious">△ spurious</span>' });
   });
-
-  if (!rows.length) return '<div style="color:var(--muted);font-size:11px">No relations (empty gold and pred).</div>';
 
   const body = rows.map(({ cls, src, tgt, rel, badge }) =>
-    `<tr class="${cls}"><td>${esc(src)}</td><td>${esc(tgt)}</td><td>${esc(rel)}</td><td style="color:var(--muted);font-size:10px">${badge}</td></tr>`
+    `<tr class="${cls}"><td>${esc(src)}</td><td>${esc(tgt)}</td><td>${esc(rel)}</td><td style="font-family:'IBM Plex Sans',sans-serif;font-size:11px">${badge}</td></tr>`
   ).join('');
 
-  return `<table><thead><tr><th>SOURCE</th><th>TARGET</th><th>RELATION</th><th></th></tr></thead><tbody>${body}</tbody></table>`;
+  return `<table><thead><tr><th>Source</th><th>Target</th><th>Relation</th><th>Status</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
 /* ── Reasoning trace ── */
@@ -453,87 +999,34 @@ function renderTrace(task, v) {
   const warnStep = v.first_violation_step;
   return steps.map(step => {
     const isWarn = warnStep != null && step.step_id === warnStep;
+    const supports = (step.supports || []).map(([a,b,r]) => `  ${a} ${r} ${b}`).join('\n');
     return `<div class="trace-step">
-      <span class="step-num ${isWarn ? 'step-warn' : ''}" title="${isWarn ? 'First violation' : ''}">${step.step_id ?? '?'}</span>
-      <div class="step-body">${esc(step.text || '')}</div>
+      <span class="step-num ${isWarn ? 'step-viol' : ''}" title="${isWarn ? 'First violation at this step' : `Step ${step.step_id}`}">${step.step_id ?? '?'}</span>
+      <div class="step-body ${isWarn ? 'step-viol-body' : ''}">
+        ${esc(step.text || '')}
+        ${supports ? `<div class="step-supports">Supports:\n${esc(supports)}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   Statistics panel
-───────────────────────────────────────────────────────────────── */
-function renderStats() {
-  const n = ALL_TASKS.length;
-  if (!n) return;
-
-  const valid = ALL_TASKS.filter(t => t.verification?.is_valid).length;
-  const validRate = (valid / n * 100).toFixed(1);
-
-  const directF1s = ALL_TASKS.map(t => t.score?.direct?.f1).filter(v => v != null);
-  const closureF1s = ALL_TASKS.map(t => t.score?.closure?.f1).filter(v => v != null);
-  const avgDirect  = directF1s.length  ? (directF1s.reduce((a,b)=>a+b,0) / directF1s.length).toFixed(3) : '—';
-  const avgClosure = closureF1s.length ? (closureF1s.reduce((a,b)=>a+b,0) / closureF1s.length).toFixed(3) : '—';
-
-  // Category distribution
-  const catCounts = {};
-  ALL_TASKS.forEach(t => {
-    const c = t.category || '(none)';
-    catCounts[c] = (catCounts[c] || 0) + 1;
-  });
-  const catMax = Math.max(...Object.values(catCounts));
-
-  // Top violation types
-  const vCounts = {};
-  ALL_TASKS.forEach(t => {
-    [...(t.verification?.violations || []), ...(t.verification?.formula_violations || [])]
-      .forEach(vi => { vCounts[vi.type] = (vCounts[vi.type] || 0) + 1; });
-  });
-  const topV = Object.entries(vCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-  const catBars = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).map(([cat, cnt]) => `
-    <div style="font-size:11px;margin-bottom:2px">${esc(cat)} <span style="color:var(--muted)">(${cnt})</span></div>
-    <div class="bar-track"><div class="bar-fill" style="width:${(cnt/catMax*100).toFixed(1)}%">${cnt}</div></div>
-  `).join('');
-
-  const topVHtml = topV.length ? topV.map(([t, c]) =>
-    `<div class="stat-row"><span class="sk">${esc(t)}</span><span>${c}</span></div>`
-  ).join('') : '<div style="color:var(--muted);font-size:11px">None</div>';
-
-  document.getElementById('stats-panel').innerHTML = `
-    <h2>Run Statistics</h2>
-    <div class="stat-row"><span class="sk">Total tasks</span><span>${n}</span></div>
-    <div class="stat-row"><span class="sk">Validity rate</span><span>${validRate}%</span></div>
-    <div class="stat-row"><span class="sk">Avg direct F1</span><span>${avgDirect}</span></div>
-    <div class="stat-row"><span class="sk">Avg closure F1</span><span>${avgClosure}</span></div>
-    <div style="margin-top:16px"><h3 style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Category Distribution</h3>
-      ${catBars}
-    </div>
-    <div style="margin-top:16px"><h3 style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Top Violation Types</h3>
-      ${topVHtml}
-    </div>
-  `;
-}
-
-/* ─────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
    Utilities
-───────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════ */
+function statCard(label, value, sub, cls='') {
+  return `<div class="stat-card ${cls}">
+    <div class="sc-label">${esc(label)}</div>
+    <div class="sc-value">${esc(String(value))}</div>
+    ${sub ? `<div class="sc-sub">${esc(sub)}</div>` : ''}
+  </div>`;
+}
+
 function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function truncate(s, n) {
-  return s.length > n ? s.slice(0, n - 1) + '…' : s;
-}
-
-function fmtF1(v) {
-  if (v == null) return '—';
-  return Number(v).toFixed(3);
-}
+function truncate(s, n) { return s.length > n ? s.slice(0,n-1)+'…' : s; }
+function pct(r)  { return (r * 100).toFixed(1) + '%'; }
+function avg(arr){ return arr.reduce((a,b)=>a+b,0) / arr.length; }
 </script>
 </body>
 </html>

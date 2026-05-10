@@ -1,0 +1,4 @@
+axis_a,axis_b,pearson_r,phi,agreement_count,n
+parse_success,verifier_valid,nan,nan,496,496
+parse_success,trace_grounded,nan,nan,496,496
+verifier_valid,trace_grounded,nan,nan,496,496
