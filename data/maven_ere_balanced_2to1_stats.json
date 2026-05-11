@@ -1,28 +1,49 @@
 {
   "split": "valid",
   "input_path": "data/raw/MAVEN_ERE/valid.jsonl",
-  "num_documents": 710,
-  "num_tasks": 3186,
+  "num_documents": 500,
+  "num_tasks": 500,
   "before_multiplier": 2.0,
   "event_event_only": true,
-  "pool_sizes": {
-    "BEFORE": 98866,
-    "SIMULTANEOUS": 1062
+  "subset_of": {
+    "source_path": "data/maven_ere_balanced_2to1.jsonl before 500-task subset replacement",
+    "raw_input_num_documents": 710,
+    "source_num_tasks": 3186,
+    "source_num_documents": 561,
+    "source_label_counts": {
+      "BEFORE": 2124,
+      "SIMULTANEOUS": 1062
+    },
+    "source_documents_by_label": {
+      "BEFORE": 489,
+      "SIMULTANEOUS": 323
+    },
+    "source_pool_sizes": {
+      "BEFORE": 98866,
+      "SIMULTANEOUS": 1062
+    },
+    "source_skipped_relation_counts": {
+      "BEFORE:timex_filtered": 61361,
+      "BEGINS-ON": 73,
+      "CONTAINS": 25550,
+      "ENDS-ON": 34,
+      "OVERLAP": 1570,
+      "SIMULTANEOUS:timex_filtered": 412
+    }
   },
+  "selection_strategy": "deterministic stratified document-diverse subset; exact 333 BEFORE / 167 SIMULTANEOUS; at most one task per document",
+  "selection_seed": "maven-ere-balanced-500-v1",
   "sampled_counts": {
-    "BEFORE": 2124,
-    "SIMULTANEOUS": 1062
+    "BEFORE": 333,
+    "SIMULTANEOUS": 167
   },
   "label_fractions": {
-    "BEFORE": "2124/3186 (66.7%)",
-    "SIMULTANEOUS": "1062/3186 (33.3%)"
+    "BEFORE": "333/500 (66.6%)",
+    "SIMULTANEOUS": "167/500 (33.4%)"
   },
-  "skipped_relation_counts": {
-    "BEFORE:timex_filtered": 61361,
-    "BEGINS-ON": 73,
-    "CONTAINS": 25550,
-    "ENDS-ON": 34,
-    "OVERLAP": 1570,
-    "SIMULTANEOUS:timex_filtered": 412
-  }
+  "documents_by_label": {
+    "BEFORE": 333,
+    "SIMULTANEOUS": 167
+  },
+  "max_tasks_per_document": 1
 }
