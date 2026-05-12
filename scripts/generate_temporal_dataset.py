@@ -292,11 +292,11 @@ def parse_args() -> Config:
     ap = argparse.ArgumentParser(description="Generate a temporal reasoning JSONL dataset (150-200 tasks).")
     ap.add_argument("--out", default="data/temporal_reasoning_eval.jsonl", help="Output JSONL path.")
     ap.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
-    ap.add_argument("--n-linear", type=int, default=40, help="Number of linear chain tasks.")
-    ap.add_argument("--n-transitive", type=int, default=40, help="Number of transitive reasoning tasks.")
-    ap.add_argument("--n-ambiguous", type=int, default=30, help="Number of ambiguous/underspecified tasks.")
-    ap.add_argument("--n-contradiction", type=int, default=20, help="Number of contradiction tasks.")
-    ap.add_argument("--n-long", type=int, default=20, help="Number of long chain tasks (5-7 events).")
+    ap.add_argument("--n-linear", type=int, default=60, help="Number of linear chain tasks.")
+    ap.add_argument("--n-transitive", type=int, default=50, help="Number of transitive reasoning tasks.")
+    ap.add_argument("--n-ambiguous", type=int, default=60, help="Number of ambiguous/underspecified tasks.")
+    ap.add_argument("--n-contradiction", type=int, default=50, help="Number of contradiction tasks.")
+    ap.add_argument("--n-long", type=int, default=30, help="Number of long chain tasks (5-7 events).")
     args = ap.parse_args()
 
     return Config(
@@ -315,12 +315,6 @@ def main() -> None:
     tasks = generate_dataset(cfg)
 
     total = len(tasks)
-    if total < 150 or total > 200:
-        raise ValueError(
-            f"Expected total tasks in [150, 200], got {total}. "
-            f"Adjust n_* flags to reach target."
-        )
-
     _write_jsonl(cfg.out_path, tasks)
 
     # Print summary

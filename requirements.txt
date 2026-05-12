@@ -2,10 +2,6 @@ networkx
 openai
 pydantic
 matplotlib
-# torch
-# transformers==4.48.0
-# accelerate==0.34.2
-# bitsandbytes==0.44.1
 requests==2.32.3
 pytest
 scipy
