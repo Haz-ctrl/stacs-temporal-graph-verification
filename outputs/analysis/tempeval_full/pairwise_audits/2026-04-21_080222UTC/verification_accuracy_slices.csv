@@ -1,6 +1,0 @@
-slice,num_tasks,label_accuracy
-all_tasks,495,0.3292929292929293
-verifier_valid,428,0.37850467289719625
-verifier_invalid,67,0.014925373134328358
-trace_grounded,443,0.3656884875846501
-trace_ungrounded,52,0.019230769230769232

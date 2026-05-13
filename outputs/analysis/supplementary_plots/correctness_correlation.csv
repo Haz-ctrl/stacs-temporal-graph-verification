@@ -1,41 +1,91 @@
 model_label,dataset,signal,description,n,spearman_rho,spearman_p,point_biserial_r,point_biserial_p
-DeepSeek R1 7B,synthetic,is_valid,Graph validity flag (binary),91,0.14953661355497677,0.15714561498381535,0.14953661355497672,0.1571456149838159
-DeepSeek R1 7B,synthetic,trace_grounded,Reasoning trace groundedness (binary),91,0.4444444444444444,1.0177546946625807e-05,0.44444444444444436,1.017754694662578e-05
-DeepSeek R1 7B,synthetic,violation_count,Total structural violation count,91,-0.38618244924939066,0.0001563276195781112,,
-DeepSeek R1 7B,synthetic,first_violation_step,Step index of first violation (NaN when none),8,0.2182178902359924,0.6036450565101361,,
-Qwen 3.5 9B,synthetic,is_valid,Graph validity flag (binary),114,0.26295029405356657,0.004705697462199813,0.2629502940535666,0.004705697462199827
-Qwen 3.5 9B,synthetic,trace_grounded,Reasoning trace groundedness (binary),114,0.5270462766947299,1.7008904231587686e-09,0.5270462766947299,1.700890423158751e-09
-Qwen 3.5 9B,synthetic,violation_count,Total structural violation count,114,-0.23226657634705206,0.012893234135740275,,
-Qwen 3.5 9B,synthetic,first_violation_step,Step index of first violation (NaN when none),14,0.0,1.0,,
-Llama 3.1 8B,synthetic,is_valid,Graph validity flag (binary),120,-0.2504122014340809,0.005806559775596579,-0.2504122014340809,0.005806559775596556
-Llama 3.1 8B,synthetic,trace_grounded,Reasoning trace groundedness (binary),120,0.39735970711951313,6.997871716441126e-06,0.39735970711951313,6.997871716441097e-06
-Llama 3.1 8B,synthetic,violation_count,Total structural violation count,120,0.056549695736947805,0.5395602383009006,,
-Llama 3.1 8B,synthetic,first_violation_step,Step index of first violation (NaN when none),25,-0.1931609687386522,0.35490701421144,,
-Mistral 7B,synthetic,is_valid,Graph validity flag (binary),117,-0.22824414451887748,0.013320125787655644,-0.22824414451887742,0.013320125787655736
-Mistral 7B,synthetic,trace_grounded,Reasoning trace groundedness (binary),117,-0.13498568633893793,0.14676116640717185,-0.13498568633893793,0.14676116640717263
-Mistral 7B,synthetic,violation_count,Total structural violation count,117,0.26939177180320945,0.0033126152035717897,,
-Mistral 7B,synthetic,first_violation_step,Step index of first violation (NaN when none),43,0.0,1.0,,
-Gemma 3 12B,synthetic,is_valid,Graph validity flag (binary),120,nan,nan,nan,nan
-Gemma 3 12B,synthetic,trace_grounded,Reasoning trace groundedness (binary),120,nan,nan,nan,nan
-Gemma 3 12B,synthetic,violation_count,Total structural violation count,120,nan,nan,,
-Gemma 3 12B,synthetic,first_violation_step,Step index of first violation (NaN when none),0,nan,nan,,
-DeepSeek R1 7B,tempeval,is_valid,Graph validity flag (binary),433,0.5191255963580417,3.0044195510702893e-31,0.5191255963580419,3.0044195510700086e-31
-DeepSeek R1 7B,tempeval,trace_grounded,Reasoning trace groundedness (binary),433,0.49749355172929083,1.8699774656383871e-28,0.4974935517292909,1.8699774656383508e-28
-DeepSeek R1 7B,tempeval,violation_count,Total structural violation count,433,-0.5062563550085504,1.458828265627107e-29,,
-DeepSeek R1 7B,tempeval,first_violation_step,Step index of first violation (NaN when none),234,0.6241515980843952,1.1343106140342853e-26,,
-Qwen 3.5 9B,tempeval,is_valid,Graph validity flag (binary),394,0.6274111428199416,1.6607608182885552e-44,0.6274111428199415,1.6607608182885537e-44
-Qwen 3.5 9B,tempeval,trace_grounded,Reasoning trace groundedness (binary),394,0.6274111428199416,1.6607608182885552e-44,0.6274111428199415,1.6607608182885537e-44
-Qwen 3.5 9B,tempeval,violation_count,Total structural violation count,394,-0.6274111428199416,1.6607608182885552e-44,,
-Qwen 3.5 9B,tempeval,first_violation_step,Step index of first violation (NaN when none),183,nan,nan,,
-Llama 3.1 8B,tempeval,is_valid,Graph validity flag (binary),496,0.2810315039753775,1.8665420106762076e-10,0.2810315039753776,1.8665420106762006e-10
-Llama 3.1 8B,tempeval,trace_grounded,Reasoning trace groundedness (binary),496,0.2810315039753775,1.8665420106762076e-10,0.2810315039753776,1.8665420106762006e-10
-Llama 3.1 8B,tempeval,violation_count,Total structural violation count,496,-0.2810315039753775,1.8665420106762076e-10,,
-Llama 3.1 8B,tempeval,first_violation_step,Step index of first violation (NaN when none),91,nan,nan,,
-Mistral 7B,tempeval,is_valid,Graph validity flag (binary),495,0.18566838765559482,3.230007217130066e-05,0.18566838765559487,3.230007217130033e-05
-Mistral 7B,tempeval,trace_grounded,Reasoning trace groundedness (binary),495,0.15711614643185404,0.0004504879484130861,0.15711614643185406,0.0004504879484130946
-Mistral 7B,tempeval,violation_count,Total structural violation count,495,-0.18851188704237526,2.4275971078861444e-05,,
-Mistral 7B,tempeval,first_violation_step,Step index of first violation (NaN when none),58,0.2737884723499266,0.03755858529887548,,
-Gemma 3 12B,tempeval,is_valid,Graph validity flag (binary),496,0.03274832704589314,0.4668003837929865,0.032748327045893144,0.4668003837929777
-Gemma 3 12B,tempeval,trace_grounded,Reasoning trace groundedness (binary),496,0.03274832704589314,0.4668003837929865,0.032748327045893144,0.4668003837929777
-Gemma 3 12B,tempeval,violation_count,Total structural violation count,496,-0.03274832704589314,0.4668003837929865,,
-Gemma 3 12B,tempeval,first_violation_step,Step index of first violation (NaN when none),1,nan,nan,,
+DeepSeek R1 7B,Synthetic,is_valid,Graph validity flag (binary),142,0.11375590525840065,0.17767233568261956,0.11375590525840065,0.17767233568261917
+DeepSeek R1 7B,Synthetic,trace_grounded,Reasoning trace groundedness (binary),142,0.21757577030256012,0.009294276622375348,0.21757577030256015,0.009294276622375383
+DeepSeek R1 7B,Synthetic,violation_count,Total structural violation count,142,-0.053285653165344844,0.5288207339489859,,
+DeepSeek R1 7B,Synthetic,first_violation_step,Step index of first violation (NaN when none),16,0.2675161406274082,0.31650026640337414,,
+DeepSeek R1 7B,Synthetic,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),142,0.042616759343333616,0.6145582576199138,,
+DeepSeek R1 7B,Synthetic,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),142,-0.10873298701150035,0.1977204172277088,,
+Gemma 3 12B,Synthetic,is_valid,Graph validity flag (binary),190,-0.08891301427220075,0.2224984561459546,-0.08891301427220073,0.2224984561459539
+Gemma 3 12B,Synthetic,trace_grounded,Reasoning trace groundedness (binary),190,nan,nan,nan,nan
+Gemma 3 12B,Synthetic,violation_count,Total structural violation count,190,nan,nan,,
+Gemma 3 12B,Synthetic,first_violation_step,Step index of first violation (NaN when none),2,nan,nan,,
+Gemma 3 12B,Synthetic,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),190,0.08891301427220075,0.2224984561459546,,
+Gemma 3 12B,Synthetic,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),190,nan,nan,,
+Llama 3.1 8B,Synthetic,is_valid,Graph validity flag (binary),190,-0.05011148285857956,0.4923269398111969,-0.050111482858579595,0.49232693981119846
+Llama 3.1 8B,Synthetic,trace_grounded,Reasoning trace groundedness (binary),190,0.41298426906300734,3.190411119164252e-09,0.41298426906300767,3.1904111191641745e-09
+Llama 3.1 8B,Synthetic,violation_count,Total structural violation count,190,0.12227977131843622,0.09282105870257142,,
+Llama 3.1 8B,Synthetic,first_violation_step,Step index of first violation (NaN when none),65,-0.7496881756060128,6.699242014554967e-13,,
+Llama 3.1 8B,Synthetic,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),190,-0.016501954468265627,0.8212184443704147,,
+Llama 3.1 8B,Synthetic,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),190,0.26892643710023856,0.0001755786893371737,,
+Mistral 7B,Synthetic,is_valid,Graph validity flag (binary),186,-0.22917046351263917,0.0016530498825651548,-0.22917046351263914,0.0016530498825651425
+Mistral 7B,Synthetic,trace_grounded,Reasoning trace groundedness (binary),186,-0.048227957996178523,0.5133127418385529,-0.048227957996178544,0.5133127418385525
+Mistral 7B,Synthetic,violation_count,Total structural violation count,186,0.23348168364264946,0.0013401266137950463,,
+Mistral 7B,Synthetic,first_violation_step,Step index of first violation (NaN when none),86,-0.27804488490408963,0.009539806835394554,,
+Mistral 7B,Synthetic,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),186,0.22493648724886298,0.002023928061710193,,
+Mistral 7B,Synthetic,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),186,0.2555973602160189,0.000429835371213701,,
+Qwen 3.5 9B,Synthetic,is_valid,Graph validity flag (binary),179,0.04738240731675399,0.5287952761406454,0.04738240731675401,0.5287952761406461
+Qwen 3.5 9B,Synthetic,trace_grounded,Reasoning trace groundedness (binary),179,0.47327416927861005,2.2259974949763e-11,0.4732741692786102,2.2259974949762582e-11
+Qwen 3.5 9B,Synthetic,violation_count,Total structural violation count,179,0.02604594179028704,0.7292763049939286,,
+Qwen 3.5 9B,Synthetic,first_violation_step,Step index of first violation (NaN when none),43,-0.20173943552300655,0.19452865404849268,,
+Qwen 3.5 9B,Synthetic,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),179,-0.04277471054715245,0.5696699698561626,,
+Qwen 3.5 9B,Synthetic,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),179,-0.01961731510060886,0.7943638742553624,,
+DeepSeek R1 7B,TempEval-3,is_valid,Graph validity flag (binary),398,0.15782145475536452,0.0015861513409137274,0.15782145475536452,0.0015861513409137196
+DeepSeek R1 7B,TempEval-3,trace_grounded,Reasoning trace groundedness (binary),398,0.1613588695165887,0.0012371812181225655,0.1613588695165887,0.0012371812181225829
+DeepSeek R1 7B,TempEval-3,violation_count,Total structural violation count,398,-0.17229938500809008,0.0005556142953191794,,
+DeepSeek R1 7B,TempEval-3,first_violation_step,Step index of first violation (NaN when none),56,0.48654787829833773,0.00014345217453261278,,
+DeepSeek R1 7B,TempEval-3,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),398,-0.021013322461293348,0.6759894628426173,,
+DeepSeek R1 7B,TempEval-3,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),398,-0.22429492274294588,6.234056546452642e-06,,
+Gemma 3 12B,TempEval-3,is_valid,Graph validity flag (binary),496,0.04892835468091328,0.2767768958531541,0.0489283546809133,0.2767768958531487
+Gemma 3 12B,TempEval-3,trace_grounded,Reasoning trace groundedness (binary),496,0.04892835468091328,0.2767768958531541,0.0489283546809133,0.2767768958531487
+Gemma 3 12B,TempEval-3,violation_count,Total structural violation count,496,-0.04892835468091328,0.2767768958531541,,
+Gemma 3 12B,TempEval-3,first_violation_step,Step index of first violation (NaN when none),1,nan,nan,,
+Gemma 3 12B,TempEval-3,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),496,nan,nan,,
+Gemma 3 12B,TempEval-3,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),496,-0.04892835468091328,0.2767768958531541,,
+Llama 3.1 8B,TempEval-3,is_valid,Graph validity flag (binary),496,0.067755464767219,0.13183356397839616,0.067755464767219,0.13183356397839632
+Llama 3.1 8B,TempEval-3,trace_grounded,Reasoning trace groundedness (binary),496,0.067755464767219,0.13183356397839616,0.067755464767219,0.13183356397839632
+Llama 3.1 8B,TempEval-3,violation_count,Total structural violation count,496,-0.067755464767219,0.13183356397839616,,
+Llama 3.1 8B,TempEval-3,first_violation_step,Step index of first violation (NaN when none),4,nan,nan,,
+Llama 3.1 8B,TempEval-3,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),496,nan,nan,,
+Llama 3.1 8B,TempEval-3,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),496,-0.067755464767219,0.13183356397839616,,
+Mistral 7B,TempEval-3,is_valid,Graph validity flag (binary),496,-0.07255074461000338,0.1065638031791241,-0.07255074461000338,0.10656380317912438
+Mistral 7B,TempEval-3,trace_grounded,Reasoning trace groundedness (binary),496,0.02207796577473877,0.6237668050044656,0.02207796577473878,0.6237668050044746
+Mistral 7B,TempEval-3,violation_count,Total structural violation count,496,-0.022819137602507374,0.6121617684377789,,
+Mistral 7B,TempEval-3,first_violation_step,Step index of first violation (NaN when none),99,0.1990690407173758,0.04822564799168091,,
+Mistral 7B,TempEval-3,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),496,0.08981830160347071,0.04557114111507738,,
+Mistral 7B,TempEval-3,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),496,-0.05512119474845862,0.22040882644784202,,
+Qwen 3.5 9B,TempEval-3,is_valid,Graph validity flag (binary),417,-0.049882492910533226,0.30953206317994714,-0.049882492910533205,0.30953206317994736
+Qwen 3.5 9B,TempEval-3,trace_grounded,Reasoning trace groundedness (binary),417,0.09835297971638558,0.04472146779928026,0.09835297971638558,0.044721467799280316
+Qwen 3.5 9B,TempEval-3,violation_count,Total structural violation count,417,-0.09835297971638558,0.04472146779928026,,
+Qwen 3.5 9B,TempEval-3,first_violation_step,Step index of first violation (NaN when none),13,0.40969798317499057,0.16444111467826095,,
+Qwen 3.5 9B,TempEval-3,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),417,0.049882492910533226,0.30953206317994714,,
+Qwen 3.5 9B,TempEval-3,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),417,nan,nan,,
+DeepSeek R1 7B,MAVEN-ERE,is_valid,Graph validity flag (binary),468,0.09881437802368244,0.03258188149925542,0.09881437802368237,0.03258188149925605
+DeepSeek R1 7B,MAVEN-ERE,trace_grounded,Reasoning trace groundedness (binary),468,0.09881437802368244,0.03258188149925542,0.09881437802368237,0.03258188149925605
+DeepSeek R1 7B,MAVEN-ERE,violation_count,Total structural violation count,468,-0.1006216320910259,0.029519093758205585,,
+DeepSeek R1 7B,MAVEN-ERE,first_violation_step,Step index of first violation (NaN when none),16,0.8320502943378436,6.40307240965356e-05,,
+DeepSeek R1 7B,MAVEN-ERE,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),468,0.05624327711508133,0.2245813610342581,,
+DeepSeek R1 7B,MAVEN-ERE,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),468,-0.1463551455923941,0.0014994483750117734,,
+Gemma 3 12B,MAVEN-ERE,is_valid,Graph validity flag (binary),500,nan,nan,nan,nan
+Gemma 3 12B,MAVEN-ERE,trace_grounded,Reasoning trace groundedness (binary),500,nan,nan,nan,nan
+Gemma 3 12B,MAVEN-ERE,violation_count,Total structural violation count,500,nan,nan,,
+Gemma 3 12B,MAVEN-ERE,first_violation_step,Step index of first violation (NaN when none),0,nan,nan,,
+Gemma 3 12B,MAVEN-ERE,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),500,nan,nan,,
+Gemma 3 12B,MAVEN-ERE,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),500,nan,nan,,
+Llama 3.1 8B,MAVEN-ERE,is_valid,Graph validity flag (binary),499,0.03178150962117352,0.4787318919877187,0.03178150962117349,0.47873189198771965
+Llama 3.1 8B,MAVEN-ERE,trace_grounded,Reasoning trace groundedness (binary),499,0.03178150962117352,0.4787318919877187,0.03178150962117349,0.47873189198771965
+Llama 3.1 8B,MAVEN-ERE,violation_count,Total structural violation count,499,-0.03178150962117352,0.4787318919877187,,
+Llama 3.1 8B,MAVEN-ERE,first_violation_step,Step index of first violation (NaN when none),1,nan,nan,,
+Llama 3.1 8B,MAVEN-ERE,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),499,nan,nan,,
+Llama 3.1 8B,MAVEN-ERE,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),499,-0.03178150962117352,0.4787318919877187,,
+Mistral 7B,MAVEN-ERE,is_valid,Graph validity flag (binary),499,-0.231255878681397,1.752070557514364e-07,-0.23125587868139702,1.7520705575143157e-07
+Mistral 7B,MAVEN-ERE,trace_grounded,Reasoning trace groundedness (binary),499,-0.021597327221200203,0.630307592967702,-0.021597327221200203,0.6303075929676997
+Mistral 7B,MAVEN-ERE,violation_count,Total structural violation count,499,-0.02363050731898493,0.5984607975825291,,
+Mistral 7B,MAVEN-ERE,first_violation_step,Step index of first violation (NaN when none),288,0.06934650885294287,0.24073807151942916,,
+Mistral 7B,MAVEN-ERE,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),499,0.23501393862766284,1.088970598440368e-07,,
+Mistral 7B,MAVEN-ERE,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),499,-0.0968450140553338,0.030540043991895725,,
+Qwen 3.5 9B,MAVEN-ERE,is_valid,Graph validity flag (binary),371,0.1467078164032932,0.004631677653790887,0.14670781640329306,0.004631677653790868
+Qwen 3.5 9B,MAVEN-ERE,trace_grounded,Reasoning trace groundedness (binary),371,nan,nan,nan,nan
+Qwen 3.5 9B,MAVEN-ERE,violation_count,Total structural violation count,371,nan,nan,,
+Qwen 3.5 9B,MAVEN-ERE,first_violation_step,Step index of first violation (NaN when none),6,0.0,1.0,,
+Qwen 3.5 9B,MAVEN-ERE,ltl_genuine_violation_count,Count of genuine LTL violations (unsupported_commitment + trace_inversion),371,-0.1467078164032932,0.004631677653790887,,
+Qwen 3.5 9B,MAVEN-ERE,ltl_corroboration_count,Count of invariant-corroborating LTL violations (contradiction + inconsistency + hallucination),371,nan,nan,,

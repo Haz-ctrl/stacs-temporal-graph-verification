@@ -1,4 +1,0 @@
-axis_a,axis_b,pearson_r,phi,agreement_count,n
-parse_success,verifier_valid,0.6123724356957942,0.6123724356957942,136,150
-parse_success,trace_grounded,0.7734431367038469,0.7734431367038469,144,150
-verifier_valid,trace_grounded,0.7917484901417805,0.7917484901417805,142,150

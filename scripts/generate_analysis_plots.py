@@ -8,8 +8,10 @@ Usage:
     python scripts/generate_analysis_plots.py \
         --canonical-dir outputs/runs/canonical_full \
         --tempeval-dir  outputs/runs/tempeval_full \
+        --maven-ere-dir outputs/runs/maven_ere_full \
         --canonical-analysis outputs/analysis/canonical_full \
         --tempeval-analysis  outputs/analysis/tempeval_full \
+        --maven-ere-analysis outputs/analysis/maven_ere_full \
         --out outputs/analysis/supplementary_plots
 """
 from __future__ import annotations
@@ -19,6 +21,7 @@ import csv
 import json
 import math
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -29,6 +32,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 # ---------------------------------------------------------------------------
 # I/O helpers
 # ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DatasetBundle:
+    key: str
+    label: str
+    summary: Dict[str, Any]
+    run_dirs: List[Path]
+    manifest: Dict[str, Dict[str, Any]]
 
 
 def _read_json(path: Path) -> Dict[str, Any]:
@@ -286,11 +298,10 @@ def plot_direct_vs_closure_f1_by_category(
 
 
 def plot_cross_dataset_comparison(
-    canonical_summary: Dict[str, Any],
-    tempeval_summary: Dict[str, Any],
+    datasets: Sequence[DatasetBundle],
     out_dir: Path,
 ) -> None:
-    """Side-by-side direct and closure F1 for synthetic vs TempEval-3 datasets."""
+    """Side-by-side direct and closure F1 across evaluation datasets."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -298,27 +309,44 @@ def plot_cross_dataset_comparison(
     def _idx(rows: List[Dict[str, Any]], key: str) -> Dict[str, float]:
         return {r["model_label"]: float(r.get(key) or 0.0) for r in rows}
 
-    canon_rows = canonical_summary.get("summary", [])
-    te_rows = tempeval_summary.get("summary", [])
-    models = sorted({r["model_label"] for r in canon_rows + te_rows})
-
-    canon_direct = _idx(canon_rows, "fidelity_direct_f1")
-    canon_closure = _idx(canon_rows, "fidelity_closure_f1_full")
-    te_direct = _idx(te_rows, "fidelity_direct_f1")
-    te_closure = _idx(te_rows, "fidelity_closure_f1_full")
+    summary_rows = {
+        dataset.label: dataset.summary.get("summary", [])
+        for dataset in datasets
+    }
+    models = sorted({
+        r["model_label"]
+        for rows in summary_rows.values()
+        for r in rows
+    })
+    direct_by_dataset = {
+        label: _idx(rows, "fidelity_direct_f1")
+        for label, rows in summary_rows.items()
+    }
+    closure_by_dataset = {
+        label: _idx(rows, "fidelity_closure_f1_full")
+        for label, rows in summary_rows.items()
+    }
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    width = 0.35
+    width = min(0.25, 0.8 / max(1, len(datasets)))
     pos = list(range(len(models)))
+    offsets = [
+        (i - (len(datasets) - 1) / 2) * width
+        for i in range(len(datasets))
+    ]
 
-    for ax, title, canon_d, te_d in [
-        (ax1, "Direct F1", canon_direct, te_direct),
-        (ax2, "Coverage-aware Closure F1", canon_closure, te_closure),
+    for ax, title, metric_by_dataset in [
+        (ax1, "Direct F1", direct_by_dataset),
+        (ax2, "Coverage-aware Closure F1", closure_by_dataset),
     ]:
-        ax.bar([p - width / 2 for p in pos], [canon_d.get(m, 0.0) for m in models],
-               width, label="Synthetic")
-        ax.bar([p + width / 2 for p in pos], [te_d.get(m, 0.0) for m in models],
-               width, label="TempEval-3")
+        for dataset, offset in zip(datasets, offsets):
+            values = metric_by_dataset[dataset.label]
+            ax.bar(
+                [p + offset for p in pos],
+                [values.get(m, 0.0) for m in models],
+                width,
+                label=dataset.label,
+            )
         ax.set_xticks(pos)
         ax.set_xticklabels(models, rotation=25, ha="right")
         ax.set_ylim(0.0, 1.05)
@@ -501,10 +529,7 @@ def plot_ambiguity_and_contradiction(
 
 
 def plot_rq3_spearman_heatmap(
-    canonical_run_dirs: List[Path],
-    tempeval_run_dirs: List[Path],
-    canonical_manifest: Dict[str, Dict[str, Any]],
-    tempeval_manifest: Dict[str, Dict[str, Any]],
+    datasets: Sequence[DatasetBundle],
     out_dir: Path,
     *,
     predictions_filename: str = "predictions.jsonl",
@@ -517,20 +542,14 @@ def plot_rq3_spearman_heatmap(
     from src.analysis.correctness_correlation import batch_analyse
 
     run_spec: List[Tuple[Path, str, str]] = []
-    for run_dir in canonical_run_dirs:
-        preds = run_dir / predictions_filename
-        report_file = run_dir / "report.json"
-        if preds.exists() and report_file.exists():
-            report = _read_json(report_file)
-            label = _model_label_from_report(report, canonical_manifest)
-            run_spec.append((preds, label, "synthetic"))
-    for run_dir in tempeval_run_dirs:
-        preds = run_dir / predictions_filename
-        report_file = run_dir / "report.json"
-        if preds.exists() and report_file.exists():
-            report = _read_json(report_file)
-            label = _model_label_from_report(report, tempeval_manifest)
-            run_spec.append((preds, label, "tempeval"))
+    for dataset in datasets:
+        for run_dir in dataset.run_dirs:
+            preds = run_dir / predictions_filename
+            report_file = run_dir / "report.json"
+            if preds.exists() and report_file.exists():
+                report = _read_json(report_file)
+                label = _model_label_from_report(report, dataset.manifest)
+                run_spec.append((preds, label, dataset.label))
 
     if not run_spec:
         return
@@ -790,6 +809,11 @@ def main() -> None:
         help="Directory containing TempEval-3 run subdirectories.",
     )
     parser.add_argument(
+        "--maven-ere-dir",
+        default="outputs/runs/maven_ere_full",
+        help="Directory containing MAVEN-ERE run subdirectories.",
+    )
+    parser.add_argument(
         "--canonical-analysis",
         default="outputs/analysis/canonical_full",
         help="Analysis output directory for canonical runs (must contain summary.json).",
@@ -798,6 +822,11 @@ def main() -> None:
         "--tempeval-analysis",
         default="outputs/analysis/tempeval_full",
         help="Analysis output directory for TempEval-3 runs (must contain summary.json).",
+    )
+    parser.add_argument(
+        "--maven-ere-analysis",
+        default="outputs/analysis/maven_ere_full",
+        help="Analysis output directory for MAVEN-ERE runs (must contain summary.json).",
     )
     parser.add_argument(
         "--out",
@@ -813,13 +842,16 @@ def main() -> None:
 
     canonical_dir = Path(args.canonical_dir)
     tempeval_dir = Path(args.tempeval_dir)
+    maven_ere_dir = Path(args.maven_ere_dir)
     canonical_analysis = Path(args.canonical_analysis)
     tempeval_analysis = Path(args.tempeval_analysis)
+    maven_ere_analysis = Path(args.maven_ere_analysis)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     canonical_summary = _read_json(canonical_analysis / "summary.json")
     tempeval_summary = _read_json(tempeval_analysis / "summary.json")
+    maven_ere_summary = _read_json(maven_ere_analysis / "summary.json")
 
     canonical_run_dirs = _find_run_dirs(
         canonical_dir,
@@ -829,9 +861,38 @@ def main() -> None:
         tempeval_dir,
         predictions_filename=args.predictions_file,
     )
+    maven_ere_run_dirs = _find_run_dirs(
+        maven_ere_dir,
+        predictions_filename=args.predictions_file,
+    )
 
     canonical_manifest = _load_manifest(canonical_dir)
     tempeval_manifest = _load_manifest(tempeval_dir)
+    maven_ere_manifest = _load_manifest(maven_ere_dir)
+
+    datasets = [
+        DatasetBundle(
+            key="synthetic",
+            label="Synthetic",
+            summary=canonical_summary,
+            run_dirs=canonical_run_dirs,
+            manifest=canonical_manifest,
+        ),
+        DatasetBundle(
+            key="tempeval",
+            label="TempEval-3",
+            summary=tempeval_summary,
+            run_dirs=tempeval_run_dirs,
+            manifest=tempeval_manifest,
+        ),
+        DatasetBundle(
+            key="maven_ere",
+            label="MAVEN-ERE",
+            summary=maven_ere_summary,
+            run_dirs=maven_ere_run_dirs,
+            manifest=maven_ere_manifest,
+        ),
+    ]
 
     canonical_predictions_by_model = _load_predictions_by_model(
         canonical_run_dirs,
@@ -850,7 +911,7 @@ def main() -> None:
     plot_direct_vs_closure_f1_by_category(canonical_summary, out_dir)
     n_plots += 1
 
-    plot_cross_dataset_comparison(canonical_summary, tempeval_summary, out_dir)
+    plot_cross_dataset_comparison(datasets, out_dir)
     n_plots += 1
 
     plot_first_violation_step_distribution(canonical_predictions_by_model, out_dir)
@@ -863,10 +924,7 @@ def main() -> None:
     n_plots += 1
 
     plot_rq3_spearman_heatmap(
-        canonical_run_dirs,
-        tempeval_run_dirs,
-        canonical_manifest,
-        tempeval_manifest,
+        datasets,
         out_dir,
         predictions_filename=args.predictions_file,
     )
