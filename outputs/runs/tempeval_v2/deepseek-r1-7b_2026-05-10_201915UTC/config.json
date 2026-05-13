@@ -1,0 +1,19 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-10_201915UTC",
+  "data_path": "data/tempeval_eval.jsonl",
+  "num_tasks": 496,
+  "pred_source": "llm",
+  "model": "deepseek-r1:7b",
+  "base_url": "http://localhost:11434",
+  "temperature": 0.0,
+  "seed": 42,
+  "log_raw": false,
+  "validate_data": true,
+  "strict_data": false,
+  "timeout_s": 300,
+  "max_retries": 4,
+  "retry_backoff_s": 5.0,
+  "dataset_version": "tempeval_eval",
+  "code_version": "bacd767b5490d696b6b01a9b24dee85e17527961",
+  "specification_name": "default_temporal_spec"
+}

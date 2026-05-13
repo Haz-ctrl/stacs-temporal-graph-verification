@@ -1,0 +1,50 @@
+{
+  "runs": {
+    "deepseek-r1-7b_2026-05-12_202518UTC": {
+      "model_label": "DeepSeek R1 7B",
+      "family": "deepseek",
+      "size_bucket": "7b",
+      "reasoning_tuned": true,
+      "group": "lab_baseline",
+      "notes": "Confirmed available in the lab Ollama environment.",
+      "status": "completed"
+    },
+    "qwen3-5-9b_2026-05-12_212753UTC": {
+      "model_label": "Qwen 3.5 9B",
+      "family": "qwen",
+      "size_bucket": "9b",
+      "reasoning_tuned": false,
+      "group": "lab_baseline",
+      "notes": "Confirmed available in the lab Ollama environment.",
+      "status": "completed"
+    },
+    "llama3-1-8b_2026-05-13_041908UTC": {
+      "model_label": "Llama 3.1 8B",
+      "family": "llama",
+      "size_bucket": "8b",
+      "reasoning_tuned": false,
+      "group": "lab_baseline",
+      "notes": "Confirmed available in the lab Ollama environment.",
+      "status": "completed"
+    },
+    "mistral-7b_2026-05-13_043657UTC": {
+      "model_label": "Mistral 7B",
+      "family": "mistral",
+      "size_bucket": "7b",
+      "reasoning_tuned": false,
+      "group": "lab_candidate",
+      "notes": "Confirmed available in the lab Ollama environment.",
+      "status": "completed"
+    },
+    "gemma3-12b_2026-05-13_045357UTC": {
+      "model_label": "Gemma 3 12B",
+      "family": "gemma",
+      "size_bucket": "12b",
+      "reasoning_tuned": false,
+      "group": "lab_candidate",
+      "notes": "Confirmed available in the lab Ollama environment.",
+      "status": "completed"
+    }
+  },
+  "failures": []
+}

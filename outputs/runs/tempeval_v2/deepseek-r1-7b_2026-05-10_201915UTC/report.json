@@ -1,0 +1,5167 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-10_201915UTC",
+  "predictions_file": "outputs/runs/tempeval_v2/deepseek-r1-7b_2026-05-10_201915UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/tempeval_eval.jsonl",
+    "dataset_version": "tempeval_eval",
+    "num_tasks": 496,
+    "expected_valid_tasks": 496,
+    "expected_invalid_tasks": 0
+  },
+  "code_version": "bacd767b5490d696b6b01a9b24dee85e17527961",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-05-10T17:01:08.255213562+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-05-10T17:01:08.890225022+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-05-06T21:19:10.955309938+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-05-06T21:18:11.478249111+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-05-06T21:14:50.151647077+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "deepseek-r1-7b_2026-05-10_201915UTC",
+    "data_path": "data/tempeval_eval.jsonl",
+    "num_tasks": 496,
+    "pred_source": "llm",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 300,
+    "max_retries": 4,
+    "retry_backoff_s": 5.0,
+    "dataset_version": "tempeval_eval",
+    "code_version": "bacd767b5490d696b6b01a9b24dee85e17527961",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 496,
+  "num_failures": 98,
+  "failures": [
+    {
+      "id": "te3_test_AP_20130322_l7",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "turn [ei5]",
+          "started [ei3]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['started [ei3]']. Invalid edge format (expected 3 items): ['started [ei3]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "started [ei3]",
+            "turn [ei5]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "started [ei3]",
+            "turn [ei5]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l5",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "faking [ei2]",
+          "announced [ei5]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "faking [ei2]",
+            "announced [ei5]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "faking [ei2]",
+            "announced [ei5]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l21",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "pulled [ei12]",
+          "showed [ei13]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "pulled [ei12]",
+            "showed [ei13]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "pulled [ei12]",
+            "showed [ei13]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l22",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "discovered [ei14]",
+          "showed [ei13]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "discovered [ei14]",
+            "showed [ei13]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "discovered [ei14]",
+            "showed [ei13]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l38",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "plead [ei24]",
+          "said [ei27]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "plead [ei24]",
+            "said [ei27]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "plead [ei24]",
+            "said [ei27]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l43",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "search [ei29]",
+          "pay [ei28]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['search [ei29]']. Invalid edge format (expected 3 items): ['search [ei29]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "search [ei29]",
+            "pay [ei28]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "search [ei29]",
+            "pay [ei28]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l48",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "thought [ei31]",
+          "told [ei30]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "told [ei30]",
+            "thought [ei31]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "told [ei30]",
+            "thought [ei31]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l52012",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "unaware [ei2003]",
+          "said [ei34]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "unaware [ei2003]",
+            "said [ei34]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "unaware [ei2003]",
+            "said [ei34]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l56",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei34]",
+          "find [ei37]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['find [ei37]']. Invalid edge format (expected 3 items): ['find [ei37]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei34]",
+            "find [ei37]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei34]",
+            "find [ei37]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l72",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "arrest [ei46]",
+          "defended [ei45]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "arrest [ei46]",
+            "defended [ei45]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "arrest [ei46]",
+            "defended [ei45]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l80",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "denied [ei48]",
+          "told [ei50]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "denied [ei48]",
+            "told [ei50]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "denied [ei48]",
+            "told [ei50]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1003_l220",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "announced [ei5]",
+          "said [ei20]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['announced [ei5]', 'said [ei20]']. Invalid edge format (expected 3 items): ['announced [ei5]', 'said [ei20]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "announced [ei5]",
+            "said [ei20]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_1243_l55",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "send [ei38]",
+          "foresee [ei37]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "foresee [ei37]",
+            "send [ei38]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "foresee [ei37]",
+            "send [ei38]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_248_l10",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "begin [ei6]",
+          "said [ei7]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei7]",
+            "begin [ei6]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei7]",
+            "begin [ei6]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_248_l15",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "closure [ei10]",
+          "expected [ei8]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "expected [ei8]",
+            "closure [ei10]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "expected [ei8]",
+            "closure [ei10]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_248_l19",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "announcement [ei11]",
+          "said [ei12]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei12]",
+            "announcement [ei11]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei12]",
+            "announcement [ei11]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_248_l105",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "close [ei2]",
+          "cuts [ei102]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "cuts [ei102]",
+            "close [ei2]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "cuts [ei102]",
+            "close [ei2]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_248_l108",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "announcement [ei11]",
+          "said [ei12]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei12]",
+            "announcement [ei11]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei12]",
+            "announcement [ei11]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l4",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "coup [ei3]",
+          "arrived [ei1]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "coup [ei3]",
+            "arrived [ei1]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "coup [ei3]",
+            "arrived [ei1]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l5",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "leaving [ei4]",
+          "arrived [ei1]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "leaving [ei4]",
+            "arrived [ei1]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "leaving [ei4]",
+            "arrived [ei1]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l13",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "eased [ei9]",
+          "happened [ei10]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['happened [ei10]']. Invalid edge format (expected 3 items): ['happened [ei10]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "happened [ei10]",
+            "eased [ei9]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "happened [ei10]",
+            "eased [ei9]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l26",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "dropped [ei18]",
+          "resume [ei19]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['dropped [ei18]']. Invalid edge format (expected 3 items): ['dropped [ei18]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "dropped [ei18]",
+            "resume [ei19]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "dropped [ei18]",
+            "resume [ei19]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l28",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "suspended [ei21]",
+          "resume [ei19]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "suspended [ei21]",
+            "resume [ei19]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "suspended [ei21]",
+            "resume [ei19]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l31",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "resume [ei19]",
+          "said [ei24]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei24]']. Invalid edge format (expected 3 items): ['said [ei24]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei24]",
+            "resume [ei19]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei24]",
+            "resume [ei19]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_CNN_20130322_314_l109",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "happened [ei10]",
+          "apologized [ei5]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['happened [ei10]', 'applied [ei5]']. Invalid edge format (expected 3 items): ['happened [ei10]', 'applied [ei5]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "apologized [ei5]",
+            "happened [ei10]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l4",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "enabled [ei3]",
+          "released [ei2]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "released [ei2]",
+            "enabled [ei3]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "released [ei2]",
+            "enabled [ei3]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l10",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "move [ei8]",
+          "hoping [ei7]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['hoping [ei7]', 'BEFORE', 'move [ei8]']. Unsupported relation label: 'move [ei8]'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "hoping [ei7]",
+            "move [ei8]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "hoping [ei7]",
+            "move [ei8]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l1001",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "build [ei1000]",
+          "expanding [ei9]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "expanding [ei9]",
+            "build [ei1000]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "expanding [ei9]",
+            "build [ei1000]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l19",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "identified [ei12]",
+          "said [ei11]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "identified [ei12]",
+            "said [ei11]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "identified [ei12]",
+            "said [ei11]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l29",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "have [ei18]",
+          "gets [ei19]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['have [ei18]']. Invalid edge format (expected 3 items): ['have [ei18]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "gets [ei19]",
+            "have [ei18]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130318_731_l33",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "buy [ei23]",
+          "convince [ei22]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "convince [ei22]",
+            "buy [ei23]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "convince [ei22]",
+            "buy [ei23]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130321_1145_l22",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "advancing [ei10]",
+          "said [ei15]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei15]']. Invalid edge format (expected 3 items): ['said [ei15]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "advancing [ei10]",
+            "said [ei15]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_159_l35",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "left [ei26]",
+          "said [ei37]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['left [ei26]']. Invalid edge format (expected 3 items): ['left [ei26]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "left [ei26]",
+            "said [ei37]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "left [ei26]",
+            "said [ei37]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_159_l74",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "incident [ei52]",
+          "raid [ei2]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['raid [ei2]', 'incident [ei52]']. Invalid edge format (expected 3 items): ['raid [ei2]', 'incident [ei52]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "incident [ei52]",
+            "raid [ei2]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l9",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "increase [ei6]",
+          "sessions [ei5]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "sessions [ei5]",
+            "increase [ei6]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "sessions [ei5]",
+            "increase [ei6]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l10",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "kick [ei7]",
+          "sessions [ei5]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "sessions [ei5]",
+            "kick [ei7]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "sessions [ei5]",
+            "kick [ei7]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l15",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "expecting [ei10]",
+          "increases [ei8]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "expecting [ei10]",
+            "increases [ei8]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "expecting [ei10]",
+            "increases [ei8]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l19",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "make [ei12]",
+          "says [ei11]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['make [ei12]']. Invalid edge format (expected 3 items): ['make [ei12]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "says [ei11]",
+            "make [ei12]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "says [ei11]",
+            "make [ei12]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l37",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "vary [ei22]",
+          "agree [ei23]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['vary [ei22]']. Invalid edge format (expected 3 items): ['vary [ei22]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "agree [ei23]",
+            "vary [ei22]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "agree [ei23]",
+            "vary [ei22]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l43",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "refusing [ei27]",
+          "Starting [ei25]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "Starting [ei25]",
+            "refusing [ei27]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Starting [ei25]",
+            "refusing [ei27]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l44",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "sell [ei28]",
+          "Starting [ei25]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "Starting [ei25]",
+            "sell [ei28]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Starting [ei25]",
+            "sell [ei28]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l46",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "reduce [ei30]",
+          "Starting [ei25]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "Starting [ei25]",
+            "reduce [ei30]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Starting [ei25]",
+            "reduce [ei30]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_WSJ_20130322_804_l52",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "make [ei12]",
+          "affordable [ei2000]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "affordable [ei2000]",
+            "make [ei12]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "affordable [ei2000]",
+            "make [ei12]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1150_l16",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "expedition [ei9]",
+          "took [ei8]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "expedition [ei9]",
+            "took [ei8]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1150_l18",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "crossing [ei11]",
+          "took [ei8]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "crossing [ei11]",
+            "took [ei8]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1150_l20",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "took [ei8]",
+          "made [ei12]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['took [ei8]']. Invalid edge format (expected 3 items): ['took [ei8]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "took [ei8]",
+            "made [ei12]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "took [ei8]",
+            "made [ei12]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1150_l52",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "called [ei30]",
+          "said [ei34]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['called [ei30]']. Invalid edge format (expected 3 items): ['called [ei30]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "called [ei30]",
+            "said [ei34]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1353_l10",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "compensate [ei9]",
+          "agreed [ei8]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "agreed [ei8]",
+            "compensate [ei9]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "agreed [ei8]",
+            "compensate [ei9]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1353_l32",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "killed [ei19]",
+          "admitted [ei23]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['killed [ei19]']. Invalid edge format (expected 3 items): ['killed [ei19]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "killed [ei19]",
+            "admitted [ei23]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "killed [ei19]",
+            "admitted [ei23]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1353_l35",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "used [ei26]",
+          "admitted [ei23]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "used [ei26]",
+            "admitted [ei23]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "used [ei26]",
+            "admitted [ei23]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1353_l39",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "opened [ei29]",
+          "said [ei28]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "opened [ei29]",
+            "said [ei28]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "opened [ei29]",
+            "said [ei28]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1353_l48",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "incident [ei32]",
+          "revealed [ei36]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['incident [ei32]', 'revealed [ei36]']. Invalid edge format (expected 3 items): ['incident [ei32]', 'revealed [ei36]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "incident [ei32]",
+            "revealed [ei36]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "incident [ei32]",
+            "revealed [ei36]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1600_l5",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "bringing [ei5]",
+          "snow [ei1]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "bringing [ei5]",
+            "snow [ei1]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1600_l20",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "start [ei15]",
+          "comes [ei14]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "comes [ei14]",
+            "start [ei15]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "comes [ei14]",
+            "start [ei15]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1600_l26",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "disruption [ei19]",
+          "said [ei16]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei16]']. Invalid edge format (expected 3 items): ['said [ei16]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei16]",
+            "disruption [ei19]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei16]",
+            "disruption [ei19]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_1600_l30",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "expected [ei21]",
+          "said [ei22]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei22]",
+            "expected [ei21]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei22]",
+            "expected [ei21]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l2",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "buy [ei2]",
+          "said [ei1]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei1]",
+            "buy [ei2]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei1]",
+            "buy [ei2]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l8",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "return [ei7]",
+          "said [ei5]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei5]",
+            "return [ei7]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei5]",
+            "return [ei7]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l9",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "investment [ei8]",
+          "said [ei5]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "investment [ei8]",
+            "said [ei5]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "investment [ei8]",
+            "said [ei5]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l20",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "generate [ei14]",
+          "said [ei12]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['generate [ei14]']. Invalid edge format (expected 3 items): ['generate [ei14]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei12]",
+            "generate [ei14]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei12]",
+            "generate [ei14]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l24",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "realised [ei17]",
+          "allow [ei15]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "realised [ei17]",
+            "allow [ei15]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "realised [ei17]",
+            "allow [ei15]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l30",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "take [ei20]",
+          "expects [ei19]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "expects [ei19]",
+            "take [ei20]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "expects [ei19]",
+            "take [ei20]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l33",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "expects [ei19]",
+          "said [ei23]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['expects [ei19]']. Invalid edge format (expected 3 items): ['expects [ei19]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "expects [ei19]",
+            "said [ei23]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_332_l37",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei23]",
+          "received [ei24]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei23]']. Invalid edge format (expected 3 items): ['said [ei23]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "received [ei24]",
+            "said [ei23]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "received [ei24]",
+            "said [ei23]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_721_l32",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei18]",
+          "insisted [ei21]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei18]']. Invalid edge format (expected 3 items): ['said [ei18]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "insisted [ei21]",
+            "said [ei18]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_bbc_20130322_721_l100",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "seized [ei14]",
+          "raided [ei1]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['raided [ei1]']. Invalid edge format (expected 3 items): ['raided [ei1]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "raided [ei1]",
+            "seized [ei14]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l8",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "causing [ei5]",
+          "cloaked [ei4]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['cloaked [ei4]']. Invalid edge format (expected 3 items): ['cloaked [ei4]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "causing [ei5]",
+            "cloaked [ei4]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l28",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "clean [ei20]",
+          "said [ei14]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei14]",
+            "clean [ei20]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei14]",
+            "clean [ei20]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l34",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "put [ei23]",
+          "led [ei22]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "led [ei22]",
+            "put [ei23]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l37",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "led [ei22]",
+          "comply [ei24]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['led [ei22]']. Invalid edge format (expected 3 items): ['led [ei22]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "led [ei22]",
+            "comply [ei24]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "led [ei22]",
+            "comply [ei24]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l56",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "pushed [ei30]",
+          "released [ei33]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "pushed [ei30]",
+            "released [ei33]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "pushed [ei30]",
+            "released [ei33]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_china_pollution_l63",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "calling [ei39]",
+          "said [ei38]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "calling [ei39]",
+            "said [ei38]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_cyprus_l28",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "forming [ei15]",
+          "said [ei21]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei21]', 'BEFORE']. Invalid edge format (expected 3 items): ['said [ei21]', 'BEFORE']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "forming [ei15]",
+            "said [ei21]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_cyprus_l445",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "forced [ei30]",
+          "exit [ei2011]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "forced [ei30]",
+            "exit [ei2011]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "forced [ei30]",
+            "exit [ei2011]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_cyprus_l76",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei51]",
+          "expulsion [ei52]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei51]']. Invalid edge format (expected 3 items): ['said [ei51]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei51]",
+            "expulsion [ei52]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei51]",
+            "expulsion [ei52]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_cyprus_l79",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "converted [ei55]",
+          "expulsion [ei52]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "expulsion [ei52]",
+            "converted [ei55]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "expulsion [ei52]",
+            "converted [ei55]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_cyprus_l216",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei21]",
+          "said [ei51]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei21]']. Invalid edge format (expected 3 items): ['said [ei21]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei21]",
+            "said [ei51]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l5",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "get [ei4]",
+          "informed [ei1]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['informed [ei1]']. Invalid edge format (expected 3 items): ['informed [ei1]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "get [ei4]",
+            "informed [ei1]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "get [ei4]",
+            "informed [ei1]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l14",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "believes [ei11]",
+          "called [ei8]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "believes [ei11]",
+            "called [ei8]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "believes [ei11]",
+            "called [ei8]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l17",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "called [ei8]",
+          "said [ei13]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "called [ei8]",
+            "said [ei13]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l18",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "appeal [ei14]",
+          "said [ei13]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "said [ei13]",
+            "appeal [ei14]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "said [ei13]",
+            "appeal [ei14]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l21",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "said [ei13]",
+          "ruling [ei15]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['said [ei13]']. Invalid edge format (expected 3 items): ['said [ei13]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "ruling [ei15]",
+            "said [ei13]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "ruling [ei15]",
+            "said [ei13]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_sarcozy_l102",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "informed [ei1]",
+          "ruling [ei15]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['informed [ei1]']. Invalid edge format (expected 3 items): ['informed [ei1]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "ruling [ei15]",
+            "informed [ei1]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "ruling [ei15]",
+            "informed [ei1]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l3",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "savor [ei3]",
+          "slipped [ei2]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "slipped [ei2]",
+            "savor [ei3]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "slipped [ei2]",
+            "savor [ei3]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l35",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "pass [ei19]",
+          "led [ei20]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "led [ei20]",
+            "pass [ei19]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l50",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "started [ei26]",
+          "hold [ei29]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "started [ei26]",
+            "hold [ei29]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "started [ei26]",
+            "hold [ei29]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l66",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "crack [ei41]",
+          "begun [ei40]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Invalid \\\\escape')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "begun [ei40]",
+            "crack [ei41]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "begun [ei40]",
+            "crack [ei41]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l67",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "forming [ei42]",
+          "begun [ei40]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Invalid \\\\escape')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "begun [ei40]",
+            "forming [ei42]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l72",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "repeal [ei44]",
+          "led [ei43]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Invalid \\\\escape')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "led [ei43]",
+            "repeal [ei44]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l75",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "allowing [ei47]",
+          "led [ei43]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "allowing [ei47]",
+            "led [ei43]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l76",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "serve [ei48]",
+          "led [ei43]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Invalid \\\\escape')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "led [ei43]",
+            "serve [ei48]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "led [ei43]",
+            "serve [ei48]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l81",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "voted [ei50]",
+          "split [ei49]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['split [ei49]']. Invalid edge format (expected 3 items): ['split [ei49]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "split [ei49]",
+            "voted [ei50]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130321_women_senate_l84",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "lapsed [ei53]",
+          "split [ei49]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "lapsed [ei53]",
+            "split [ei49]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "lapsed [ei53]",
+            "split [ei49]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130322_strange_computer_l2",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "deployed [ei1]",
+          "taking [ei2]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "taking [ei2]",
+            "deployed [ei1]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "taking [ei2]",
+            "deployed [ei1]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130322_strange_computer_l10",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "develop [ei7]",
+          "working [ei6]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "develop [ei7]",
+            "working [ei6]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130322_strange_computer_l14",
+      "category": "invalid_edge_support",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "bought [ei8]",
+          "confident [ei9]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['bought [ei8]']. Invalid edge format (expected 3 items): ['bought [ei8]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "bought [ei8]",
+            "confident [ei9]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "bought [ei8]",
+            "confident [ei9]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130322_strange_computer_l28",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "used [ei20]",
+          "performs [ei18]",
+          "AFTER"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "performs [ei18]",
+            "used [ei20]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "performs [ei18]",
+            "used [ei20]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "te3_test_nyt_20130322_strange_computer_l31",
+      "category": "invalid_json",
+      "task_category": "tempeval_relation",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "done [ei23]",
+          "performs [ei18]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "done [ei23]",
+            "performs [ei18]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "done [ei23]",
+            "performs [ei18]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    }
+  ],
+  "repair_hit_count": 1,
+  "repair_hit_rate": 0.0020161290322580645,
+  "parse_success_rate": 0.8024193548387096,
+  "conditional_validity_rate": 0.8592964824120602,
+  "conditional_trace_grounding_rate": 0.864321608040201,
+  "transport_failure_counts": {},
+  "parse_failure_counts": {
+    "invalid_edge_support": 35,
+    "invalid_json": 63
+  },
+  "valid_count": 342,
+  "invalid_count": 56,
+  "trace_grounded_count": 344,
+  "trace_ungrounded_count": 54,
+  "validity_rate": 0.6895161290322581,
+  "violation_counts": {
+    "hallucinated_node": 22,
+    "unsupported_reasoning_reference": 22,
+    "unsupported_reasoning_step": 33
+  },
+  "formula_violation_counts": {
+    "ltl_hallucinated_node": 22,
+    "ltl_unsupported_final_commitment": 35
+  },
+  "first_violation_step_histogram": {
+    "0": 22,
+    "1": 34
+  },
+  "taxonomy_counts": {
+    "grounding": 44,
+    "reasoning_trace": 33
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 0,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.4623115577889447,
+      "recall": 0.4623115577889447,
+      "f1": 0.4623115577889447,
+      "correct": 184,
+      "pred_total": 398,
+      "gold_total": 398
+    },
+    "closure": {
+      "precision": 0.4697802197802198,
+      "recall": 0.5277777777777778,
+      "f1": 0.49709302325581395,
+      "correct": 171,
+      "pred_total": 364,
+      "gold_total": 324
+    }
+  },
+  "report_path": "outputs/runs/tempeval_v2/deepseek-r1-7b_2026-05-10_201915UTC/report.json"
+}

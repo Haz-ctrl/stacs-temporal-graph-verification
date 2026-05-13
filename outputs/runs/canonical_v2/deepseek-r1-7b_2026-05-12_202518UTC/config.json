@@ -1,0 +1,19 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-12_202518UTC",
+  "data_path": "data/temporal_reasoning_eval.jsonl",
+  "num_tasks": 250,
+  "pred_source": "llm",
+  "model": "deepseek-r1:7b",
+  "base_url": "http://localhost:11434",
+  "temperature": 0.0,
+  "seed": 42,
+  "log_raw": false,
+  "validate_data": true,
+  "strict_data": false,
+  "timeout_s": 120,
+  "max_retries": 4,
+  "retry_backoff_s": 3.0,
+  "dataset_version": "temporal_reasoning_eval",
+  "code_version": "4e749e7bdcc41bae6a7db3c9df1e98738b6a67e3",
+  "specification_name": "default_temporal_spec"
+}

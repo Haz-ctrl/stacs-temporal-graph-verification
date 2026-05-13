@@ -1,0 +1,1777 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-11_210823UTC",
+  "predictions_file": "outputs/runs/maven_ere_v2/deepseek-r1-7b_2026-05-11_210823UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/maven_ere_balanced_2to1.jsonl",
+    "dataset_version": "maven_ere_balanced_2to1",
+    "num_tasks": 500,
+    "expected_valid_tasks": 500,
+    "expected_invalid_tasks": 0
+  },
+  "code_version": "908898b78123ffb2e2874cff3a34daefa5f2ff30",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-05-10T17:01:08.890225022+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-05-10T17:01:08.255213562+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-05-06T21:19:10.955309938+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-05-06T21:18:11.478249111+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-05-06T21:14:50.151647077+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "deepseek-r1-7b_2026-05-11_210823UTC",
+    "data_path": "data/maven_ere_balanced_2to1.jsonl",
+    "num_tasks": 500,
+    "pred_source": "llm",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 4,
+    "retry_backoff_s": 3.0,
+    "dataset_version": "maven_ere_balanced_2to1",
+    "code_version": "908898b78123ffb2e2874cff3a34daefa5f2ff30",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 500,
+  "num_failures": 32,
+  "failures": [
+    {
+      "id": "maven_ere_valid_72f377d680499b8c5466e35819dda1a0_0002757",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "weakened [2c7835ebdb1c1a78fc742033662e6a23]",
+          "refused [1ed4ceb10cdf9b19cea34407fe0d4c75]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['weakened', 'AFTER']. Invalid edge format (expected 3 items): ['weakened', 'AFTER']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "weakened [2c7835ebdb1c1a78fc742033662e6a23]",
+            "refused [1ed4ceb10cdf9b19cea34407fe0d4c75]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "weakened [2c7835ebdb1c1a78fc742033662e6a23]",
+            "refused [1ed4ceb10cdf9b19cea34407fe0d4c75]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_d8c798e1195d7b3c089be22027798924_0000383",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "killed [13374502dabd2d2435d2a7f601cc55c1]",
+          "carried out [5ef542181ddd9caea85ded917b0e4f74]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "killed [13374502dabd2d2435d2a7f601cc55c1]",
+            "carried out [5ef542181ddd9caea85ded917b0e4f74]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "killed [13374502dabd2d2435d2a7f601cc55c1]",
+            "carried out [5ef542181ddd9caea85ded917b0e4f74]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_31fd3808e8fe6b0e88ca7d9abd1a6199_0000739",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "disrupted [a17b72edd36cefd7f57c1e91777052eb]",
+          "services [5794ac7e4020fc5ba84aef4409d6869e]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "disrupted [a17b72edd36cefd7f57c1e91777052eb]",
+            "services [5794ac7e4020fc5ba84aef4409d6869e]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_5716ac920f50ffe368edb3088c6ecab4_0000212",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "found [8e57c4cee85d264ee0baa5c3ad2a5bff]",
+          "terminated [7ca30cffcebd629836ac9a0e48db99cd]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['found [8e57c4cee85d264ee0baa5c3ad2a5bff]']. Invalid edge format (expected 3 items): ['found [8e57c4cee85d264ee0baa5c3ad2a5bff]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "found [8e57c4cee85d264ee0baa5c3ad2a5bff]",
+            "terminated [7ca30cffcebd629836ac9a0e48db99cd]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "found [8e57c4cee85d264ee0baa5c3ad2a5bff]",
+            "terminated [7ca30cffcebd629836ac9a0e48db99cd]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_a1881a72f6148000e87a750c2a8d9b7e_0001644",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "forcing [bfcc770cb54a404e69e4f427615b5640]",
+          "practice [e6f2cf945cb4024f557d0744062454b4]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['forcing [bfcc770cb54a404e69e4f427615b5640]']. Invalid edge format (expected 3 items): ['forcing [bfcc770cb54a404e69e4f427615b5640]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "forcing [bfcc770cb54a404e69e4f427615b5640]",
+            "practice [e6f2cf945cb4024f557d0744062454b4]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_b30801bb9cbf09f87dddd51dba5a4616_0001490",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "riot [5cec2a7f15b8c70904877ffa4f1c44b2]",
+          "killed [cc1924eb486df52e631d64ccc765cf54]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['riot']. Invalid edge format (expected 3 items): ['riot']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "riot [5cec2a7f15b8c70904877ffa4f1c44b2]",
+            "killed [cc1924eb486df52e631d64ccc765cf54]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "riot [5cec2a7f15b8c70904877ffa4f1c44b2]",
+            "killed [cc1924eb486df52e631d64ccc765cf54]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_c49e96b43d9ff26f06ae53c76209af5f_0003118",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "Watched [8f354afb970fec75e3c60b924b0528ba]",
+          "held [85a52a4d454d078ba48d432753571e96]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "Watched [8f354afb970fec75e3c60b924b0528ba]",
+            "held [85a52a4d454d078ba48d432753571e96]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_1eab5d3c4c77402661cca5a0621d6228_0002613",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "brunt [389e0a51c6bd09cd8b2412df1871c1e2]",
+          "harmed [2e8675408e38199dbf5c9ce79619924a]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['brunt']. Invalid edge format (expected 3 items): ['brunt']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "brunt [389e0a51c6bd09cd8b2412df1871c1e2]",
+            "harmed [2e8675408e38199dbf5c9ce79619924a]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "brunt [389e0a51c6bd09cd8b2412df1871c1e2]",
+            "harmed [2e8675408e38199dbf5c9ce79619924a]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_48cb432074c0e70547b8e5cef136e93f_0001791",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "carried out [9c8c5ab77a3ce67ec5786d4caa142aa5]",
+          "extending [2da437d07a2ac6ca6c699be1dcee6497]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "carried out [9c8c5ab77a3ce67ec5786d4caa142aa5]",
+            "extending [2da437d07a2ac6ca6c699be1dcee6497]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "carried out [9c8c5ab77a3ce67ec5786d4caa142aa5]",
+            "extending [2da437d07a2ac6ca6c699be1dcee6497]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_a0b9c123a2031d1b41c5e356ec7bd24e_0001630",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "held [caf3dbfe5ca753c9a89f634388982618]",
+          "failed [51b008c57bd03c767736751ed740cdec]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "held [caf3dbfe5ca753c9a89f634388982618]",
+            "failed [51b008c57bd03c767736751ed740cdec]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "held [caf3dbfe5ca753c9a89f634388982618]",
+            "failed [51b008c57bd03c767736751ed740cdec]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_05abd53228d0a4d6c9eba209842e854a_0002553",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "played [06cbb55b95e60b840a3becdb4cceeed4]",
+          "tournament [fd317840b0de0df780bef5901c062b8a]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "played [06cbb55b95e60b840a3becdb4cceeed4]",
+            "tournament [fd317840b0de0df780bef5901c062b8a]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_4063304f06ed338d446f56fd730a9478_0000461",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "offered [9f943c2b064a9f9c0e2cebcb548d3ca0]",
+          "offered [7722e7f4a900a40aa7305d3ccc36c8bf]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['offered [9f943c2b064a9f9c0e2cebcb548d3ca0]', 'offered [7722e7f4a900a40aa7305d3ccc36c8bf]', 'SIMULANEOUS']. Unsupported relation label: 'SIMULANEOUS'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "offered [7722e7f4a900a40aa7305d3ccc36c8bf]",
+            "offered [9f943c2b064a9f9c0e2cebcb548d3ca0]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_a46f4043665d29b7cf26f90df7b20405_0001008",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "injured [bd3b6f5de85997670c8415a185fe992b]",
+          "killed [3ace98059699bf68c5988d758def9f15]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "injured [bd3b6f5de85997670c8415a185fe992b]",
+            "killed [3ace98059699bf68c5988d758def9f15]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_a69558a6e73fabeb8e926545a18e5816_0001935",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "hosted [3ce6f55c448e83631987525104feb90e]",
+          "hosted [787dcbfb7627da0f95163ccd018c250a]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['hosted [3ce6f55c448e83631987525104feb90e]', 'SIMULTANEOUS']. Invalid edge format (expected 3 items): ['hosted [3ce6f55c448e83631987525104feb90e]', 'SIMULTANEOUS']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "hosted [3ce6f55c448e83631987525104feb90e]",
+            "hosted [787dcbfb7627da0f95163ccd018c250a]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_ba68a8ca5499415286f8bcb842191e9d_0001462",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "came [5722e013ff1bf0632f83118500855374]",
+          "elected [09f615fe20de32cedc8c582bab566da4]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['elected', 'came']. Invalid edge format (expected 3 items): ['elected', 'came']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "came [5722e013ff1bf0632f83118500855374]",
+            "elected [09f615fe20de32cedc8c582bab566da4]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "came [5722e013ff1bf0632f83118500855374]",
+            "elected [09f615fe20de32cedc8c582bab566da4]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_841397767d4ce6853ac8b59a23b3b866_0001002",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "occurred [04f6457700d03647631f422e7986e456]",
+          "occurred [ca42fa79f9d2e2d309975258001d1fe9]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['occurred [04f6457700d03647631f422e7986e456]', 'occurred [ca42fa79f9d2e2d309975258001d1fe9]', 'SIMULATNEOUS']. Unsupported relation label: 'SIMULATNEOUS'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "occurred [04f6457700d03647631f422e7986e456]",
+            "occurred [ca42fa79f9d2e2d309975258001d1fe9]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_901d9c8ca558a9173e283fa9c32bbbfd_0002124",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "overthrown [b77ecaf51aa2b3f2026fe0c4e286b726]",
+          "giving [e39f30f1d2fb5f7624d37d041fd2ed36]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "overthrown [b77ecaf51aa2b3f2026fe0c4e286b726]",
+            "giving [e39f30f1d2fb5f7624d37d041fd2ed36]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "overthrown [b77ecaf51aa2b3f2026fe0c4e286b726]",
+            "giving [e39f30f1d2fb5f7624d37d041fd2ed36]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_df4a4f0bcd8f914db3ee8c784711002d_0002644",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "rejected [e376f4b626bc6e9bc706ad6c4072902f]",
+          "referendum [2a19af9a12987c3221a45a5a8bfd1e61]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['referendum [2a19af9a12987c3221a45a5a8bfd1e61]', 'rejected [e376f4b626bc6e9bc706ad6c4072902f]']. Invalid edge format (expected 3 items): ['referendum [2a19af9a12987c3221a45a5a8bfd1e61]', 'rejected [e376f4b626bc6e9bc706ad6c4072902f]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "referendum [2a19af9a12987c3221a45a5a8bfd1e61]",
+            "rejected [e376f4b626bc6e9bc706ad6c4072902f]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_954e5e716e82b34b10fa341338ddd7f6_0001670",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "training [7e6eff7102b5d3e4a28a2f6ba532d62c]",
+          "affirmed [729bb4446737fa0608b55fd3790f5b15]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "training [7e6eff7102b5d3e4a28a2f6ba532d62c]",
+            "affirmed [729bb4446737fa0608b55fd3790f5b15]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "training [7e6eff7102b5d3e4a28a2f6ba532d62c]",
+            "affirmed [729bb4446737fa0608b55fd3790f5b15]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_80e84396f4bf4783206ca41a3d16284b_0001207",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "renamed [8fcafb948d8c698c6fd2dd6f48eaa32c]",
+          "Breaking [8bd2f317649c73f558c88ebc2d9fdf1d]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['renamed [8fcafb948d8c698c6fd2dd6f48eaa32c]']. Invalid edge format (expected 3 items): ['renamed [8fcafb948d8c698c6fd2dd6f48eaa32c]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "renamed [8fcafb948d8c698c6fd2dd6f48eaa32c]",
+            "Breaking [8bd2f317649c73f558c88ebc2d9fdf1d]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "renamed [8fcafb948d8c698c6fd2dd6f48eaa32c]",
+            "Breaking [8bd2f317649c73f558c88ebc2d9fdf1d]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_69efa1a1d63d4ab91429ed99e3347f40_0000703",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "dropped [835eaf2ec12a25c06df3da293a54daa4]",
+          "earning [f5943abd352c20bcda5e9b70f9091050]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['dropped [835eaf2ec12a25c06df3da293a54daa4]']. Invalid edge format (expected 3 items): ['dropped [835eaf2ec12a25c06df3da293a54daa4]']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "dropped [835eaf2ec12a25c06df3da293a54daa4]",
+            "earning [f5943abd352c20bcda5e9b70f9091050]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "dropped [835eaf2ec12a25c06df3da293a54daa4]",
+            "earning [f5943abd352c20bcda5e9b70f9091050]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_fa8a536f9a170bd6f12545875103c63e_0001269",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "justified [a6055dc3e8b667a3e0134c34f5ad9f17]",
+          "flee [fe70a1dac75f4f71e292b347c11ae105]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['justified', 'flee', 'BRAFORE']. Unsupported relation label: 'BRAFORE'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "justified [a6055dc3e8b667a3e0134c34f5ad9f17]",
+            "flee [fe70a1dac75f4f71e292b347c11ae105]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "justified [a6055dc3e8b667a3e0134c34f5ad9f17]",
+            "flee [fe70a1dac75f4f71e292b347c11ae105]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_bce02e01e6b72b5b0cc8c62d27f356aa_0001400",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "Wrestling [0f2b1c228ba5caf7fbead117cd604356]",
+          "wrestling [c2b0e6b692d6b8469302174f0e2de614]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "Wrestling [0f2b1c228ba5caf7fbead117cd604356]",
+            "wrestling [c2b0e6b692d6b8469302174f0e2de614]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_47ef7d339cee55cd04ec8e4f3244fc1c_0002288",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "Siege [f17ae526b7436defa51f4f80ab701b4d]",
+          "referred [638b01a1be8e6fe9c9ccdf331130ca14]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "Siege [f17ae526b7436defa51f4f80ab701b4d]",
+            "referred [638b01a1be8e6fe9c9ccdf331130ca14]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_f4888dcb9d6eec519d1b1c2008c4efe2_0002814",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "retaliated [562ffb54ea4a3ed1edb1e9c84b3ffe7f]",
+          "captured [3ea1a0601710a87a0ea412c22fd53fac]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "retaliated [562ffb54ea4a3ed1edb1e9c84b3ffe7f]",
+            "captured [3ea1a0601710a87a0ea412c22fd53fac]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "retaliated [562ffb54ea4a3ed1edb1e9c84b3ffe7f]",
+            "captured [3ea1a0601710a87a0ea412c22fd53fac]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_9ea66e14bfa3fa3c033109e6b19cf585_0000080",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "organised [9bfd7242804db70fde6847445cfa0ef1]",
+          "Final [2d5161c54092404f2653fd5ff07ceaac]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "organised [9bfd7242804db70fde6847445cfa0ef1]",
+            "Final [2d5161c54092404f2653fd5ff07ceaac]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "organised [9bfd7242804db70fde6847445cfa0ef1]",
+            "Final [2d5161c54092404f2653fd5ff07ceaac]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_ee397d5007f59a6bfd7c3f50f768564a_0000570",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "wars [41d0ec8ae7a2bea6306972a05f8f8f0a]",
+          "campaigns [1815a1931b35cc3e375548533f524dff]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "campaigns [1815a1931b35cc3e375548533f524dff]",
+            "wars [41d0ec8ae7a2bea6306972a05f8f8f0a]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_241652a5be385efdee6dc4ad29fdbf3e_0000276",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "take-off [64337ea6ce13654b21c598fb20085f6b]",
+          "lifting off [027692c40f26d574bb856f2b3e2acb94]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "lifting off [027692c40f26d574bb856f2b3e2acb94]",
+            "take-off [64337ea6ce13654b21c598fb20085f6b]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_f3279ffbc2bcdffeee0d12efa06cf841_0001296",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "held [62626d63f2be99f85af2cfd794abdbc5]",
+          "answered [3531131fc612902b3943d9a80ef68173]",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['held [62626d63f2be99f85af2cfd794abdbc5]', 'answered [3531131fc612902b3943d9a80ef68173]', 'SIMULANEOUS']. Unsupported relation label: 'SIMULANEOUS'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "missing_direct_edges": [
+          [
+            "held [62626d63f2be99f85af2cfd794abdbc5]",
+            "answered [3531131fc612902b3943d9a80ef68173]",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "held [62626d63f2be99f85af2cfd794abdbc5]",
+            "answered [3531131fc612902b3943d9a80ef68173]"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_002cd40be39bbc07cc165afeeff2fd81_0002137",
+      "category": "invalid_json",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "final [b1f9caf57ceffa87276e69c09de5fad4]",
+          "match [6a4f8fe5e94901ed4260655826e61267]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "final [b1f9caf57ceffa87276e69c09de5fad4]",
+            "match [6a4f8fe5e94901ed4260655826e61267]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_c4e77f330fb0e9b5e48bfd41f2b63b5f_0000736",
+      "category": "invalid_edge_support",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "Final [366d7a370569749d444f575c80675d45]",
+          "held [2d2630ea4f000d85678345730cf6d382]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['Final', 'held', 'SIMULANEOUS']. Unsupported relation label: 'SIMULANEOUS'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "Final [366d7a370569749d444f575c80675d45]",
+            "held [2d2630ea4f000d85678345730cf6d382]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "maven_ere_valid_86fa452602f82d8b553b7a34a92f4cfe_0001784",
+      "category": "transport_timeout",
+      "task_category": "maven_ere_temporal",
+      "num_events": 2,
+      "gold_relation_count": 1,
+      "gold_relations": [
+        [
+          "conducted [248adeeea72260964f4244068d43c04a]",
+          "attacked [4dc34f8b1dd9158a52ae6811982ae9da]",
+          "SIMULTANEOUS"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 1
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [
+          [
+            "attacked [4dc34f8b1dd9158a52ae6811982ae9da]",
+            "conducted [248adeeea72260964f4244068d43c04a]",
+            "SIMULTANEOUS"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    }
+  ],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 0.936,
+  "conditional_validity_rate": 0.9658119658119658,
+  "conditional_trace_grounding_rate": 0.9658119658119658,
+  "transport_failure_counts": {
+    "transport_timeout": 6
+  },
+  "parse_failure_counts": {
+    "invalid_edge_support": 15,
+    "invalid_json": 11
+  },
+  "valid_count": 452,
+  "invalid_count": 16,
+  "trace_grounded_count": 452,
+  "trace_ungrounded_count": 16,
+  "validity_rate": 0.904,
+  "violation_counts": {
+    "hallucinated_node": 12,
+    "unsupported_reasoning_reference": 12,
+    "unsupported_reasoning_step": 4
+  },
+  "formula_violation_counts": {
+    "ltl_hallucinated_node": 12,
+    "ltl_unsupported_final_commitment": 4
+  },
+  "first_violation_step_histogram": {
+    "0": 12,
+    "1": 4
+  },
+  "taxonomy_counts": {
+    "grounding": 24,
+    "reasoning_trace": 4
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 0,
+    "num_overcommit_tasks": 0,
+    "num_overcommit_edges": 0,
+    "task_overcommit_rate": 0.0,
+    "avg_overcommit_edges_per_gold_empty_task": 0.0
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.44967880085653106,
+      "recall": 0.44871794871794873,
+      "f1": 0.44919786096256686,
+      "correct": 210,
+      "pred_total": 467,
+      "gold_total": 468
+    },
+    "closure": {
+      "precision": 0.4405940594059406,
+      "recall": 0.5615141955835962,
+      "f1": 0.49375866851595,
+      "correct": 178,
+      "pred_total": 404,
+      "gold_total": 317
+    }
+  },
+  "report_path": "outputs/runs/maven_ere_v2/deepseek-r1-7b_2026-05-11_210823UTC/report.json"
+}

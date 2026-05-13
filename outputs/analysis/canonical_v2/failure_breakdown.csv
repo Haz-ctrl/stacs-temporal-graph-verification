@@ -1,0 +1,46 @@
+run_id,model_label,failure_scope,failure_type,event_count,affected_tasks,affected_task_rate
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,ltl_formula,ltl_contradiction,11,11,0.044
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,ltl_formula,ltl_hallucinated_node,1,1,0.004
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,ltl_formula,ltl_temporal_inconsistency,12,12,0.048
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,ltl_formula,ltl_trace_inversion,9,5,0.02
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,ltl_formula,ltl_unsupported_final_commitment,3,2,0.008
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,parse,invalid_edge_support,9,9,0.036
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,parse,invalid_json,45,45,0.18
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,parse,schema_violation,1,1,0.004
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,transport,transport_timeout,1,1,0.004
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,contradiction,5,5,0.02
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,cycle,6,6,0.024
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,hallucinated_node,1,1,0.004
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,temporal_inconsistency,6,6,0.024
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,unsupported_reasoning_reference,1,1,0.004
+deepseek-r1-7b_2026-05-12_202518UTC,DeepSeek R1 7B,verification,unsupported_reasoning_step,10,10,0.04
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,ltl_formula,ltl_contradiction,41,41,0.164
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,ltl_formula,ltl_temporal_inconsistency,41,41,0.164
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,ltl_formula,ltl_trace_inversion,44,41,0.164
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,ltl_formula,ltl_unsupported_final_commitment,2,2,0.008
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,transport,transport_timeout,21,21,0.084
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,verification,contradiction,35,35,0.14
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,verification,cycle,35,35,0.14
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,verification,temporal_inconsistency,35,35,0.14
+qwen3-5-9b_2026-05-12_212753UTC,Qwen 3.5 9B,verification,unsupported_reasoning_step,6,6,0.024
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,ltl_formula,ltl_contradiction,50,50,0.2
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,ltl_formula,ltl_temporal_inconsistency,50,50,0.2
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,ltl_formula,ltl_trace_inversion,49,49,0.196
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,ltl_formula,ltl_unsupported_final_commitment,42,15,0.06
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,verification,contradiction,49,49,0.196
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,verification,cycle,49,49,0.196
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,verification,temporal_inconsistency,49,49,0.196
+llama3-1-8b_2026-05-13_041908UTC,Llama 3.1 8B,verification,unsupported_reasoning_step,14,14,0.056
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,ltl_formula,ltl_contradiction,40,40,0.16
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,ltl_formula,ltl_hallucinated_node,9,9,0.036
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,ltl_formula,ltl_temporal_inconsistency,41,41,0.164
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,ltl_formula,ltl_trace_inversion,37,34,0.136
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,ltl_formula,ltl_unsupported_final_commitment,63,57,0.228
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,parse,invalid_edge_support,5,5,0.02
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,contradiction,27,27,0.108
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,cycle,27,27,0.108
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,hallucinated_node,9,9,0.036
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,temporal_inconsistency,27,27,0.108
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,unsupported_reasoning_reference,4,4,0.016
+mistral-7b_2026-05-13_043657UTC,Mistral 7B,verification,unsupported_reasoning_step,56,56,0.224
+gemma3-12b_2026-05-13_045357UTC,Gemma 3 12B,ltl_formula,ltl_unsupported_final_commitment,4,2,0.008

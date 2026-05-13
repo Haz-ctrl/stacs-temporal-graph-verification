@@ -1,0 +1,24 @@
+run_id,model_label,failure_scope,failure_type,event_count,affected_tasks,affected_task_rate
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,ltl_formula,ltl_hallucinated_node,12,12,0.024
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,ltl_formula,ltl_unsupported_final_commitment,4,4,0.008
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,parse,invalid_edge_support,15,15,0.03
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,parse,invalid_json,11,11,0.022
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,transport,transport_timeout,6,6,0.012
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,verification,hallucinated_node,12,12,0.024
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,verification,unsupported_reasoning_reference,12,12,0.024
+deepseek-r1-7b_2026-05-11_210823UTC,DeepSeek R1 7B,verification,unsupported_reasoning_step,4,4,0.008
+qwen3-5-9b_2026-05-11_234717UTC,Qwen 3.5 9B,ltl_formula,ltl_unsupported_final_commitment,6,6,0.012
+qwen3-5-9b_2026-05-11_234717UTC,Qwen 3.5 9B,parse,invalid_edge_support,5,5,0.01
+qwen3-5-9b_2026-05-11_234717UTC,Qwen 3.5 9B,parse,invalid_json,25,25,0.05
+qwen3-5-9b_2026-05-11_234717UTC,Qwen 3.5 9B,parse,schema_violation,34,34,0.068
+qwen3-5-9b_2026-05-11_234717UTC,Qwen 3.5 9B,transport,transport_timeout,65,65,0.13
+llama3-1-8b_2026-05-12_174820UTC,Llama 3.1 8B,ltl_formula,ltl_hallucinated_node,1,1,0.002
+llama3-1-8b_2026-05-12_174820UTC,Llama 3.1 8B,parse,invalid_json,1,1,0.002
+llama3-1-8b_2026-05-12_174820UTC,Llama 3.1 8B,verification,hallucinated_node,1,1,0.002
+llama3-1-8b_2026-05-12_174820UTC,Llama 3.1 8B,verification,unsupported_reasoning_reference,1,1,0.002
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,ltl_formula,ltl_hallucinated_node,5,5,0.01
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,ltl_formula,ltl_unsupported_final_commitment,287,287,0.574
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,parse,invalid_json,1,1,0.002
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,verification,hallucinated_node,5,5,0.01
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,verification,unsupported_reasoning_reference,1,1,0.002
+mistral-7b_2026-05-12_182052UTC,Mistral 7B,verification,unsupported_reasoning_step,6,6,0.012

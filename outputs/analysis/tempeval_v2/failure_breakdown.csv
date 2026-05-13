@@ -1,0 +1,27 @@
+run_id,model_label,failure_scope,failure_type,event_count,affected_tasks,affected_task_rate
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,ltl_formula,ltl_hallucinated_node,22,22,0.04435483870967742
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,ltl_formula,ltl_unsupported_final_commitment,35,35,0.07056451612903226
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,parse,invalid_edge_support,35,35,0.07056451612903226
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,parse,invalid_json,63,63,0.12701612903225806
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,verification,hallucinated_node,22,22,0.04435483870967742
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,verification,unsupported_reasoning_reference,22,22,0.04435483870967742
+deepseek-r1-7b_2026-05-10_201915UTC,DeepSeek R1 7B,verification,unsupported_reasoning_step,33,33,0.06653225806451613
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,ltl_formula,ltl_unsupported_final_commitment,12,12,0.024193548387096774
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,parse,invalid_edge_support,5,5,0.010080645161290322
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,parse,invalid_json,46,46,0.09274193548387097
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,parse,schema_violation,24,24,0.04838709677419355
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,transport,transport_timeout,4,4,0.008064516129032258
+qwen3-5-9b_2026-05-10_213450UTC,Qwen 3.5 9B,verification,unsupported_reasoning_step,1,1,0.0020161290322580645
+llama3-1-8b_2026-05-11_093924UTC,Llama 3.1 8B,ltl_formula,ltl_hallucinated_node,4,4,0.008064516129032258
+llama3-1-8b_2026-05-11_093924UTC,Llama 3.1 8B,verification,hallucinated_node,4,4,0.008064516129032258
+llama3-1-8b_2026-05-11_093924UTC,Llama 3.1 8B,verification,unsupported_reasoning_reference,4,4,0.008064516129032258
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,ltl_formula,ltl_contradiction,2,2,0.004032258064516129
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,ltl_formula,ltl_hallucinated_node,4,4,0.008064516129032258
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,ltl_formula,ltl_temporal_inconsistency,2,2,0.004032258064516129
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,ltl_formula,ltl_unsupported_final_commitment,93,93,0.1875
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,verification,hallucinated_node,4,4,0.008064516129032258
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,verification,unsupported_reasoning_reference,4,4,0.008064516129032258
+mistral-7b_2026-05-11_095644UTC,Mistral 7B,verification,unsupported_reasoning_step,5,5,0.010080645161290322
+gemma3-12b_2026-05-11_101551UTC,Gemma 3 12B,ltl_formula,ltl_hallucinated_node,1,1,0.0020161290322580645
+gemma3-12b_2026-05-11_101551UTC,Gemma 3 12B,verification,hallucinated_node,1,1,0.0020161290322580645
+gemma3-12b_2026-05-11_101551UTC,Gemma 3 12B,verification,unsupported_reasoning_reference,1,1,0.0020161290322580645

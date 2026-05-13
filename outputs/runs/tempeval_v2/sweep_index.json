@@ -1,0 +1,48 @@
+{
+  "data_path": "data/tempeval_eval.jsonl",
+  "seed": 42,
+  "temperature": 0.0,
+  "timeout_s": 300,
+  "max_retries": 4,
+  "retry_backoff_s": 5.0,
+  "max_tasks": 0,
+  "continue_on_error": true,
+  "failures": [],
+  "runs": [
+    {
+      "run_id": "deepseek-r1-7b_2026-05-10_201915UTC",
+      "run_dir": "outputs/runs/tempeval_v2/deepseek-r1-7b_2026-05-10_201915UTC",
+      "model": "deepseek-r1:7b",
+      "label": "DeepSeek R1 7B",
+      "status": "completed"
+    },
+    {
+      "run_id": "qwen3-5-9b_2026-05-10_213450UTC",
+      "run_dir": "outputs/runs/tempeval_v2/qwen3-5-9b_2026-05-10_213450UTC",
+      "model": "qwen3.5:9b",
+      "label": "Qwen 3.5 9B",
+      "status": "completed"
+    },
+    {
+      "run_id": "llama3-1-8b_2026-05-11_093924UTC",
+      "run_dir": "outputs/runs/tempeval_v2/llama3-1-8b_2026-05-11_093924UTC",
+      "model": "llama3.1:8b",
+      "label": "Llama 3.1 8B",
+      "status": "completed"
+    },
+    {
+      "run_id": "mistral-7b_2026-05-11_095644UTC",
+      "run_dir": "outputs/runs/tempeval_v2/mistral-7b_2026-05-11_095644UTC",
+      "model": "mistral:7b",
+      "label": "Mistral 7B",
+      "status": "completed"
+    },
+    {
+      "run_id": "gemma3-12b_2026-05-11_101551UTC",
+      "run_dir": "outputs/runs/tempeval_v2/gemma3-12b_2026-05-11_101551UTC",
+      "model": "gemma3:12b",
+      "label": "Gemma 3 12B",
+      "status": "completed"
+    }
+  ]
+}

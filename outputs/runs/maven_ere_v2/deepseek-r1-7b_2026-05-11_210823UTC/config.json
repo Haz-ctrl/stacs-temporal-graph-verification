@@ -1,0 +1,19 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-11_210823UTC",
+  "data_path": "data/maven_ere_balanced_2to1.jsonl",
+  "num_tasks": 500,
+  "pred_source": "llm",
+  "model": "deepseek-r1:7b",
+  "base_url": "http://localhost:11434",
+  "temperature": 0.0,
+  "seed": 42,
+  "log_raw": false,
+  "validate_data": true,
+  "strict_data": false,
+  "timeout_s": 120,
+  "max_retries": 4,
+  "retry_backoff_s": 3.0,
+  "dataset_version": "maven_ere_balanced_2to1",
+  "code_version": "908898b78123ffb2e2874cff3a34daefa5f2ff30",
+  "specification_name": "default_temporal_spec"
+}

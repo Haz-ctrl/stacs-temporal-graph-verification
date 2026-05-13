@@ -1,0 +1,5111 @@
+{
+  "run_id": "deepseek-r1-7b_2026-05-12_202518UTC",
+  "predictions_file": "outputs/runs/canonical_v2/deepseek-r1-7b_2026-05-12_202518UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 250,
+    "expected_valid_tasks": 200,
+    "expected_invalid_tasks": 50
+  },
+  "code_version": "4e749e7bdcc41bae6a7db3c9df1e98738b6a67e3",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-05-10T17:01:08.255213562+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-05-10T17:01:08.890225022+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-05-06T21:19:10.955309938+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-05-06T21:18:11.478249111+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-05-06T21:14:50.151647077+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "deepseek-r1-7b_2026-05-12_202518UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 250,
+    "pred_source": "llm",
+    "model": "deepseek-r1:7b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 4,
+    "retry_backoff_s": 3.0,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "4e749e7bdcc41bae6a7db3c9df1e98738b6a67e3",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 250,
+  "num_failures": 56,
+  "failures": [
+    {
+      "id": "con_030",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Sara printed the handouts in the kitchen",
+          "Ivy opened the door in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Ivy opened the door in the classroom",
+          "Sara printed the handouts in the kitchen",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "missing_direct_edges": [
+          [
+            "Ivy opened the door in the classroom",
+            "Sara printed the handouts in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Sara printed the handouts in the kitchen",
+            "Ivy opened the door in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ivy opened the door in the classroom",
+            "Sara printed the handouts in the kitchen"
+          ],
+          [
+            "Sara printed the handouts in the kitchen",
+            "Ivy opened the door in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_001",
+      "category": "invalid_edge_support",
+      "task_category": "long_chain",
+      "num_events": 7,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Ivy boarded the train in the garden",
+          "Ivy started the meeting in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ivy started the meeting in the lab",
+          "Ethan closed the window in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ethan closed the window in the lab",
+          "Jon started the car in the garden",
+          "BEFORE"
+        ],
+        [
+          "Jon started the car in the garden",
+          "Mia sent an email at the office",
+          "BEFORE"
+        ],
+        [
+          "Mia sent an email at the office",
+          "Sara locked the bike in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Sara locked the bike in the classroom",
+          "Leo charged the phone at the station",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': 'AFTER'. Invalid edge format (expected 3 items): 'AFTER'\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 21
+        },
+        "missing_direct_edges": [
+          [
+            "Ethan closed the window in the lab",
+            "Jon started the car in the garden",
+            "BEFORE"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Ivy started the meeting in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Ethan closed the window in the lab",
+            "BEFORE"
+          ],
+          [
+            "Jon started the car in the garden",
+            "Mia sent an email at the office",
+            "BEFORE"
+          ],
+          [
+            "Mia sent an email at the office",
+            "Sara locked the bike in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Sara locked the bike in the classroom",
+            "Leo charged the phone at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ethan closed the window in the lab",
+            "Jon started the car in the garden"
+          ],
+          [
+            "Ethan closed the window in the lab",
+            "Leo charged the phone at the station"
+          ],
+          [
+            "Ethan closed the window in the lab",
+            "Mia sent an email at the office"
+          ],
+          [
+            "Ethan closed the window in the lab",
+            "Sara locked the bike in the classroom"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Ethan closed the window in the lab"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Ivy started the meeting in the lab"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Jon started the car in the garden"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Leo charged the phone at the station"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Mia sent an email at the office"
+          ],
+          [
+            "Ivy boarded the train in the garden",
+            "Sara locked the bike in the classroom"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Ethan closed the window in the lab"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Jon started the car in the garden"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Leo charged the phone at the station"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Mia sent an email at the office"
+          ],
+          [
+            "Ivy started the meeting in the lab",
+            "Sara locked the bike in the classroom"
+          ],
+          [
+            "Jon started the car in the garden",
+            "Leo charged the phone at the station"
+          ],
+          [
+            "Jon started the car in the garden",
+            "Mia sent an email at the office"
+          ],
+          [
+            "Jon started the car in the garden",
+            "Sara locked the bike in the classroom"
+          ],
+          [
+            "Mia sent an email at the office",
+            "Leo charged the phone at the station"
+          ],
+          [
+            "Mia sent an email at the office",
+            "Sara locked the bike in the classroom"
+          ],
+          [
+            "Sara locked the bike in the classroom",
+            "Leo charged the phone at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_028",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "gold_relations": [
+        [
+          "Sofia washed the dishes in the hallway",
+          "Ruby closed the window in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ruby closed the window in the lab",
+          "Ben installed the update at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Ben installed the update at the caf\u00e9",
+          "Mia watered the plants at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Mia watered the plants at the caf\u00e9",
+          "Ivy ran the tests at the station",
+          "BEFORE"
+        ],
+        [
+          "Ivy ran the tests at the station",
+          "Ethan made tea in the library",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 5
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 15
+        },
+        "missing_direct_edges": [
+          [
+            "Ben installed the update at the caf\u00e9",
+            "Mia watered the plants at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Ivy ran the tests at the station",
+            "Ethan made tea in the library",
+            "BEFORE"
+          ],
+          [
+            "Mia watered the plants at the caf\u00e9",
+            "Ivy ran the tests at the station",
+            "BEFORE"
+          ],
+          [
+            "Ruby closed the window in the lab",
+            "Ben installed the update at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Ruby closed the window in the lab",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben installed the update at the caf\u00e9",
+            "Ethan made tea in the library"
+          ],
+          [
+            "Ben installed the update at the caf\u00e9",
+            "Ivy ran the tests at the station"
+          ],
+          [
+            "Ben installed the update at the caf\u00e9",
+            "Mia watered the plants at the caf\u00e9"
+          ],
+          [
+            "Ivy ran the tests at the station",
+            "Ethan made tea in the library"
+          ],
+          [
+            "Mia watered the plants at the caf\u00e9",
+            "Ethan made tea in the library"
+          ],
+          [
+            "Mia watered the plants at the caf\u00e9",
+            "Ivy ran the tests at the station"
+          ],
+          [
+            "Ruby closed the window in the lab",
+            "Ben installed the update at the caf\u00e9"
+          ],
+          [
+            "Ruby closed the window in the lab",
+            "Ethan made tea in the library"
+          ],
+          [
+            "Ruby closed the window in the lab",
+            "Ivy ran the tests at the station"
+          ],
+          [
+            "Ruby closed the window in the lab",
+            "Mia watered the plants at the caf\u00e9"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Ben installed the update at the caf\u00e9"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Ethan made tea in the library"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Ivy ran the tests at the station"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Mia watered the plants at the caf\u00e9"
+          ],
+          [
+            "Sofia washed the dishes in the hallway",
+            "Ruby closed the window in the lab"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_017",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_024",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ethan made tea in the library",
+          "Omar called a friend at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Omar called a friend at the caf\u00e9",
+          "Hana opened the door in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ethan made tea in the library",
+            "Omar called a friend at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Omar called a friend at the caf\u00e9",
+            "Hana opened the door in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ethan made tea in the library",
+            "Hana opened the door in the hallway"
+          ],
+          [
+            "Ethan made tea in the library",
+            "Omar called a friend at the caf\u00e9"
+          ],
+          [
+            "Omar called a friend at the caf\u00e9",
+            "Hana opened the door in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_033",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_042",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ruby downloaded the update at the caf\u00e9",
+          "Kai received a confirmation email at the office",
+          "BEFORE"
+        ],
+        [
+          "Kai received a confirmation email at the office",
+          "Ivy boarded the train in the lab",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Kai received a confirmation email at the office",
+            "Ivy boarded the train in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ruby downloaded the update at the caf\u00e9",
+            "Kai received a confirmation email at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Kai received a confirmation email at the office",
+            "Ivy boarded the train in the lab"
+          ],
+          [
+            "Ruby downloaded the update at the caf\u00e9",
+            "Ivy boarded the train in the lab"
+          ],
+          [
+            "Ruby downloaded the update at the caf\u00e9",
+            "Kai received a confirmation email at the office"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_051",
+      "category": "transport_timeout",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "OllamaTransportError(\"Ollama request timed out after 4 attempt(s): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_026",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Omar closed the window in the hallway",
+          "Noah started the meeting at home",
+          "BEFORE"
+        ],
+        [
+          "Omar closed the window in the hallway",
+          "Priya sent an email in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Omar closed the window in the hallway",
+          "Ethan paid the bill in the garden",
+          "BEFORE"
+        ],
+        [
+          "Noah started the meeting at home",
+          "Priya sent an email in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Noah started the meeting at home",
+          "Ethan paid the bill in the garden",
+          "BEFORE"
+        ],
+        [
+          "Priya sent an email in the hallway",
+          "Ethan paid the bill in the garden",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n{\\n  \"answer\": \"\",\\n  \"events\": [\"Omar closed the window in the hallway\", \"Noah started the meeting at home\", \"Priya sent an email in the hallway\", \"Ethan paid the bill in the garden\"],\\n  \"relations\": [\\n    [\"Omar closed the window in the hallway\", \"Noah started the meeting at home\", \"BEFORE\"],\\n    [\"Noah started the meeting at home\", \"Priya sent an email in the hallway\", \"BEFORE\"],\\n    [\"Priya sent an email in the hallway\", \"Ethan paid the bill in the garden\", \"BEFORE\"]\\n  ],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Omar closed the window in the hallway happened before Noah started the meeting at home\",\\n      \"supports\": [[\"Omar closed the window in the hallway\", \"Noah started the meeting at home\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Noah started the meeting at home happened before Priya sent an email in the hallway\",\\n      \"supports\": [[\"Noah started the meeting at home\", \"Priya sent an email in the hallway\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Priya sent an email in the hallway happened before Ethan paid the bill in the garden\",\\n      \"supports\": [[\"Priya sent an email in the hallway\", \"Ethan paid the bill in the garden\", \"BEFORE\"]]\\n    }\\n  ]\\n]')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Noah started the meeting at home",
+            "Ethan paid the bill in the garden",
+            "BEFORE"
+          ],
+          [
+            "Noah started the meeting at home",
+            "Priya sent an email in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Ethan paid the bill in the garden",
+            "BEFORE"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Noah started the meeting at home",
+            "BEFORE"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Priya sent an email in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Priya sent an email in the hallway",
+            "Ethan paid the bill in the garden",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Noah started the meeting at home",
+            "Ethan paid the bill in the garden"
+          ],
+          [
+            "Noah started the meeting at home",
+            "Priya sent an email in the hallway"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Ethan paid the bill in the garden"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Noah started the meeting at home"
+          ],
+          [
+            "Omar closed the window in the hallway",
+            "Priya sent an email in the hallway"
+          ],
+          [
+            "Priya sent an email in the hallway",
+            "Ethan paid the bill in the garden"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_021",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "gold_relations": [
+        [
+          "Lina checked the battery in the library",
+          "Ava packed a bag in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ava packed a bag in the lab",
+          "Omar made tea in the library",
+          "BEFORE"
+        ],
+        [
+          "Omar made tea in the library",
+          "Ethan started the car in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Ethan started the car in the classroom",
+          "Lina uploaded the file in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Lina uploaded the file in the classroom",
+          "Hana paid the bill at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 5
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 15
+        },
+        "missing_direct_edges": [
+          [
+            "Ava packed a bag in the lab",
+            "Omar made tea in the library",
+            "BEFORE"
+          ],
+          [
+            "Ethan started the car in the classroom",
+            "Lina uploaded the file in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Ava packed a bag in the lab",
+            "BEFORE"
+          ],
+          [
+            "Lina uploaded the file in the classroom",
+            "Hana paid the bill at home",
+            "BEFORE"
+          ],
+          [
+            "Omar made tea in the library",
+            "Ethan started the car in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ava packed a bag in the lab",
+            "Ethan started the car in the classroom"
+          ],
+          [
+            "Ava packed a bag in the lab",
+            "Hana paid the bill at home"
+          ],
+          [
+            "Ava packed a bag in the lab",
+            "Lina uploaded the file in the classroom"
+          ],
+          [
+            "Ava packed a bag in the lab",
+            "Omar made tea in the library"
+          ],
+          [
+            "Ethan started the car in the classroom",
+            "Hana paid the bill at home"
+          ],
+          [
+            "Ethan started the car in the classroom",
+            "Lina uploaded the file in the classroom"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Ava packed a bag in the lab"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Ethan started the car in the classroom"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Hana paid the bill at home"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Lina uploaded the file in the classroom"
+          ],
+          [
+            "Lina checked the battery in the library",
+            "Omar made tea in the library"
+          ],
+          [
+            "Lina uploaded the file in the classroom",
+            "Hana paid the bill at home"
+          ],
+          [
+            "Omar made tea in the library",
+            "Ethan started the car in the classroom"
+          ],
+          [
+            "Omar made tea in the library",
+            "Hana paid the bill at home"
+          ],
+          [
+            "Omar made tea in the library",
+            "Lina uploaded the file in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_014",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 7,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Ben turned on the kettle in the garden",
+          "Omar boarded the train at the station",
+          "BEFORE"
+        ],
+        [
+          "Omar boarded the train at the station",
+          "Jon ran the tests in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Jon ran the tests in the hallway",
+          "Jon wrote the code in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Jon wrote the code in the classroom",
+          "Lina charged the phone at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Lina charged the phone at the caf\u00e9",
+          "Mia opened the door at the station",
+          "BEFORE"
+        ],
+        [
+          "Mia opened the door at the station",
+          "Jon fed the cat in the kitchen",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 21
+        },
+        "missing_direct_edges": [
+          [
+            "Ben turned on the kettle in the garden",
+            "Omar boarded the train at the station",
+            "BEFORE"
+          ],
+          [
+            "Jon ran the tests in the hallway",
+            "Jon wrote the code in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Jon wrote the code in the classroom",
+            "Lina charged the phone at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Lina charged the phone at the caf\u00e9",
+            "Mia opened the door at the station",
+            "BEFORE"
+          ],
+          [
+            "Mia opened the door at the station",
+            "Jon fed the cat in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Jon ran the tests in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben turned on the kettle in the garden",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Ben turned on the kettle in the garden",
+            "Jon ran the tests in the hallway"
+          ],
+          [
+            "Ben turned on the kettle in the garden",
+            "Jon wrote the code in the classroom"
+          ],
+          [
+            "Ben turned on the kettle in the garden",
+            "Lina charged the phone at the caf\u00e9"
+          ],
+          [
+            "Ben turned on the kettle in the garden",
+            "Mia opened the door at the station"
+          ],
+          [
+            "Ben turned on the kettle in the garden",
+            "Omar boarded the train at the station"
+          ],
+          [
+            "Jon ran the tests in the hallway",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Jon ran the tests in the hallway",
+            "Jon wrote the code in the classroom"
+          ],
+          [
+            "Jon ran the tests in the hallway",
+            "Lina charged the phone at the caf\u00e9"
+          ],
+          [
+            "Jon ran the tests in the hallway",
+            "Mia opened the door at the station"
+          ],
+          [
+            "Jon wrote the code in the classroom",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Jon wrote the code in the classroom",
+            "Lina charged the phone at the caf\u00e9"
+          ],
+          [
+            "Jon wrote the code in the classroom",
+            "Mia opened the door at the station"
+          ],
+          [
+            "Lina charged the phone at the caf\u00e9",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Lina charged the phone at the caf\u00e9",
+            "Mia opened the door at the station"
+          ],
+          [
+            "Mia opened the door at the station",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Jon fed the cat in the kitchen"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Jon ran the tests in the hallway"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Jon wrote the code in the classroom"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Lina charged the phone at the caf\u00e9"
+          ],
+          [
+            "Omar boarded the train at the station",
+            "Mia opened the door at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_039",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Sam checked the battery in the garden",
+          "Sofia received a confirmation email at the station",
+          "BEFORE"
+        ],
+        [
+          "Sam checked the battery in the garden",
+          "Priya turned on the kettle in the library",
+          "BEFORE"
+        ],
+        [
+          "Sam checked the battery in the garden",
+          "Priya locked the bike at home",
+          "BEFORE"
+        ],
+        [
+          "Sofia received a confirmation email at the station",
+          "Priya turned on the kettle in the library",
+          "BEFORE"
+        ],
+        [
+          "Sofia received a confirmation email at the station",
+          "Priya locked the bike at home",
+          "BEFORE"
+        ],
+        [
+          "Priya turned on the kettle in the library",
+          "Priya locked the bike at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Priya turned on the kettle in the library",
+            "Priya locked the bike at home",
+            "BEFORE"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Priya locked the bike at home",
+            "BEFORE"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Priya turned on the kettle in the library",
+            "BEFORE"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Sofia received a confirmation email at the station",
+            "BEFORE"
+          ],
+          [
+            "Sofia received a confirmation email at the station",
+            "Priya locked the bike at home",
+            "BEFORE"
+          ],
+          [
+            "Sofia received a confirmation email at the station",
+            "Priya turned on the kettle in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Priya turned on the kettle in the library",
+            "Priya locked the bike at home"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Priya locked the bike at home"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Priya turned on the kettle in the library"
+          ],
+          [
+            "Sam checked the battery in the garden",
+            "Sofia received a confirmation email at the station"
+          ],
+          [
+            "Sofia received a confirmation email at the station",
+            "Priya locked the bike at home"
+          ],
+          [
+            "Sofia received a confirmation email at the station",
+            "Priya turned on the kettle in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_012",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Leo closed the window at home",
+          "Ben installed the update in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Leo closed the window at home",
+          "Priya turned on the kettle in the library",
+          "BEFORE"
+        ],
+        [
+          "Ben installed the update in the classroom",
+          "Priya turned on the kettle in the library",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ben installed the update in the classroom",
+            "Priya turned on the kettle in the library",
+            "BEFORE"
+          ],
+          [
+            "Leo closed the window at home",
+            "Ben installed the update in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Leo closed the window at home",
+            "Priya turned on the kettle in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben installed the update in the classroom",
+            "Priya turned on the kettle in the library"
+          ],
+          [
+            "Leo closed the window at home",
+            "Ben installed the update in the classroom"
+          ],
+          [
+            "Leo closed the window at home",
+            "Priya turned on the kettle in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_054",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Sofia turned on the kettle in the classroom",
+          "Ruby approved the release in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Ruby approved the release in the kitchen",
+          "Ruby called a friend in the garden",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ruby approved the release in the kitchen",
+            "Ruby called a friend in the garden",
+            "BEFORE"
+          ],
+          [
+            "Sofia turned on the kettle in the classroom",
+            "Ruby approved the release in the kitchen",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ruby approved the release in the kitchen",
+            "Ruby called a friend in the garden"
+          ],
+          [
+            "Sofia turned on the kettle in the classroom",
+            "Ruby approved the release in the kitchen"
+          ],
+          [
+            "Sofia turned on the kettle in the classroom",
+            "Ruby called a friend in the garden"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_007",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Sam checked the battery in the hallway",
+          "Sara washed the dishes in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Sara washed the dishes in the kitchen",
+          "Nora wrote the code at the station",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Sam checked the battery in the hallway",
+            "Sara washed the dishes in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Sara washed the dishes in the kitchen",
+            "Nora wrote the code at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Sam checked the battery in the hallway",
+            "Nora wrote the code at the station"
+          ],
+          [
+            "Sam checked the battery in the hallway",
+            "Sara washed the dishes in the kitchen"
+          ],
+          [
+            "Sara washed the dishes in the kitchen",
+            "Nora wrote the code at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_045",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Hana fed the cat in the garden",
+          "Hana charged the phone at the station",
+          "BEFORE"
+        ],
+        [
+          "Hana charged the phone at the station",
+          "Kai paid the bill at the office",
+          "BEFORE"
+        ],
+        [
+          "Kai paid the bill at the office",
+          "Amir started the meeting in the library",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Hana charged the phone at the station",
+            "Kai paid the bill at the office",
+            "BEFORE"
+          ],
+          [
+            "Hana fed the cat in the garden",
+            "Hana charged the phone at the station",
+            "BEFORE"
+          ],
+          [
+            "Kai paid the bill at the office",
+            "Amir started the meeting in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Hana charged the phone at the station",
+            "Amir started the meeting in the library"
+          ],
+          [
+            "Hana charged the phone at the station",
+            "Kai paid the bill at the office"
+          ],
+          [
+            "Hana fed the cat in the garden",
+            "Amir started the meeting in the library"
+          ],
+          [
+            "Hana fed the cat in the garden",
+            "Hana charged the phone at the station"
+          ],
+          [
+            "Hana fed the cat in the garden",
+            "Kai paid the bill at the office"
+          ],
+          [
+            "Kai paid the bill at the office",
+            "Amir started the meeting in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_031",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Ruby downloaded the update in the library",
+          "Zara opened the door at the office",
+          "BEFORE"
+        ],
+        [
+          "Zara opened the door at the office",
+          "Priya checked the battery at the office",
+          "BEFORE"
+        ],
+        [
+          "Priya checked the battery at the office",
+          "Leo left the station in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Priya checked the battery at the office",
+            "Leo left the station in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Ruby downloaded the update in the library",
+            "Zara opened the door at the office",
+            "BEFORE"
+          ],
+          [
+            "Zara opened the door at the office",
+            "Priya checked the battery at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Priya checked the battery at the office",
+            "Leo left the station in the hallway"
+          ],
+          [
+            "Ruby downloaded the update in the library",
+            "Leo left the station in the hallway"
+          ],
+          [
+            "Ruby downloaded the update in the library",
+            "Priya checked the battery at the office"
+          ],
+          [
+            "Ruby downloaded the update in the library",
+            "Zara opened the door at the office"
+          ],
+          [
+            "Zara opened the door at the office",
+            "Leo left the station in the hallway"
+          ],
+          [
+            "Zara opened the door at the office",
+            "Priya checked the battery at the office"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_041",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Priya printed the handouts in the kitchen",
+          "Ethan fed the cat in the library",
+          "BEFORE"
+        ],
+        [
+          "Ethan fed the cat in the library",
+          "Jon downloaded the update at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ethan fed the cat in the library",
+            "Jon downloaded the update at home",
+            "BEFORE"
+          ],
+          [
+            "Priya printed the handouts in the kitchen",
+            "Ethan fed the cat in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ethan fed the cat in the library",
+            "Jon downloaded the update at home"
+          ],
+          [
+            "Priya printed the handouts in the kitchen",
+            "Ethan fed the cat in the library"
+          ],
+          [
+            "Priya printed the handouts in the kitchen",
+            "Jon downloaded the update at home"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_003",
+      "category": "invalid_edge_support",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['UNKNOWN']. Invalid edge format (expected 3 items): ['UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_043",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Ruby submitted the form in the garden",
+          "Nora turned on the kettle in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ruby submitted the form in the garden",
+          "Sam checked the battery in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Nora turned on the kettle in the lab",
+          "Sam checked the battery in the classroom",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Nora turned on the kettle in the lab",
+            "Sam checked the battery in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Ruby submitted the form in the garden",
+            "Nora turned on the kettle in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ruby submitted the form in the garden",
+            "Sam checked the battery in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Nora turned on the kettle in the lab",
+            "Sam checked the battery in the classroom"
+          ],
+          [
+            "Ruby submitted the form in the garden",
+            "Nora turned on the kettle in the lab"
+          ],
+          [
+            "Ruby submitted the form in the garden",
+            "Sam checked the battery in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_010",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ruby locked the bike at the caf\u00e9",
+          "Omar ran the tests in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Omar ran the tests in the classroom",
+          "Jon installed the update at the caf\u00e9",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Omar ran the tests in the classroom",
+            "Jon installed the update at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Ruby locked the bike at the caf\u00e9",
+            "Omar ran the tests in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Omar ran the tests in the classroom",
+            "Jon installed the update at the caf\u00e9"
+          ],
+          [
+            "Ruby locked the bike at the caf\u00e9",
+            "Jon installed the update at the caf\u00e9"
+          ],
+          [
+            "Ruby locked the bike at the caf\u00e9",
+            "Omar ran the tests in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_034",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_030",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ivy submitted the form in the garden",
+          "Zara sent an email in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Zara sent an email in the hallway",
+          "Nora locked the bike in the library",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ivy submitted the form in the garden",
+            "Zara sent an email in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Zara sent an email in the hallway",
+            "Nora locked the bike in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ivy submitted the form in the garden",
+            "Nora locked the bike in the library"
+          ],
+          [
+            "Ivy submitted the form in the garden",
+            "Zara sent an email in the hallway"
+          ],
+          [
+            "Zara sent an email in the hallway",
+            "Nora locked the bike in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_006",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Priya sent an email in the garden",
+          "Ethan finished the lecture in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ethan finished the lecture in the lab",
+          "Omar locked the bike at the station",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n{\\n  \"answer\": \"string\",\\n  \"events\": [\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\"],\\n  \"relations\": [[\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"UNKNOWN\"], [\"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\", \"UNKNOWN\"], [\"Priya sent an email in the garden\", \"Omar locked the bike at the station\", \"UNKNOWN\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Priya sent an email in the garden happened before Ethan finished the lecture in the lab.\",\\n      \"supports\": [[\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ethan finished the lecture in the lab happened before Omar locked the bike at the station.\",\\n      \"supports\": [[\"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\", \"BEFORE\"]\u7684\u7406\u89e3\u662f\u9519\u8bef\u7684\u3002\u56e0\u4e3a\u9898\u76ee\u4e2d\u7ed9\u51fa\u7684\u987a\u5e8f\u662f\u5148_priya\uff0c\u7136\u540e_ethan\uff0c\u6700\u540e_omar\uff0c\u6240\u4ee5\u6b63\u786e\u7684\u987a\u5e8f\u5e94\u8be5\u662f_priya\u5728_ethan\u4e4b\u524d\uff0c_ethan\u5728_omar\u4e4b\u524d\u3002\u56e0\u6b64\uff0c\u5173\u7cfb\u5e94\u8be5\u662fPRIYA\u5728ETHAN\u4e4b\u524d\uff0cETHAN\u5728OMAR\u4e4b\u524d\uff0c\u800cPRIYA\u548cOMAR\u4e4b\u95f4\u4e5f\u662fPRIYA\u5728OMAR\u4e4b\u524d\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Priya sent an email in the garden happened before Omar locked the bike at the station.\",\\n      \"supports\": [[\"Priya sent an email in the garden\", \"Omar locked the bike at the station\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n\\nWait, I think I made a mistake in the previous reasoning. Let me correct that.\\n\\nThe correct order is:\\n1. Priya sent an email in the garden\\n2. Ethan finished the lecture in the lab\\n3. Omar locked the bike at the station\\n\\nSo, the relationships are:\\n- Priya\\'s event is before Ethan\\'s\\n- Ethan\\'s event is before Omar\\'s\\n- Therefore, Priya\\'s is also before Omar\\'s\\n\\nSo, the JSON should reflect that.\\n\\n{\\n  \"answer\": \"string\",\\n  \"events\": [\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\"],\\n  \"relations\": [[\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"BEFORE\"], [\"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\", \"BEFORE\"], [\"Priya sent an email in the garden\", \"Omar locked the bike at the station\", \"BEFORE\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Priya sent an email in the garden happened before Ethan finished the lecture in the lab.\",\\n      \"supports\": [[\"Priya sent an email in the garden\", \"Ethan finished the lecture in the lab\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ethan finished the lecture in the lab happened before Omar locked the bike at the station.\",\\n      \"supports\": [[\"Ethan finished the lecture in the lab\", \"Omar locked the bike at the station\", \"BEFORE\"]]\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Priya sent an email in the garden happened before Omar locked the bike at the station.\",\\n      \"supports\": [[\"Priya sent an email in the garden\", \"Omar locked the bike at the station\", \"BEFORE\"]]\\n    }\\n  ]\\n}\\n\\nThis correctly captures the sequence and relationships between the events.')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ethan finished the lecture in the lab",
+            "Omar locked the bike at the station",
+            "BEFORE"
+          ],
+          [
+            "Priya sent an email in the garden",
+            "Ethan finished the lecture in the lab",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ethan finished the lecture in the lab",
+            "Omar locked the bike at the station"
+          ],
+          [
+            "Priya sent an email in the garden",
+            "Ethan finished the lecture in the lab"
+          ],
+          [
+            "Priya sent an email in the garden",
+            "Omar locked the bike at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_043",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Zara finished the lecture in the lab",
+          "Amir packed a bag at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Amir packed a bag at the caf\u00e9",
+          "Zara ran the tests in the library",
+          "BEFORE"
+        ],
+        [
+          "Zara ran the tests in the library",
+          "Sofia submitted the form in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Amir packed a bag at the caf\u00e9",
+            "Zara ran the tests in the library",
+            "BEFORE"
+          ],
+          [
+            "Zara finished the lecture in the lab",
+            "Amir packed a bag at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Zara ran the tests in the library",
+            "Sofia submitted the form in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir packed a bag at the caf\u00e9",
+            "Sofia submitted the form in the hallway"
+          ],
+          [
+            "Amir packed a bag at the caf\u00e9",
+            "Zara ran the tests in the library"
+          ],
+          [
+            "Zara finished the lecture in the lab",
+            "Amir packed a bag at the caf\u00e9"
+          ],
+          [
+            "Zara finished the lecture in the lab",
+            "Sofia submitted the form in the hallway"
+          ],
+          [
+            "Zara finished the lecture in the lab",
+            "Zara ran the tests in the library"
+          ],
+          [
+            "Zara ran the tests in the library",
+            "Sofia submitted the form in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_029",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "gold_relations": [
+        [
+          "Ruby finished the lecture at the caf\u00e9",
+          "Sofia wrote the code in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Sofia wrote the code in the kitchen",
+          "Sofia started the car in the library",
+          "BEFORE"
+        ],
+        [
+          "Sofia started the car in the library",
+          "Ruby boarded the train in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Ruby boarded the train in the kitchen",
+          "Amir started the meeting in the lab",
+          "BEFORE"
+        ],
+        [
+          "Amir started the meeting in the lab",
+          "Leo closed the window at the office",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"Ruby finished the lecture at the caf\u00e9. Sofia wrote the code in the kitchen. Sofia started the car in the library. Ruby boarded the train in the kitchen. Amir started the meeting in the lab. Leo closed the window at the office.\",\\n  \"events\": [\\n    \"Ruby finished the lecture at the caf\u00e9\",\\n    \"Sofia wrote the code in the kitchen\",\\n    \"Sofia started the car in the library\",\\n    \"Ruby boarded the train in the kitchen\",\\n    \"Amir started the meeting in the lab\",\\n    \"Leo closed the window at the office\"\\n  ],\\n  \"relations\": [\\n    [\"Ruby finished the lecture at the caf\u00e9\", \"Sofia wrote the code in the kitchen\", \"AFTER\"],\\n    [\"Sofia wrote the code in the kitchen\", \"Sofia started the car in the library\", \"AFTER\"],\\n    [\"Sofia started the car in the library\", \"Ruby boarded the train in the kitchen\", \"AFTER\"],\\n    [\"Ruby boarded the train in the kitchen\", \"Amir started the meeting in the lab\", \"AFTER\"],\\n    [\"Amir started the meeting in the lab\", \"Leo closed the window at the office\", \"AFTER\"]\\n  ],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Ruby finished the lecture at the caf\u00e9\",\\n      \"supports\": [[\"Ruby finished the lecture at the caf\u00e9\", \"Sofia wrote the code in the kitchen\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Sofia wrote the code in the kitchen\",\\n      \"supports\": [[\"Sofia wrote the code in the kitchen\", \"Sofia started the car in the library\", \"AFTER\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Sofia started the car in the library\",\\n      \"supports\": [[\"Sofia started the car in the library\", \"Ruby boarded the train in the kitchen\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 4,\\n      \"text\": \"Ruby boarded the train in the kitchen\",\\n      \"supports\": [[\"Ruby boarded the train in the kitchen\", \"Amir started the meeting in the lab\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 5,\\n      \"text\": \"Amir started the meeting in the lab\",\\n      \"supports\": [[\"Amir started the meeting in the lab\", \"Leo closed the window at the office\", \"AFTER\"]]\\n    }\\n  ]\\n}\\n```')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 5
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 15
+        },
+        "missing_direct_edges": [
+          [
+            "Amir started the meeting in the lab",
+            "Leo closed the window at the office",
+            "BEFORE"
+          ],
+          [
+            "Ruby boarded the train in the kitchen",
+            "Amir started the meeting in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Sofia wrote the code in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Sofia started the car in the library",
+            "Ruby boarded the train in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Sofia wrote the code in the kitchen",
+            "Sofia started the car in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir started the meeting in the lab",
+            "Leo closed the window at the office"
+          ],
+          [
+            "Ruby boarded the train in the kitchen",
+            "Amir started the meeting in the lab"
+          ],
+          [
+            "Ruby boarded the train in the kitchen",
+            "Leo closed the window at the office"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Amir started the meeting in the lab"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Leo closed the window at the office"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Ruby boarded the train in the kitchen"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Sofia started the car in the library"
+          ],
+          [
+            "Ruby finished the lecture at the caf\u00e9",
+            "Sofia wrote the code in the kitchen"
+          ],
+          [
+            "Sofia started the car in the library",
+            "Amir started the meeting in the lab"
+          ],
+          [
+            "Sofia started the car in the library",
+            "Leo closed the window at the office"
+          ],
+          [
+            "Sofia started the car in the library",
+            "Ruby boarded the train in the kitchen"
+          ],
+          [
+            "Sofia wrote the code in the kitchen",
+            "Amir started the meeting in the lab"
+          ],
+          [
+            "Sofia wrote the code in the kitchen",
+            "Leo closed the window at the office"
+          ],
+          [
+            "Sofia wrote the code in the kitchen",
+            "Ruby boarded the train in the kitchen"
+          ],
+          [
+            "Sofia wrote the code in the kitchen",
+            "Sofia started the car in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_022",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Sam washed the dishes at the office",
+          "Hana started the meeting at home",
+          "BEFORE"
+        ],
+        [
+          "Hana started the meeting at home",
+          "Ruby locked the bike in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Hana started the meeting at home",
+            "Ruby locked the bike in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Sam washed the dishes at the office",
+            "Hana started the meeting at home",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Hana started the meeting at home",
+            "Ruby locked the bike in the hallway"
+          ],
+          [
+            "Sam washed the dishes at the office",
+            "Hana started the meeting at home"
+          ],
+          [
+            "Sam washed the dishes at the office",
+            "Ruby locked the bike in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_049",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Amir started the car in the lab",
+          "Ruby boarded the train in the garden",
+          "BEFORE"
+        ],
+        [
+          "Ruby boarded the train in the garden",
+          "Sara started the meeting in the classroom",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Amir started the car in the lab",
+            "Ruby boarded the train in the garden",
+            "BEFORE"
+          ],
+          [
+            "Ruby boarded the train in the garden",
+            "Sara started the meeting in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir started the car in the lab",
+            "Ruby boarded the train in the garden"
+          ],
+          [
+            "Amir started the car in the lab",
+            "Sara started the meeting in the classroom"
+          ],
+          [
+            "Ruby boarded the train in the garden",
+            "Sara started the meeting in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_003",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "gold_relations": [
+        [
+          "Noah submitted the form in the library",
+          "Ivy wrote the code in the library",
+          "BEFORE"
+        ],
+        [
+          "Ivy wrote the code in the library",
+          "Sam started the meeting at the station",
+          "BEFORE"
+        ],
+        [
+          "Sam started the meeting at the station",
+          "Ruby sent an email at the station",
+          "BEFORE"
+        ],
+        [
+          "Ruby sent an email at the station",
+          "Ruby boarded the train in the lab",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 4
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 10
+        },
+        "missing_direct_edges": [
+          [
+            "Ivy wrote the code in the library",
+            "Sam started the meeting at the station",
+            "BEFORE"
+          ],
+          [
+            "Noah submitted the form in the library",
+            "Ivy wrote the code in the library",
+            "BEFORE"
+          ],
+          [
+            "Ruby sent an email at the station",
+            "Ruby boarded the train in the lab",
+            "BEFORE"
+          ],
+          [
+            "Sam started the meeting at the station",
+            "Ruby sent an email at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ivy wrote the code in the library",
+            "Ruby boarded the train in the lab"
+          ],
+          [
+            "Ivy wrote the code in the library",
+            "Ruby sent an email at the station"
+          ],
+          [
+            "Ivy wrote the code in the library",
+            "Sam started the meeting at the station"
+          ],
+          [
+            "Noah submitted the form in the library",
+            "Ivy wrote the code in the library"
+          ],
+          [
+            "Noah submitted the form in the library",
+            "Ruby boarded the train in the lab"
+          ],
+          [
+            "Noah submitted the form in the library",
+            "Ruby sent an email at the station"
+          ],
+          [
+            "Noah submitted the form in the library",
+            "Sam started the meeting at the station"
+          ],
+          [
+            "Ruby sent an email at the station",
+            "Ruby boarded the train in the lab"
+          ],
+          [
+            "Sam started the meeting at the station",
+            "Ruby boarded the train in the lab"
+          ],
+          [
+            "Sam started the meeting at the station",
+            "Ruby sent an email at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_002",
+      "category": "invalid_edge_support",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "gold_relations": [
+        [
+          "Ruby ran the tests in the kitchen",
+          "Priya made tea in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Priya made tea in the classroom",
+          "Omar uploaded the file in the library",
+          "BEFORE"
+        ],
+        [
+          "Omar uploaded the file in the library",
+          "Omar downloaded the update in the garden",
+          "BEFORE"
+        ],
+        [
+          "Omar downloaded the update in the garden",
+          "Hana called a friend in the kitchen",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['Hana called a friend in the kitchen', 'BEFORE']. Invalid edge format (expected 3 items): ['Hana called a friend in the kitchen', 'BEFORE']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 4
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 10
+        },
+        "missing_direct_edges": [
+          [
+            "Omar downloaded the update in the garden",
+            "Hana called a friend in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Omar uploaded the file in the library",
+            "Omar downloaded the update in the garden",
+            "BEFORE"
+          ],
+          [
+            "Priya made tea in the classroom",
+            "Omar uploaded the file in the library",
+            "BEFORE"
+          ],
+          [
+            "Ruby ran the tests in the kitchen",
+            "Priya made tea in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Omar downloaded the update in the garden",
+            "Hana called a friend in the kitchen"
+          ],
+          [
+            "Omar uploaded the file in the library",
+            "Hana called a friend in the kitchen"
+          ],
+          [
+            "Omar uploaded the file in the library",
+            "Omar downloaded the update in the garden"
+          ],
+          [
+            "Priya made tea in the classroom",
+            "Hana called a friend in the kitchen"
+          ],
+          [
+            "Priya made tea in the classroom",
+            "Omar downloaded the update in the garden"
+          ],
+          [
+            "Priya made tea in the classroom",
+            "Omar uploaded the file in the library"
+          ],
+          [
+            "Ruby ran the tests in the kitchen",
+            "Hana called a friend in the kitchen"
+          ],
+          [
+            "Ruby ran the tests in the kitchen",
+            "Omar downloaded the update in the garden"
+          ],
+          [
+            "Ruby ran the tests in the kitchen",
+            "Omar uploaded the file in the library"
+          ],
+          [
+            "Ruby ran the tests in the kitchen",
+            "Priya made tea in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_028",
+      "category": "schema_violation",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Zara installed the update at the office",
+          "Hana started the car at home",
+          "BEFORE"
+        ],
+        [
+          "Zara installed the update at the office",
+          "Ben received a confirmation email in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Hana started the car at home",
+          "Ben received a confirmation email in the classroom",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Expected string field 'answer', got list.\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Hana started the car at home",
+            "Ben received a confirmation email in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Zara installed the update at the office",
+            "Ben received a confirmation email in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Zara installed the update at the office",
+            "Hana started the car at home",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Hana started the car at home",
+            "Ben received a confirmation email in the classroom"
+          ],
+          [
+            "Zara installed the update at the office",
+            "Ben received a confirmation email in the classroom"
+          ],
+          [
+            "Zara installed the update at the office",
+            "Hana started the car at home"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_044",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Omar charged the phone in the kitchen",
+          "Hana printed the handouts at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Omar charged the phone in the kitchen",
+          "Zara wrote the code in the garden",
+          "BEFORE"
+        ],
+        [
+          "Hana printed the handouts at the caf\u00e9",
+          "Zara wrote the code in the garden",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Hana printed the handouts at the caf\u00e9",
+            "Zara wrote the code in the garden",
+            "BEFORE"
+          ],
+          [
+            "Omar charged the phone in the kitchen",
+            "Hana printed the handouts at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Omar charged the phone in the kitchen",
+            "Zara wrote the code in the garden",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Hana printed the handouts at the caf\u00e9",
+            "Zara wrote the code in the garden"
+          ],
+          [
+            "Omar charged the phone in the kitchen",
+            "Hana printed the handouts at the caf\u00e9"
+          ],
+          [
+            "Omar charged the phone in the kitchen",
+            "Zara wrote the code in the garden"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_021",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Mia closed the window in the kitchen",
+          "Ethan checked the battery in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Ethan checked the battery in the kitchen",
+          "Noah charged the phone in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Noah charged the phone in the kitchen",
+          "Priya packed a bag in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError('Invalid JSON: Could not find balanced JSON object in model output:\\n```json\\n{\\n  \"answer\": \"Mia closed the window in the kitchen. Ethan checked the battery in the kitchen. Noah charged the phone in the kitchen. Priya packed a bag in the hallway.\",\\n  \"events\": [\"Mia closed the window in the kitchen\", \"Ethan checked the battery in the kitchen\", \"Noah charged the phone in the kitchen\", \"Priya packed a bag in the hallway\"],\\n  \"relations\": [[\"Mia closed the window in the kitchen\", \"Ethan checked the battery in the kitchen\", \"AFTER\"], [\"Ethan checked the battery in the kitchen\", \"Noah charged the phone in the kitchen\", \"AFTER\"], [\"Noah charged the phone in the kitchen\", \"Priya packed a bag in the hallway\", \"AFTER\"]],\\n  \"reasoning_steps\": [\\n    {\\n      \"step_id\": 1,\\n      \"text\": \"Mia closed the window in the kitchen, which is followed by Ethan checking the battery in the kitchen.\",\\n      \"supports\": [[\"Mia closed the window in the kitchen\", \"Ethan checked the battery in the kitchen\", \"AFTER\"]]\\n    },\\n    {\\n      \"step_id\": 2,\\n      \"text\": \"Ethan checking the battery in the kitchen is followed by Noah charging the phone in the kitchen.\",\\n      \"supports\": [[\"Ethan checked the battery in the kitchen\", \"Noah charged the phone in the kitchen\", \"AFTER\"]\u7684\u7406\u89e3\u662f\u6b63\u786e\u7684\u3002\"\\n    },\\n    {\\n      \"step_id\": 3,\\n      \"text\": \"Noah charging the phone in the kitchen is followed by Priya packing a bag in the hallway.\",\\n      \"supports\": [[\"Noah charged the phone in the kitchen\", \"Priya packed a bag in the hallway\", \"AFTER\"]]\\n    }\\n  ]\\n}\\n```')",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Ethan checked the battery in the kitchen",
+            "Noah charged the phone in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Mia closed the window in the kitchen",
+            "Ethan checked the battery in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Noah charged the phone in the kitchen",
+            "Priya packed a bag in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ethan checked the battery in the kitchen",
+            "Noah charged the phone in the kitchen"
+          ],
+          [
+            "Ethan checked the battery in the kitchen",
+            "Priya packed a bag in the hallway"
+          ],
+          [
+            "Mia closed the window in the kitchen",
+            "Ethan checked the battery in the kitchen"
+          ],
+          [
+            "Mia closed the window in the kitchen",
+            "Noah charged the phone in the kitchen"
+          ],
+          [
+            "Mia closed the window in the kitchen",
+            "Priya packed a bag in the hallway"
+          ],
+          [
+            "Noah charged the phone in the kitchen",
+            "Priya packed a bag in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_005",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Ben checked the battery in the kitchen",
+          "Noah called a friend in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ben checked the battery in the kitchen",
+          "Nora paid the bill in the library",
+          "BEFORE"
+        ],
+        [
+          "Ben checked the battery in the kitchen",
+          "Ben opened the door in the lab",
+          "BEFORE"
+        ],
+        [
+          "Noah called a friend in the lab",
+          "Nora paid the bill in the library",
+          "BEFORE"
+        ],
+        [
+          "Noah called a friend in the lab",
+          "Ben opened the door in the lab",
+          "BEFORE"
+        ],
+        [
+          "Nora paid the bill in the library",
+          "Ben opened the door in the lab",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Ben checked the battery in the kitchen",
+            "Ben opened the door in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ben checked the battery in the kitchen",
+            "Noah called a friend in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ben checked the battery in the kitchen",
+            "Nora paid the bill in the library",
+            "BEFORE"
+          ],
+          [
+            "Noah called a friend in the lab",
+            "Ben opened the door in the lab",
+            "BEFORE"
+          ],
+          [
+            "Noah called a friend in the lab",
+            "Nora paid the bill in the library",
+            "BEFORE"
+          ],
+          [
+            "Nora paid the bill in the library",
+            "Ben opened the door in the lab",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben checked the battery in the kitchen",
+            "Ben opened the door in the lab"
+          ],
+          [
+            "Ben checked the battery in the kitchen",
+            "Noah called a friend in the lab"
+          ],
+          [
+            "Ben checked the battery in the kitchen",
+            "Nora paid the bill in the library"
+          ],
+          [
+            "Noah called a friend in the lab",
+            "Ben opened the door in the lab"
+          ],
+          [
+            "Noah called a friend in the lab",
+            "Nora paid the bill in the library"
+          ],
+          [
+            "Nora paid the bill in the library",
+            "Ben opened the door in the lab"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_014",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Mia uploaded the file in the classroom",
+          "Leo sent an email in the library",
+          "BEFORE"
+        ],
+        [
+          "Mia uploaded the file in the classroom",
+          "Leo watered the plants at the office",
+          "BEFORE"
+        ],
+        [
+          "Leo sent an email in the library",
+          "Leo watered the plants at the office",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Leo sent an email in the library",
+            "Leo watered the plants at the office",
+            "BEFORE"
+          ],
+          [
+            "Mia uploaded the file in the classroom",
+            "Leo sent an email in the library",
+            "BEFORE"
+          ],
+          [
+            "Mia uploaded the file in the classroom",
+            "Leo watered the plants at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Leo sent an email in the library",
+            "Leo watered the plants at the office"
+          ],
+          [
+            "Mia uploaded the file in the classroom",
+            "Leo sent an email in the library"
+          ],
+          [
+            "Mia uploaded the file in the classroom",
+            "Leo watered the plants at the office"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_011",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Zara turned on the kettle in the library",
+          "Lina packed a bag at home",
+          "BEFORE"
+        ],
+        [
+          "Zara turned on the kettle in the library",
+          "Ivy left the station in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Zara turned on the kettle in the library",
+          "Nora read the note at the station",
+          "BEFORE"
+        ],
+        [
+          "Lina packed a bag at home",
+          "Ivy left the station in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Lina packed a bag at home",
+          "Nora read the note at the station",
+          "BEFORE"
+        ],
+        [
+          "Ivy left the station in the hallway",
+          "Nora read the note at the station",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Ivy left the station in the hallway",
+            "Nora read the note at the station",
+            "BEFORE"
+          ],
+          [
+            "Lina packed a bag at home",
+            "Ivy left the station in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Lina packed a bag at home",
+            "Nora read the note at the station",
+            "BEFORE"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Ivy left the station in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Lina packed a bag at home",
+            "BEFORE"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Nora read the note at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ivy left the station in the hallway",
+            "Nora read the note at the station"
+          ],
+          [
+            "Lina packed a bag at home",
+            "Ivy left the station in the hallway"
+          ],
+          [
+            "Lina packed a bag at home",
+            "Nora read the note at the station"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Ivy left the station in the hallway"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Lina packed a bag at home"
+          ],
+          [
+            "Zara turned on the kettle in the library",
+            "Nora read the note at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "con_005",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Sofia charged the phone in the lab",
+          "Amir checked the battery at home",
+          "BEFORE"
+        ],
+        [
+          "Amir checked the battery at home",
+          "Sofia charged the phone in the lab",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "missing_direct_edges": [
+          [
+            "Amir checked the battery at home",
+            "Sofia charged the phone in the lab",
+            "BEFORE"
+          ],
+          [
+            "Sofia charged the phone in the lab",
+            "Amir checked the battery at home",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir checked the battery at home",
+            "Sofia charged the phone in the lab"
+          ],
+          [
+            "Sofia charged the phone in the lab",
+            "Amir checked the battery at home"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_018",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Lina opened the door at home",
+          "Jon watered the plants at the office",
+          "BEFORE"
+        ],
+        [
+          "Jon watered the plants at the office",
+          "Lina installed the update at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': 'BEFORE'. Invalid edge format (expected 3 items): 'BEFORE'\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Jon watered the plants at the office",
+            "Lina installed the update at home",
+            "BEFORE"
+          ],
+          [
+            "Lina opened the door at home",
+            "Jon watered the plants at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Jon watered the plants at the office",
+            "Lina installed the update at home"
+          ],
+          [
+            "Lina opened the door at home",
+            "Jon watered the plants at the office"
+          ],
+          [
+            "Lina opened the door at home",
+            "Lina installed the update at home"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_052",
+      "category": "invalid_edge_support",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['Hana started the meeting in the classroom', 'UNKNOWN', 'Sam paid the bill in the library']. Unsupported relation label: 'Sam paid the bill in the library'. Allowed relations: ['AFTER', 'BEFORE', 'SIMULTANEOUS', 'UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_002",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ava locked the bike in the hallway",
+          "Ruby downloaded the update at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Ruby downloaded the update at the caf\u00e9",
+          "Kai fed the cat in the kitchen",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Ava locked the bike in the hallway",
+            "Ruby downloaded the update at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Ruby downloaded the update at the caf\u00e9",
+            "Kai fed the cat in the kitchen",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ava locked the bike in the hallway",
+            "Kai fed the cat in the kitchen"
+          ],
+          [
+            "Ava locked the bike in the hallway",
+            "Ruby downloaded the update at the caf\u00e9"
+          ],
+          [
+            "Ruby downloaded the update at the caf\u00e9",
+            "Kai fed the cat in the kitchen"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_020",
+      "category": "invalid_edge_support",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Ben watered the plants at the office",
+          "Sofia uploaded the file at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Sofia uploaded the file at the caf\u00e9",
+          "Kai locked the bike in the lab",
+          "BEFORE"
+        ],
+        [
+          "Kai locked the bike in the lab",
+          "Priya boarded the train at the caf\u00e9",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['Ben watered the plants at the office']. Invalid edge format (expected 3 items): ['Ben watered the plants at the office']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Ben watered the plants at the office",
+            "Sofia uploaded the file at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Kai locked the bike in the lab",
+            "Priya boarded the train at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Sofia uploaded the file at the caf\u00e9",
+            "Kai locked the bike in the lab",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben watered the plants at the office",
+            "Kai locked the bike in the lab"
+          ],
+          [
+            "Ben watered the plants at the office",
+            "Priya boarded the train at the caf\u00e9"
+          ],
+          [
+            "Ben watered the plants at the office",
+            "Sofia uploaded the file at the caf\u00e9"
+          ],
+          [
+            "Kai locked the bike in the lab",
+            "Priya boarded the train at the caf\u00e9"
+          ],
+          [
+            "Sofia uploaded the file at the caf\u00e9",
+            "Kai locked the bike in the lab"
+          ],
+          [
+            "Sofia uploaded the file at the caf\u00e9",
+            "Priya boarded the train at the caf\u00e9"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_009",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 3,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Jon washed the dishes in the garden",
+          "Noah sent an email at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Noah sent an email at the caf\u00e9",
+          "Kai read the note in the garden",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Jon washed the dishes in the garden",
+            "Noah sent an email at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Noah sent an email at the caf\u00e9",
+            "Kai read the note in the garden",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Jon washed the dishes in the garden",
+            "Kai read the note in the garden"
+          ],
+          [
+            "Jon washed the dishes in the garden",
+            "Noah sent an email at the caf\u00e9"
+          ],
+          [
+            "Noah sent an email at the caf\u00e9",
+            "Kai read the note in the garden"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "con_043",
+      "category": "invalid_edge_support",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ben paid the bill in the lab",
+          "Ben made tea in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Ben made tea in the hallway",
+          "Ben paid the bill in the lab",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': ['UNKNOWN']. Invalid edge format (expected 3 items): ['UNKNOWN']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "missing_direct_edges": [
+          [
+            "Ben made tea in the hallway",
+            "Ben paid the bill in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ben paid the bill in the lab",
+            "Ben made tea in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben made tea in the hallway",
+            "Ben paid the bill in the lab"
+          ],
+          [
+            "Ben paid the bill in the lab",
+            "Ben made tea in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_031",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Ruby uploaded the file in the kitchen",
+          "Leo locked the bike in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Ruby uploaded the file in the kitchen",
+          "Ethan started the meeting in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Leo locked the bike in the classroom",
+          "Ethan started the meeting in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Leo locked the bike in the classroom",
+            "Ethan started the meeting in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Ruby uploaded the file in the kitchen",
+            "Ethan started the meeting in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Ruby uploaded the file in the kitchen",
+            "Leo locked the bike in the classroom",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Leo locked the bike in the classroom",
+            "Ethan started the meeting in the hallway"
+          ],
+          [
+            "Ruby uploaded the file in the kitchen",
+            "Ethan started the meeting in the hallway"
+          ],
+          [
+            "Ruby uploaded the file in the kitchen",
+            "Leo locked the bike in the classroom"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_008",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 2,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "amb_055",
+      "category": "invalid_json",
+      "task_category": "ambiguous",
+      "num_events": 3,
+      "gold_relation_count": 0,
+      "gold_relations": [],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 0
+        },
+        "missing_direct_edges": [],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": true,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_006",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Omar submitted the form in the hallway",
+          "Ruby fed the cat in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Omar submitted the form in the hallway",
+          "Ava wrote the code at the office",
+          "BEFORE"
+        ],
+        [
+          "Ruby fed the cat in the kitchen",
+          "Ava wrote the code at the office",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Omar submitted the form in the hallway",
+            "Ava wrote the code at the office",
+            "BEFORE"
+          ],
+          [
+            "Omar submitted the form in the hallway",
+            "Ruby fed the cat in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Ruby fed the cat in the kitchen",
+            "Ava wrote the code at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Omar submitted the form in the hallway",
+            "Ava wrote the code at the office"
+          ],
+          [
+            "Omar submitted the form in the hallway",
+            "Ruby fed the cat in the kitchen"
+          ],
+          [
+            "Ruby fed the cat in the kitchen",
+            "Ava wrote the code at the office"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_016",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 7,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Zara uploaded the file in the hallway",
+          "Zara read the note in the library",
+          "BEFORE"
+        ],
+        [
+          "Zara read the note in the library",
+          "Kai locked the bike in the library",
+          "BEFORE"
+        ],
+        [
+          "Kai locked the bike in the library",
+          "Ben washed the dishes at the office",
+          "BEFORE"
+        ],
+        [
+          "Ben washed the dishes at the office",
+          "Noah installed the update in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Noah installed the update in the classroom",
+          "Ben turned on the kettle in the hallway",
+          "BEFORE"
+        ],
+        [
+          "Ben turned on the kettle in the hallway",
+          "Ivy finished the lecture at the caf\u00e9",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 21
+        },
+        "missing_direct_edges": [
+          [
+            "Ben turned on the kettle in the hallway",
+            "Ivy finished the lecture at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Ben washed the dishes at the office",
+            "Noah installed the update in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Kai locked the bike in the library",
+            "Ben washed the dishes at the office",
+            "BEFORE"
+          ],
+          [
+            "Noah installed the update in the classroom",
+            "Ben turned on the kettle in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Zara read the note in the library",
+            "Kai locked the bike in the library",
+            "BEFORE"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Zara read the note in the library",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ben turned on the kettle in the hallway",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Ben washed the dishes at the office",
+            "Ben turned on the kettle in the hallway"
+          ],
+          [
+            "Ben washed the dishes at the office",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Ben washed the dishes at the office",
+            "Noah installed the update in the classroom"
+          ],
+          [
+            "Kai locked the bike in the library",
+            "Ben turned on the kettle in the hallway"
+          ],
+          [
+            "Kai locked the bike in the library",
+            "Ben washed the dishes at the office"
+          ],
+          [
+            "Kai locked the bike in the library",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Kai locked the bike in the library",
+            "Noah installed the update in the classroom"
+          ],
+          [
+            "Noah installed the update in the classroom",
+            "Ben turned on the kettle in the hallway"
+          ],
+          [
+            "Noah installed the update in the classroom",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Zara read the note in the library",
+            "Ben turned on the kettle in the hallway"
+          ],
+          [
+            "Zara read the note in the library",
+            "Ben washed the dishes at the office"
+          ],
+          [
+            "Zara read the note in the library",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Zara read the note in the library",
+            "Kai locked the bike in the library"
+          ],
+          [
+            "Zara read the note in the library",
+            "Noah installed the update in the classroom"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Ben turned on the kettle in the hallway"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Ben washed the dishes at the office"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Ivy finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Kai locked the bike in the library"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Noah installed the update in the classroom"
+          ],
+          [
+            "Zara uploaded the file in the hallway",
+            "Zara read the note in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "lc_059",
+      "category": "invalid_json",
+      "task_category": "linear_chain",
+      "num_events": 4,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Omar packed a bag in the classroom",
+          "Ivy watered the plants at the office",
+          "BEFORE"
+        ],
+        [
+          "Ivy watered the plants at the office",
+          "Nora read the note at the station",
+          "BEFORE"
+        ],
+        [
+          "Nora read the note at the station",
+          "Sara started the meeting in the library",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Ivy watered the plants at the office",
+            "Nora read the note at the station",
+            "BEFORE"
+          ],
+          [
+            "Nora read the note at the station",
+            "Sara started the meeting in the library",
+            "BEFORE"
+          ],
+          [
+            "Omar packed a bag in the classroom",
+            "Ivy watered the plants at the office",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ivy watered the plants at the office",
+            "Nora read the note at the station"
+          ],
+          [
+            "Ivy watered the plants at the office",
+            "Sara started the meeting in the library"
+          ],
+          [
+            "Nora read the note at the station",
+            "Sara started the meeting in the library"
+          ],
+          [
+            "Omar packed a bag in the classroom",
+            "Ivy watered the plants at the office"
+          ],
+          [
+            "Omar packed a bag in the classroom",
+            "Nora read the note at the station"
+          ],
+          [
+            "Omar packed a bag in the classroom",
+            "Sara started the meeting in the library"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_025",
+      "category": "invalid_edge_support",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Nora checked the battery in the garden",
+          "Noah packed a bag in the library",
+          "BEFORE"
+        ],
+        [
+          "Nora checked the battery in the garden",
+          "Sofia finished the lecture at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Noah packed a bag in the library",
+          "Sofia finished the lecture at the caf\u00e9",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'relations': 'BEFORE'. Invalid edge format (expected 3 items): 'BEFORE'\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Noah packed a bag in the library",
+            "Sofia finished the lecture at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Nora checked the battery in the garden",
+            "Noah packed a bag in the library",
+            "BEFORE"
+          ],
+          [
+            "Nora checked the battery in the garden",
+            "Sofia finished the lecture at the caf\u00e9",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Noah packed a bag in the library",
+            "Sofia finished the lecture at the caf\u00e9"
+          ],
+          [
+            "Nora checked the battery in the garden",
+            "Noah packed a bag in the library"
+          ],
+          [
+            "Nora checked the battery in the garden",
+            "Sofia finished the lecture at the caf\u00e9"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_016",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Jon started the meeting in the classroom",
+          "Sofia received a confirmation email in the classroom",
+          "BEFORE"
+        ],
+        [
+          "Jon started the meeting in the classroom",
+          "Zara turned on the kettle at home",
+          "BEFORE"
+        ],
+        [
+          "Sofia received a confirmation email in the classroom",
+          "Zara turned on the kettle at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Jon started the meeting in the classroom",
+            "Sofia received a confirmation email in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Jon started the meeting in the classroom",
+            "Zara turned on the kettle at home",
+            "BEFORE"
+          ],
+          [
+            "Sofia received a confirmation email in the classroom",
+            "Zara turned on the kettle at home",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Jon started the meeting in the classroom",
+            "Sofia received a confirmation email in the classroom"
+          ],
+          [
+            "Jon started the meeting in the classroom",
+            "Zara turned on the kettle at home"
+          ],
+          [
+            "Sofia received a confirmation email in the classroom",
+            "Zara turned on the kettle at home"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_012",
+      "category": "invalid_edge_support",
+      "task_category": "long_chain",
+      "num_events": 6,
+      "gold_relation_count": 5,
+      "gold_relations": [
+        [
+          "Kai boarded the train at home",
+          "Sara paid the bill at home",
+          "BEFORE"
+        ],
+        [
+          "Sara paid the bill at home",
+          "Amir installed the update at the station",
+          "BEFORE"
+        ],
+        [
+          "Amir installed the update at the station",
+          "Ethan set an alarm in the lab",
+          "BEFORE"
+        ],
+        [
+          "Ethan set an alarm in the lab",
+          "Amir approved the release in the garden",
+          "BEFORE"
+        ],
+        [
+          "Amir approved the release in the garden",
+          "Mia started the car in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid edge in 'supports': ['Kai boarded the train at home']. Invalid edge format (expected 3 items): ['Kai boarded the train at home']\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 5
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 15
+        },
+        "missing_direct_edges": [
+          [
+            "Amir approved the release in the garden",
+            "Mia started the car in the hallway",
+            "BEFORE"
+          ],
+          [
+            "Amir installed the update at the station",
+            "Ethan set an alarm in the lab",
+            "BEFORE"
+          ],
+          [
+            "Ethan set an alarm in the lab",
+            "Amir approved the release in the garden",
+            "BEFORE"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Sara paid the bill at home",
+            "BEFORE"
+          ],
+          [
+            "Sara paid the bill at home",
+            "Amir installed the update at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir approved the release in the garden",
+            "Mia started the car in the hallway"
+          ],
+          [
+            "Amir installed the update at the station",
+            "Amir approved the release in the garden"
+          ],
+          [
+            "Amir installed the update at the station",
+            "Ethan set an alarm in the lab"
+          ],
+          [
+            "Amir installed the update at the station",
+            "Mia started the car in the hallway"
+          ],
+          [
+            "Ethan set an alarm in the lab",
+            "Amir approved the release in the garden"
+          ],
+          [
+            "Ethan set an alarm in the lab",
+            "Mia started the car in the hallway"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Amir approved the release in the garden"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Amir installed the update at the station"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Ethan set an alarm in the lab"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Mia started the car in the hallway"
+          ],
+          [
+            "Kai boarded the train at home",
+            "Sara paid the bill at home"
+          ],
+          [
+            "Sara paid the bill at home",
+            "Amir approved the release in the garden"
+          ],
+          [
+            "Sara paid the bill at home",
+            "Amir installed the update at the station"
+          ],
+          [
+            "Sara paid the bill at home",
+            "Ethan set an alarm in the lab"
+          ],
+          [
+            "Sara paid the bill at home",
+            "Mia started the car in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_022",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 4,
+      "gold_relation_count": 6,
+      "gold_relations": [
+        [
+          "Mia uploaded the file in the library",
+          "Sofia started the meeting at home",
+          "BEFORE"
+        ],
+        [
+          "Mia uploaded the file in the library",
+          "Noah sent an email at the office",
+          "BEFORE"
+        ],
+        [
+          "Mia uploaded the file in the library",
+          "Sara fed the cat in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Sofia started the meeting at home",
+          "Noah sent an email at the office",
+          "BEFORE"
+        ],
+        [
+          "Sofia started the meeting at home",
+          "Sara fed the cat in the kitchen",
+          "BEFORE"
+        ],
+        [
+          "Noah sent an email at the office",
+          "Sara fed the cat in the kitchen",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 6
+        },
+        "missing_direct_edges": [
+          [
+            "Mia uploaded the file in the library",
+            "Noah sent an email at the office",
+            "BEFORE"
+          ],
+          [
+            "Mia uploaded the file in the library",
+            "Sara fed the cat in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Mia uploaded the file in the library",
+            "Sofia started the meeting at home",
+            "BEFORE"
+          ],
+          [
+            "Noah sent an email at the office",
+            "Sara fed the cat in the kitchen",
+            "BEFORE"
+          ],
+          [
+            "Sofia started the meeting at home",
+            "Noah sent an email at the office",
+            "BEFORE"
+          ],
+          [
+            "Sofia started the meeting at home",
+            "Sara fed the cat in the kitchen",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Mia uploaded the file in the library",
+            "Noah sent an email at the office"
+          ],
+          [
+            "Mia uploaded the file in the library",
+            "Sara fed the cat in the kitchen"
+          ],
+          [
+            "Mia uploaded the file in the library",
+            "Sofia started the meeting at home"
+          ],
+          [
+            "Noah sent an email at the office",
+            "Sara fed the cat in the kitchen"
+          ],
+          [
+            "Sofia started the meeting at home",
+            "Noah sent an email at the office"
+          ],
+          [
+            "Sofia started the meeting at home",
+            "Sara fed the cat in the kitchen"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "con_025",
+      "category": "invalid_json",
+      "task_category": "contradiction",
+      "num_events": 2,
+      "gold_relation_count": 2,
+      "gold_relations": [
+        [
+          "Ruby left the station in the hallway",
+          "Sara started the car at the caf\u00e9",
+          "BEFORE"
+        ],
+        [
+          "Sara started the car at the caf\u00e9",
+          "Ruby left the station in the hallway",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": false,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 2
+        },
+        "missing_direct_edges": [
+          [
+            "Ruby left the station in the hallway",
+            "Sara started the car at the caf\u00e9",
+            "BEFORE"
+          ],
+          [
+            "Sara started the car at the caf\u00e9",
+            "Ruby left the station in the hallway",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Ruby left the station in the hallway",
+            "Sara started the car at the caf\u00e9"
+          ],
+          [
+            "Sara started the car at the caf\u00e9",
+            "Ruby left the station in the hallway"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "long_006",
+      "category": "invalid_json",
+      "task_category": "long_chain",
+      "num_events": 5,
+      "gold_relation_count": 4,
+      "gold_relations": [
+        [
+          "Amir paid the bill in the hallway",
+          "Zara received a confirmation email in the library",
+          "BEFORE"
+        ],
+        [
+          "Zara received a confirmation email in the library",
+          "Sam wrote the code at the station",
+          "BEFORE"
+        ],
+        [
+          "Sam wrote the code at the station",
+          "Omar locked the bike in the library",
+          "BEFORE"
+        ],
+        [
+          "Omar locked the bike in the library",
+          "Kai set an alarm in the classroom",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 4
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 10
+        },
+        "missing_direct_edges": [
+          [
+            "Amir paid the bill in the hallway",
+            "Zara received a confirmation email in the library",
+            "BEFORE"
+          ],
+          [
+            "Omar locked the bike in the library",
+            "Kai set an alarm in the classroom",
+            "BEFORE"
+          ],
+          [
+            "Sam wrote the code at the station",
+            "Omar locked the bike in the library",
+            "BEFORE"
+          ],
+          [
+            "Zara received a confirmation email in the library",
+            "Sam wrote the code at the station",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Amir paid the bill in the hallway",
+            "Kai set an alarm in the classroom"
+          ],
+          [
+            "Amir paid the bill in the hallway",
+            "Omar locked the bike in the library"
+          ],
+          [
+            "Amir paid the bill in the hallway",
+            "Sam wrote the code at the station"
+          ],
+          [
+            "Amir paid the bill in the hallway",
+            "Zara received a confirmation email in the library"
+          ],
+          [
+            "Omar locked the bike in the library",
+            "Kai set an alarm in the classroom"
+          ],
+          [
+            "Sam wrote the code at the station",
+            "Kai set an alarm in the classroom"
+          ],
+          [
+            "Sam wrote the code at the station",
+            "Omar locked the bike in the library"
+          ],
+          [
+            "Zara received a confirmation email in the library",
+            "Kai set an alarm in the classroom"
+          ],
+          [
+            "Zara received a confirmation email in the library",
+            "Omar locked the bike in the library"
+          ],
+          [
+            "Zara received a confirmation email in the library",
+            "Sam wrote the code at the station"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    },
+    {
+      "id": "tr_007",
+      "category": "invalid_json",
+      "task_category": "transitive_reasoning",
+      "num_events": 3,
+      "gold_relation_count": 3,
+      "gold_relations": [
+        [
+          "Ruby ran the tests in the garden",
+          "Lina printed the handouts in the garden",
+          "BEFORE"
+        ],
+        [
+          "Ruby ran the tests in the garden",
+          "Ben uploaded the file at home",
+          "BEFORE"
+        ],
+        [
+          "Lina printed the handouts in the garden",
+          "Ben uploaded the file at home",
+          "BEFORE"
+        ]
+      ],
+      "expected_valid": true,
+      "error": "PredictionParseError(\"Invalid JSON: Expecting ',' delimiter\")",
+      "score_as_empty_prediction": {
+        "direct": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "closure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "correct": 0,
+          "pred_total": 0,
+          "gold_total": 3
+        },
+        "missing_direct_edges": [
+          [
+            "Lina printed the handouts in the garden",
+            "Ben uploaded the file at home",
+            "BEFORE"
+          ],
+          [
+            "Ruby ran the tests in the garden",
+            "Ben uploaded the file at home",
+            "BEFORE"
+          ],
+          [
+            "Ruby ran the tests in the garden",
+            "Lina printed the handouts in the garden",
+            "BEFORE"
+          ]
+        ],
+        "spurious_direct_edges": [],
+        "missing_closure_pairs": [
+          [
+            "Lina printed the handouts in the garden",
+            "Ben uploaded the file at home"
+          ],
+          [
+            "Ruby ran the tests in the garden",
+            "Ben uploaded the file at home"
+          ],
+          [
+            "Ruby ran the tests in the garden",
+            "Lina printed the handouts in the garden"
+          ]
+        ],
+        "spurious_closure_pairs": [],
+        "preserves_ordering_closure": false,
+        "has_overcommitment": false,
+        "abstained": true
+      }
+    }
+  ],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 0.776,
+  "conditional_validity_rate": 0.9226804123711341,
+  "conditional_trace_grounding_rate": 0.9432989690721649,
+  "transport_failure_counts": {
+    "transport_timeout": 1
+  },
+  "parse_failure_counts": {
+    "invalid_json": 45,
+    "invalid_edge_support": 9,
+    "schema_violation": 1
+  },
+  "valid_count": 179,
+  "invalid_count": 15,
+  "trace_grounded_count": 183,
+  "trace_ungrounded_count": 11,
+  "validity_rate": 0.716,
+  "violation_counts": {
+    "unsupported_reasoning_step": 10,
+    "cycle": 6,
+    "temporal_inconsistency": 6,
+    "contradiction": 5,
+    "hallucinated_node": 1,
+    "unsupported_reasoning_reference": 1
+  },
+  "formula_violation_counts": {
+    "ltl_unsupported_final_commitment": 3,
+    "ltl_contradiction": 11,
+    "ltl_temporal_inconsistency": 12,
+    "ltl_trace_inversion": 9,
+    "ltl_hallucinated_node": 1
+  },
+  "first_violation_step_histogram": {
+    "1": 4,
+    "0": 12,
+    "3": 1,
+    "4": 1
+  },
+  "taxonomy_counts": {
+    "reasoning_trace": 10,
+    "structural": 17,
+    "grounding": 2
+  },
+  "overcommitment": {
+    "num_gold_empty_tasks": 52,
+    "num_overcommit_tasks": 42,
+    "num_overcommit_edges": 54,
+    "task_overcommit_rate": 0.8076923076923077,
+    "avg_overcommit_edges_per_gold_empty_task": 1.0384615384615385
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.636085626911315,
+      "recall": 0.6265060240963856,
+      "f1": 0.6312594840667678,
+      "correct": 208,
+      "pred_total": 327,
+      "gold_total": 332
+    },
+    "closure": {
+      "precision": 0.8298969072164949,
+      "recall": 0.8145025295109612,
+      "f1": 0.8221276595744682,
+      "correct": 483,
+      "pred_total": 582,
+      "gold_total": 593
+    }
+  },
+  "report_path": "outputs/runs/canonical_v2/deepseek-r1-7b_2026-05-12_202518UTC/report.json"
+}

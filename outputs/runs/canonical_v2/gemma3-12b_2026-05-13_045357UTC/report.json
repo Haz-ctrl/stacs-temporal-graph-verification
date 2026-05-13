@@ -1,0 +1,178 @@
+{
+  "run_id": "gemma3-12b_2026-05-13_045357UTC",
+  "predictions_file": "outputs/runs/canonical_v2/gemma3-12b_2026-05-13_045357UTC/predictions.jsonl",
+  "pred_source": "llm",
+  "dataset": {
+    "path": "data/temporal_reasoning_eval.jsonl",
+    "dataset_version": "temporal_reasoning_eval",
+    "num_tasks": 250,
+    "expected_valid_tasks": 200,
+    "expected_invalid_tasks": 50
+  },
+  "code_version": "4e749e7bdcc41bae6a7db3c9df1e98738b6a67e3",
+  "model_metadata": {
+    "provider": "ollama",
+    "model": "gemma3:12b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "tags_snapshot": {
+      "models": [
+        {
+          "name": "gemma3:12b",
+          "model": "gemma3:12b",
+          "modified_at": "2026-05-10T17:01:08.890225022+01:00",
+          "size": 8149190253,
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "gemma3",
+            "families": [
+              "gemma3"
+            ],
+            "parameter_size": "12.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "modified_at": "2026-05-10T17:01:08.255213562+01:00",
+          "size": 6594474711,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "mistral:7b",
+          "model": "mistral:7b",
+          "modified_at": "2026-05-06T21:19:10.955309938+01:00",
+          "size": 4372824384,
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "7.2B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "llama3.1:8b",
+          "model": "llama3.1:8b",
+          "modified_at": "2026-05-06T21:18:11.478249111+01:00",
+          "size": 4920753328,
+          "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "llama",
+            "families": [
+              "llama"
+            ],
+            "parameter_size": "8.0B",
+            "quantization_level": "Q4_K_M"
+          }
+        },
+        {
+          "name": "deepseek-r1:7b",
+          "model": "deepseek-r1:7b",
+          "modified_at": "2026-05-06T21:14:50.151647077+01:00",
+          "size": 4683075440,
+          "digest": "755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "7.6B",
+            "quantization_level": "Q4_K_M"
+          }
+        }
+      ]
+    },
+    "prediction_mode": "structured_json"
+  },
+  "run_config": {
+    "run_id": "gemma3-12b_2026-05-13_045357UTC",
+    "data_path": "data/temporal_reasoning_eval.jsonl",
+    "num_tasks": 250,
+    "pred_source": "llm",
+    "model": "gemma3:12b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.0,
+    "seed": 42,
+    "log_raw": false,
+    "validate_data": true,
+    "strict_data": false,
+    "timeout_s": 120,
+    "max_retries": 4,
+    "retry_backoff_s": 3.0,
+    "dataset_version": "temporal_reasoning_eval",
+    "code_version": "4e749e7bdcc41bae6a7db3c9df1e98738b6a67e3",
+    "specification_name": "default_temporal_spec"
+  },
+  "num_tasks": 250,
+  "num_failures": 0,
+  "failures": [],
+  "repair_hit_count": 0,
+  "repair_hit_rate": 0.0,
+  "parse_success_rate": 1.0,
+  "conditional_validity_rate": 0.992,
+  "conditional_trace_grounding_rate": 1.0,
+  "transport_failure_counts": {},
+  "parse_failure_counts": {},
+  "valid_count": 248,
+  "invalid_count": 2,
+  "trace_grounded_count": 250,
+  "trace_ungrounded_count": 0,
+  "validity_rate": 0.992,
+  "violation_counts": {},
+  "formula_violation_counts": {
+    "ltl_unsupported_final_commitment": 4
+  },
+  "first_violation_step_histogram": {
+    "1": 2
+  },
+  "taxonomy_counts": {},
+  "overcommitment": {
+    "num_gold_empty_tasks": 60,
+    "num_overcommit_tasks": 4,
+    "num_overcommit_edges": 4,
+    "task_overcommit_rate": 0.06666666666666667,
+    "avg_overcommit_edges_per_gold_empty_task": 0.06666666666666667
+  },
+  "metrics_expected_valid_only": {
+    "direct": {
+      "precision": 0.7236024844720497,
+      "recall": 0.4794238683127572,
+      "f1": 0.5767326732673267,
+      "correct": 233,
+      "pred_total": 322,
+      "gold_total": 486
+    },
+    "closure": {
+      "precision": 0.75,
+      "recall": 0.5107832009080591,
+      "f1": 0.6076975016880486,
+      "correct": 450,
+      "pred_total": 600,
+      "gold_total": 881
+    }
+  },
+  "report_path": "outputs/runs/canonical_v2/gemma3-12b_2026-05-13_045357UTC/report.json"
+}
