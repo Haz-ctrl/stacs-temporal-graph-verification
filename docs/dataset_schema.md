@@ -55,6 +55,24 @@ It is intentionally a coarse event-event subset:
 
 This keeps the benchmark slice aligned with the current graph semantics without overstating support for the full TimeML relation algebra.
 
+## MATRES Slice
+
+`data/matres_balanced_small.jsonl` is an external evaluation slice derived from MATRES TimeBank and AQUAINT relations, joined against the matching TempEval-3 TimeML documents by `eiid`.
+
+It is intentionally a balanced event-event subset:
+
+- source relation files: MATRES `timebank.txt` and `aquaint.txt`
+- source documents: TempEval-3 TimeBank/AQUAINT TimeML files
+- unit of evaluation: one MATRES event-event relation per task
+- retained relations: `BEFORE`, `AFTER`, `EQUAL`, `VAGUE`
+- coarse mapping:
+  - `BEFORE` -> `BEFORE`
+  - `AFTER` -> `AFTER`
+  - `EQUAL` -> `SIMULTANEOUS`
+  - `VAGUE` -> `UNKNOWN`
+
+The `UNKNOWN` labels originate from MATRES `VAGUE`. They should be reported through direct/pairwise label metrics and abstention behaviour, not ordering-closure F1, because `UNKNOWN` intentionally contributes no ordering edge to the temporal graph.
+
 ## Legacy Files
 
 Some files under `data/` predate the canonical schema or use older category names. They are retained for exploratory work and fixtures, but the recommended runnable dataset is:

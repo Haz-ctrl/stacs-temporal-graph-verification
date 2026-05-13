@@ -47,6 +47,7 @@ stacs-temporal-graph-verification/
 │   ├── generate_analysis_plots.py # Generate all supplementary dissertation plots
 │   ├── generate_temporal_dataset.py # Generate new synthetic JSONL datasets
 │   ├── import_maven_ere.py       # Convert MAVEN-ERE temporal JSONL → canonical JSONL
+│   ├── import_matres.py          # Convert MATRES + TimeML → canonical JSONL
 │   ├── import_tempeval3.py        # Convert TempEval-3 TimeML files → canonical JSONL
 │   ├── run_llm_baseline.py        # Run a single model on a dataset
 │   ├── run_model_sweep.py         # Run multiple models sequentially from a manifest
@@ -202,6 +203,7 @@ Current dataset files have different roles:
 - `data/temporal_reasoning_eval.jsonl`: canonical runnable synthetic evaluation set
 - `data/tempeval_eval.jsonl`: TempEval-3 Platinum event-event slice in canonical task format using a conservative coarse mapping onto `BEFORE`, `AFTER`, and `SIMULTANEOUS`
 - `data/maven_ere_balanced_2to1.jsonl`: checked-in MAVEN-ERE validation slice with a 2:1 `BEFORE`:`SIMULTANEOUS` balance over EVENT-EVENT pairs
+- `data/matres_balanced_small.jsonl`: checked-in MATRES TimeBank/AQUAINT slice balanced across `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`
 - `data/tempeval_style_fixture.jsonl`: simplified adapter input for TempEval-style conversion
 - `data/diagnostic_eval.jsonl`: hand-authored diagnostic stress slice for ambiguity, anchors, and richer relations
 - `data/sample_tasks.jsonl`: small quickstart example set using the same schema
@@ -227,6 +229,11 @@ Interval relations such as `INCLUDES` or `IS_INCLUDED` are intentionally exclude
 
 To rebuild the checked-in MAVEN-ERE validation slice from the raw benchmark:
 
+<!--
+TODO add link to MAVEN_ERE zip file on Drive/Github
+-->
+1. Download MAVEN-ERE.zip 
+
 ```bash
 python -m scripts.import_maven_ere \
   --input data/raw/MAVEN_ERE/valid.jsonl \
@@ -250,6 +257,22 @@ python -m scripts.import_maven_ere \
   --context-radius 1 \
   --test-sentence-window 1
 ```
+
+To rebuild the checked-in MATRES slice, first place the matching TempEval-3 TimeBank/AQUAINT TimeML files under one local directory, then run:
+
+```bash
+python -m scripts.import_matres \
+  --matres-input https://raw.githubusercontent.com/qiangning/MATRES/master/timebank.txt \
+  --matres-input https://raw.githubusercontent.com/qiangning/MATRES/master/aquaint.txt \
+  --timeml-root path/to/TempEval3/Training/TBAQ-cleaned \
+  --output data/matres_balanced_small.jsonl \
+  --stats-out data/matres_balanced_small_stats.json \
+  --category matres_temporal \
+  --max-per-label 100 \
+  --seed 42
+```
+
+MATRES `VAGUE` is mapped to `UNKNOWN`. Report these tasks with direct/pairwise label metrics and abstention behaviour; `UNKNOWN` deliberately contributes no ordering edge, so closure F1 is not the right headline metric for that slice.
 
 See [dataset_schema.md](docs/dataset_schema.md) for the canonical schema and current scope boundaries.
 

@@ -1,0 +1,42 @@
+{
+  "input_sources": [
+    "https://raw.githubusercontent.com/qiangning/MATRES/master/timebank.txt",
+    "https://raw.githubusercontent.com/qiangning/MATRES/master/aquaint.txt"
+  ],
+  "raw_relation_counts": {
+    "AFTER": 4307,
+    "BEFORE": 6462,
+    "EQUAL": 440,
+    "VAGUE": 1531
+  },
+  "mapped_relation_counts": {
+    "AFTER": 4307,
+    "BEFORE": 6462,
+    "SIMULTANEOUS": 440,
+    "UNKNOWN": 1531
+  },
+  "skipped_relation_counts": {},
+  "num_documents": 256,
+  "num_tasks": 400,
+  "category": "matres_temporal",
+  "context_radius": 0,
+  "max_per_label": 100,
+  "max_tasks": 0,
+  "seed": 42,
+  "pool_sizes": {
+    "AFTER": 4306,
+    "BEFORE": 6461,
+    "SIMULTANEOUS": 440,
+    "UNKNOWN": 1529
+  },
+  "sampled_counts": {
+    "AFTER": 100,
+    "BEFORE": 100,
+    "SIMULTANEOUS": 100,
+    "UNKNOWN": 100
+  },
+  "skipped_counts": {
+    "missing_instance": 4
+  },
+  "analysis_note": "UNKNOWN labels originate from MATRES VAGUE. Report these through direct/pairwise label metrics and abstention behaviour; UNKNOWN does not contribute to ordering closure."
+}

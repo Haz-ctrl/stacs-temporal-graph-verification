@@ -32,6 +32,12 @@ Use `fidelity_*` metrics when making fidelity claims.
 - The original run-level `direct_f1` and `closure_f1` preserve the full expected-valid task mix.
 - The `fidelity_*` variants remove empty-gold tasks so ambiguity slices do not dilute or distort fidelity headlines.
 
+For MATRES-style `UNKNOWN` labels, prefer direct/pairwise reporting.
+
+- MATRES `VAGUE` is mapped to `UNKNOWN`.
+- `UNKNOWN` is an abstention label and contributes no ordering edge.
+- Closure F1 should not be used as the headline metric for `UNKNOWN` examples; use pairwise label metrics, confusion matrices, and abstention/overcommitment behaviour instead.
+
 ## Screening vs Final Evaluation
 
 When the run contains a small number of tasks, the generated `report.md` explicitly labels it as screening-scale analysis.
