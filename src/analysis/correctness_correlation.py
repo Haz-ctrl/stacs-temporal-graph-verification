@@ -114,12 +114,22 @@ def _extract_correctness(record: Mapping[str, Any]) -> Optional[float]:
     return 1.0 if correct > 0 else 0.0
 
 
+def _has_variation(values: Sequence[float]) -> bool:
+    """Return True when a sequence has at least two distinct values."""
+    if not values:
+        return False
+    first = values[0]
+    return any(value != first for value in values[1:])
+
+
 def _spearman_safe(xs: Sequence[float], ys: Sequence[float]) -> Tuple[float, float]:
-    """Spearman correlation dropping NaN pairs; returns (nan, nan) for n < 5."""
+    """Spearman correlation dropping NaN pairs; returns (nan, nan) when undefined."""
     pairs = [(x, y) for x, y in zip(xs, ys) if not (math.isnan(x) or math.isnan(y))]
     if len(pairs) < 5:
         return (float("nan"), float("nan"))
     xs_clean, ys_clean = zip(*pairs)
+    if not _has_variation(xs_clean) or not _has_variation(ys_clean):
+        return (float("nan"), float("nan"))
     result = spearmanr(xs_clean, ys_clean)
     return (float(result.statistic), float(result.pvalue))
 
@@ -127,11 +137,13 @@ def _spearman_safe(xs: Sequence[float], ys: Sequence[float]) -> Tuple[float, flo
 def _pointbiserial_safe(
     xs: Sequence[float], ys: Sequence[float]
 ) -> Tuple[Optional[float], Optional[float]]:
-    """Point-biserial correlation dropping NaN pairs; returns (None, None) for n < 5."""
+    """Point-biserial correlation dropping NaN pairs; returns (None, None) when undefined."""
     pairs = [(x, y) for x, y in zip(xs, ys) if not (math.isnan(x) or math.isnan(y))]
     if len(pairs) < 5:
         return (None, None)
     xs_clean, ys_clean = zip(*pairs)
+    if not _has_variation(xs_clean) or not _has_variation(ys_clean):
+        return (None, None)
     result = pointbiserialr(xs_clean, ys_clean)
     return (float(result.statistic), float(result.pvalue))
 

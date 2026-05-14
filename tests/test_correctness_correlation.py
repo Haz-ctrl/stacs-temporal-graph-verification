@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import json
 import math
+import warnings
 from pathlib import Path
-
-import pytest
 
 from src.analysis.correctness_correlation import (
     CorrelationResult,
@@ -158,6 +157,16 @@ def test_spearman_safe_returns_nan_for_empty() -> None:
     assert math.isnan(p)
 
 
+def test_spearman_safe_returns_nan_without_warning_for_constant_input() -> None:
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        rho, p = _spearman_safe([0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 1.0, 0.0])
+
+    assert caught == []
+    assert math.isnan(rho)
+    assert math.isnan(p)
+
+
 # ---------------------------------------------------------------------------
 # _pointbiserial_safe
 # ---------------------------------------------------------------------------
@@ -176,6 +185,16 @@ def test_pointbiserial_returns_values_for_sufficient_data() -> None:
     assert r is not None
     assert p is not None
     assert abs(r - 1.0) < 1e-6
+
+
+def test_pointbiserial_returns_none_without_warning_for_constant_input() -> None:
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        r, p = _pointbiserial_safe([1.0, 1.0, 1.0, 1.0, 1.0], [0.0, 1.0, 0.0, 1.0, 0.0])
+
+    assert caught == []
+    assert r is None
+    assert p is None
 
 
 # ---------------------------------------------------------------------------
