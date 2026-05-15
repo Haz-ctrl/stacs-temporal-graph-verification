@@ -5,7 +5,13 @@ from typing import Dict, Iterable, List, Set, Tuple
 
 from src.results import PRFResult, TaskScore
 from src.schemas import ReasoningStep
-from src.temporal_graph import Edge, EdgeLike, TemporalGraph, _to_edge
+from src.temporal_graph import (
+    Edge,
+    EdgeLike,
+    TemporalGraph,
+    _to_edge,
+    canonical_edge_for_matching,
+)
 
 OrderingPair = Tuple[str, str]
 
@@ -48,12 +54,7 @@ def _symmetric_canonical_edge(edge: Edge) -> Edge:
     simultaneous endpoints are sorted into a stable unordered representation.
     UNKNOWN edges are returned unchanged.
     """
-    src, tgt, rel = edge
-    if rel == "AFTER":
-        return (tgt, src, "BEFORE")
-    if rel == "SIMULTANEOUS" and tgt < src:
-        return (tgt, src, rel)
-    return (src, tgt, rel)
+    return canonical_edge_for_matching(edge)
 
 
 def direct_edge_prf(

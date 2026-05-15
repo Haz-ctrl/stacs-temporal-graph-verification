@@ -4,7 +4,11 @@ from dataclasses import dataclass, replace
 from typing import Iterable, List, Optional, Sequence, Tuple
 
 from src.schemas import Edge, ReasoningStep
-from src.temporal_graph import _to_edge, canonicalise_relation
+from src.temporal_graph import (
+    _to_edge,
+    canonical_edge_for_matching,
+    canonicalise_relation,
+)
 
 
 @dataclass(frozen=True)
@@ -45,10 +49,13 @@ class TemporalTrace:
             if len(args) != 3:
                 return False
             try:
-                edge = _to_edge(args)
+                edge = canonical_edge_for_matching(args)
             except ValueError:
                 return False
-            return edge in state.support_edges
+            return any(
+                canonical_edge_for_matching(support) == edge
+                for support in state.support_edges
+            )
 
         if name == "mentions_event":
             if len(args) != 1:

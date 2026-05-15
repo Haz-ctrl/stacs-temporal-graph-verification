@@ -23,7 +23,12 @@ from src.specs import (
     SpecContext,
     TemporalSpecification,
 )
-from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
+from src.temporal_graph import (
+    EdgeLike,
+    TemporalGraph,
+    _to_edge,
+    canonical_edge_for_matching,
+)
 from src.trace import TemporalTrace, build_temporal_trace
 
 Edge3 = Tuple[str, str, str]
@@ -645,14 +650,19 @@ class Verifier:
         for src, tgt, rel in pred_edges:
             if rel == "UNKNOWN":
                 continue
+            match_src, match_tgt, match_rel = canonical_edge_for_matching(
+                (src, tgt, rel)
+            )
             formulas.append(
                 FormulaSpec(
                     name="ltl_unsupported_final_commitment",
                     description=(
                         f"Final edge ({src}, {tgt}, {rel}) must be grounded in at least one "
-                        "reasoning step (F(supports))."
+                        "reasoning step using canonical temporal-edge matching (F(supports))."
                     ),
-                    formula=Eventually(Atom("supports", (src, tgt, rel))),
+                    formula=Eventually(
+                        Atom("supports", (match_src, match_tgt, match_rel))
+                    ),
                     violation_type="ltl_unsupported_final_commitment",
                     message=(
                         f"LTL spec violated: final committed edge ({src}, {tgt}, {rel}) has "
@@ -664,7 +674,7 @@ class Verifier:
         before_pairs: Set[Tuple[str, str]] = set()
         for step in reasoning_steps_tuple:
             for edge in getattr(step, "supports", []):
-                src, tgt, rel = _to_edge(edge)
+                src, tgt, rel = canonical_edge_for_matching(edge)
                 if rel == "BEFORE":
                     before_pairs.add((src, tgt))
 

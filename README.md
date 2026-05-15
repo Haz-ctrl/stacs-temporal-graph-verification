@@ -18,7 +18,7 @@ The current implementation is designed around four explicit layers:
 3. `scoring`: compare predicted relations against gold direct edges and ordering closure
 4. `reporting`: write reproducible run artefacts with metadata, per-task records, and aggregate metrics
 
-This repo currently supports relation labels `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`. Ordering evaluation normalises `AFTER`, collapses `SIMULTANEOUS` groups before closure, and treats `UNKNOWN` as abstention rather than an ordering edge.
+This repo currently supports relation labels `BEFORE`, `AFTER`, `SIMULTANEOUS`, and `UNKNOWN`. Ordering evaluation normalises `AFTER`, collapses `SIMULTANEOUS` groups before closure, and treats `UNKNOWN` as abstention rather than an ordering edge. LTL trace-grounding uses the same canonical temporal-edge matching, so `AFTER(A,B)` and `BEFORE(B,A)` are treated as equivalent support.
 
 ## Research Scope
 

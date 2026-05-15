@@ -89,9 +89,13 @@ The LTL layer operates over a bounded, graph-grounded fragment of temporal logic
 - `after(a, b)` — edge (a, b, AFTER) present
 - `simultaneous(a, b)` — edge (a, b, SIMULTANEOUS) present
 - `unknown(a, b)` — edge (a, b, UNKNOWN) present
-- `supports(edge)` — any reasoning step at or before this step supports the given edge
+- `supports(edge)` — the current reasoning step supports the given edge
 - `mentions_event(e)` — event e is mentioned in a reasoning step at or before this step
 - `has_violation(kind)` — a violation of type `kind` has been recorded at this step
+
+`supports(edge)` uses canonical temporal-edge matching: `AFTER(A,B)` and
+`BEFORE(B,A)` are equivalent support, and `SIMULTANEOUS(A,B)` is matched
+symmetrically. `UNKNOWN` remains exact.
 
 **Supported operators** (over the step-indexed trace of reasoning steps):
 
@@ -116,9 +120,10 @@ generates:
 F(supports(a,b,rel))
 ```
 
-This means that at least one reasoning step must explicitly support the final
+This means that at least one reasoning step must semantically support the final
 commitment. It detects cases where the final answer asserts an informative edge
-that the reasoning trace never set up.
+that the reasoning trace never set up. Matching uses the canonical temporal-edge
+semantics described above, so `AFTER(A,B)` can support `BEFORE(B,A)`.
 
 This cannot be reduced to the existing `ReasoningSupportConstraint`. That
 invariant checks the reverse direction: every step support must be entailed by

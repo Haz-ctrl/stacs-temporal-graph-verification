@@ -37,6 +37,23 @@ def _to_edge(edge_like: EdgeLike) -> Edge:
     return (source, target, relation)
 
 
+def canonical_edge_for_matching(edge_like: EdgeLike) -> Edge:
+    """
+    Return the semantic edge form used for equality-style matching.
+
+    ``AFTER(A, B)`` and ``BEFORE(B, A)`` encode the same ordering
+    commitment, so both are represented as ``BEFORE(B, A)``.  Likewise,
+    ``SIMULTANEOUS`` is symmetric, so its endpoints are sorted.  ``UNKNOWN``
+    remains exact because it is an abstention rather than an ordering relation.
+    """
+    source, target, relation = _to_edge(edge_like)
+    if relation == TemporalRelation.AFTER.value:
+        return (target, source, TemporalRelation.BEFORE.value)
+    if relation == TemporalRelation.SIMULTANEOUS.value and target < source:
+        return (target, source, relation)
+    return (source, target, relation)
+
+
 class _DisjointSet:
     def __init__(self, items: Iterable[str]) -> None:
         self._parent: Dict[str, str] = {item: item for item in items}
