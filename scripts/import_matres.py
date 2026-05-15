@@ -12,6 +12,7 @@ UNKNOWN/VAGUE tasks are kept as direct pairwise classification examples.  They
 do not contribute ordering edges and should therefore be analysed through
 direct/pairwise label metrics and abstention behaviour, not closure F1.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -99,7 +100,9 @@ def map_matres_relation(relation: str) -> Optional[str]:
     return MATRES_LABEL_MAP.get(str(relation).strip().upper())
 
 
-def load_matres_relations(inputs: Sequence[str]) -> Tuple[List[MatresRelation], Dict[str, Any]]:
+def load_matres_relations(
+    inputs: Sequence[str],
+) -> Tuple[List[MatresRelation], Dict[str, Any]]:
     relations: List[MatresRelation] = []
     skipped = Counter()
     raw_counts = Counter()
@@ -119,7 +122,9 @@ def load_matres_relations(inputs: Sequence[str]) -> Tuple[List[MatresRelation], 
                 skipped["malformed_row"] += 1
                 continue
 
-            doc_id, verb1, verb2, eiid1, eiid2, raw_relation = [part.strip() for part in parts]
+            doc_id, verb1, verb2, eiid1, eiid2, raw_relation = [
+                part.strip() for part in parts
+            ]
             raw_relation = raw_relation.upper()
             raw_counts[raw_relation] += 1
             mapped = map_matres_relation(raw_relation)
@@ -193,7 +198,9 @@ def _paragraph_spans(text: str) -> List[Tuple[int, int]]:
         if stripped:
             leading = len(raw_line) - len(raw_line.lstrip())
             trailing = len(raw_line.rstrip()) - len(stripped)
-            spans.append((line_start + leading, max(line_start + leading, line_end - trailing)))
+            spans.append(
+                (line_start + leading, max(line_start + leading, line_end - trailing))
+            )
         cursor = line_end
     return spans or [(0, len(text))]
 
@@ -266,7 +273,9 @@ def _passage_for_events(
     left_index = _paragraph_index_for_offset(doc.paragraph_spans, left.start)
     right_index = _paragraph_index_for_offset(doc.paragraph_spans, right.start)
     start_index = max(0, min(left_index, right_index) - context_radius)
-    end_index = min(len(doc.paragraph_spans) - 1, max(left_index, right_index) + context_radius)
+    end_index = min(
+        len(doc.paragraph_spans) - 1, max(left_index, right_index) + context_radius
+    )
 
     start_offset = doc.paragraph_spans[start_index][0]
     end_offset = doc.paragraph_spans[end_index][1]
@@ -279,7 +288,9 @@ def _label_for_event(event: EventMention, eiid: str, fallback_verb: str) -> str:
     return f"{surface} [{eiid}]"
 
 
-def _prompt_for_pair(*, title: str, passage: str, left_label: str, right_label: str) -> str:
+def _prompt_for_pair(
+    *, title: str, passage: str, left_label: str, right_label: str
+) -> str:
     lines: List[str] = []
     if title:
         lines.extend(["Title:", title, ""])
@@ -308,7 +319,9 @@ def build_matres_tasks(
     max_tasks: int,
     seed: int,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
-    pools: Dict[str, List[MatresRelation]] = {label: [] for label in MATRES_LABEL_MAP.values()}
+    pools: Dict[str, List[MatresRelation]] = {
+        label: [] for label in MATRES_LABEL_MAP.values()
+    }
     skipped = Counter()
 
     for relation in relations:
@@ -321,7 +334,10 @@ def build_matres_tasks(
         if left_instance is None or right_instance is None:
             skipped["missing_instance"] += 1
             continue
-        if left_instance.eid not in doc.events_by_eid or right_instance.eid not in doc.events_by_eid:
+        if (
+            left_instance.eid not in doc.events_by_eid
+            or right_instance.eid not in doc.events_by_eid
+        ):
             skipped["missing_event_mention"] += 1
             continue
         pools[relation.mapped_relation].append(relation)
@@ -419,7 +435,9 @@ def build_matres_tasks(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Convert MATRES relations into canonical pairwise JSONL tasks.")
+    parser = argparse.ArgumentParser(
+        description="Convert MATRES relations into canonical pairwise JSONL tasks."
+    )
     parser.add_argument(
         "--matres-input",
         action="append",
@@ -432,8 +450,14 @@ def main() -> None:
         help="Directory containing TimeML .tml files referenced by the MATRES rows.",
     )
     parser.add_argument("--output", required=True, help="Output canonical JSONL path.")
-    parser.add_argument("--stats-out", default="", help="Optional JSON path for conversion statistics.")
-    parser.add_argument("--category", default="matres_temporal", help="Category label to assign to converted tasks.")
+    parser.add_argument(
+        "--stats-out", default="", help="Optional JSON path for conversion statistics."
+    )
+    parser.add_argument(
+        "--category",
+        default="matres_temporal",
+        help="Category label to assign to converted tasks.",
+    )
     parser.add_argument(
         "--context-radius",
         type=int,
@@ -452,7 +476,9 @@ def main() -> None:
         default=0,
         help="Optional hard cap applied after per-label sampling and shuffling.",
     )
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for stratified sampling.")
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for stratified sampling."
+    )
     args = parser.parse_args()
 
     relations, relation_stats = load_matres_relations(args.matres_input)

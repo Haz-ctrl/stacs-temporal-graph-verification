@@ -13,6 +13,11 @@ def _write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
             handle.write(json.dumps(row) + "\n")
 
 
+# ---------------------------------------------------------------------------
+# Summary artifact generation
+# ---------------------------------------------------------------------------
+
+
 def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     dataset_path = tmp_path / "eval.jsonl"
     _write_jsonl(
@@ -72,8 +77,14 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
         json.dumps(
             {
                 "runs": {
-                    gold_run.run_id: {"model_label": "gold-baseline", "family": "control"},
-                    noisy_run.run_id: {"model_label": "noisy-baseline", "family": "control"},
+                    gold_run.run_id: {
+                        "model_label": "gold-baseline",
+                        "family": "control",
+                    },
+                    noisy_run.run_id: {
+                        "model_label": "noisy-baseline",
+                        "family": "control",
+                    },
                 }
             }
         ),
@@ -102,8 +113,12 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     assert (out_dir / "plots" / "verification_task_incidence.png").exists()
     assert any(row["model_label"] == "gold-baseline" for row in result["summary"])
     assert any(row["category"] == "ambiguous" for row in result["category_breakdown"])
-    assert any(row["difficulty"] == "empty_gold" for row in result["difficulty_breakdown"])
-    gold_row = next(row for row in result["summary"] if row["model_label"] == "gold-baseline")
+    assert any(
+        row["difficulty"] == "empty_gold" for row in result["difficulty_breakdown"]
+    )
+    gold_row = next(
+        row for row in result["summary"] if row["model_label"] == "gold-baseline"
+    )
     assert gold_row["parse_success_ci_low"] is not None
     assert gold_row["validity_expectation_alignment_rate"] == 1.0
     assert gold_row["validity_expectation_alignment_rate_e2e"] == 1.0
@@ -111,10 +126,16 @@ def test_summarise_runs_generates_tables_and_plots(tmp_path: Path) -> None:
     assert gold_row["fidelity_direct_f1"] == 1.0
     assert gold_row["fidelity_closure_f1"] == 1.0
     ambiguous_row = next(
-        row for row in result["category_breakdown"]
+        row
+        for row in result["category_breakdown"]
         if row["model_label"] == "gold-baseline" and row["category"] == "ambiguous"
     )
     assert ambiguous_row["direct_f1"] is None
+
+
+# ---------------------------------------------------------------------------
+# Manifest handling
+# ---------------------------------------------------------------------------
 
 
 def test_summarise_runs_auto_loads_run_manifest(tmp_path: Path) -> None:
@@ -150,6 +171,11 @@ def test_summarise_runs_auto_loads_run_manifest(tmp_path: Path) -> None:
 
     result = summarise_runs([run.run_dir], out_dir=tmp_path / "analysis")
     assert result["summary"][0]["model_label"] == "gold-auto"
+
+
+# ---------------------------------------------------------------------------
+# Dataset-specific plot omissions
+# ---------------------------------------------------------------------------
 
 
 def test_summarise_runs_omits_inapplicable_consistency_plots(tmp_path: Path) -> None:

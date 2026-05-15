@@ -12,7 +12,9 @@ from src.structured_predictor import StructuredOllamaPredictor
 class FakeOllamaClient:
     base_url: str = "http://localhost:11434"
 
-    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+    def generate(
+        self, model: str, prompt: str, temperature: float, seed: int | None
+    ) -> str:
         return """
         {
           "answer": "A happened before B.",
@@ -30,6 +32,11 @@ class FakeOllamaClient:
 
     def tags_snapshot(self) -> list[str]:
         return ["fake-model:latest"]
+
+
+# ---------------------------------------------------------------------------
+# Prompt construction
+# ---------------------------------------------------------------------------
 
 
 def test_build_prompt_includes_question_and_events() -> None:
@@ -54,6 +61,11 @@ def test_build_prompt_includes_question_and_events() -> None:
     assert "- A" in prompt
     assert "- B" in prompt
     assert "Return ONLY valid JSON" in prompt
+
+
+# ---------------------------------------------------------------------------
+# Prediction parsing
+# ---------------------------------------------------------------------------
 
 
 def test_predict_returns_parsed_prediction() -> None:

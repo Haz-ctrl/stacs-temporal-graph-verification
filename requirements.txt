@@ -1,7 +1,6 @@
-networkx
-openai
-pydantic
-matplotlib
+networkx==3.2.1
+pydantic==2.12.5
+matplotlib==3.9.4
 requests==2.32.3
-pytest
-scipy
+pytest==8.4.2
+scipy==1.13.1

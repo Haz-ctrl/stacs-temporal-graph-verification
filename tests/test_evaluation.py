@@ -12,6 +12,11 @@ from src.evaluation import (
 from src.schemas import ReasoningStep
 
 
+# ---------------------------------------------------------------------------
+# Edge canonicalisation and PRF helpers
+# ---------------------------------------------------------------------------
+
+
 def test_canonical_edge_set_normalises_relations() -> None:
     edges = [
         ("A", "B", "before"),
@@ -48,6 +53,11 @@ def test_compute_prf_correct_values() -> None:
     assert result.correct == 2
     assert result.pred_total == 4
     assert result.gold_total == 5
+
+
+# ---------------------------------------------------------------------------
+# Direct-edge scoring
+# ---------------------------------------------------------------------------
 
 
 def test_direct_edge_prf_exact_match_is_perfect() -> None:
@@ -104,6 +114,11 @@ def test_direct_edge_prf_no_predictions() -> None:
     assert result.precision == 0.0
     assert result.recall == 0.0
     assert result.f1 == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Closure scoring
+# ---------------------------------------------------------------------------
 
 
 def test_closure_prf_exact_match_is_perfect() -> None:
@@ -199,7 +214,14 @@ def test_closure_prf_respects_after_directionality() -> None:
     assert result.f1 == 0.0
 
 
-def test_score_prediction_reports_closure_equivalent_extra_edge_without_invalidating() -> None:
+# ---------------------------------------------------------------------------
+# Prediction-level scoring
+# ---------------------------------------------------------------------------
+
+
+def test_score_prediction_reports_closure_equivalent_extra_edge_without_invalidating() -> (
+    None
+):
     allowed = ["A", "B", "C"]
     gold = [("A", "B", "BEFORE"), ("B", "C", "BEFORE")]
     pred = [("A", "B", "BEFORE"), ("B", "C", "BEFORE"), ("A", "C", "BEFORE")]
@@ -227,6 +249,11 @@ def test_aggregate_prf_matches_compute_prf() -> None:
     from src.evaluation import aggregate_prf, compute_prf
 
     assert aggregate_prf(2, 4, 5) == compute_prf(2, 4, 5)
+
+
+# ---------------------------------------------------------------------------
+# Symmetric relation scoring
+# ---------------------------------------------------------------------------
 
 
 def test_direct_edge_prf_after_is_symmetric_with_reversed_before() -> None:
@@ -284,6 +311,11 @@ def test_score_prediction_direct_diagnostics_use_symmetric_edges() -> None:
     assert score.direct.f1 == 1.0
     assert score.missing_direct_edges == []
     assert score.spurious_direct_edges == []
+
+
+# ---------------------------------------------------------------------------
+# Prediction label normalisation
+# ---------------------------------------------------------------------------
 
 
 def test_normalise_pred_labels_remaps_stripped_trigger_word() -> None:

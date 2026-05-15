@@ -48,8 +48,7 @@ class SpecContext:
 class Invariant(Protocol):
     spec: InvariantSpec
 
-    def evaluate(self, context: SpecContext) -> List[Violation]:
-        ...
+    def evaluate(self, context: SpecContext) -> List[Violation]: ...
 
 
 @dataclass(frozen=True)

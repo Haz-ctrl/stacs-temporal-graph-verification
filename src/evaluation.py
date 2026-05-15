@@ -17,7 +17,11 @@ def canonical_edge_set(edges: Iterable[EdgeLike]) -> Set[Edge]:
 def compute_prf(correct: int, pred_total: int, gold_total: int) -> PRFResult:
     precision = (correct / pred_total) if pred_total else 0.0
     recall = (correct / gold_total) if gold_total else 0.0
-    f1 = (2.0 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    f1 = (
+        (2.0 * precision * recall / (precision + recall))
+        if (precision + recall)
+        else 0.0
+    )
     return PRFResult(
         precision=precision,
         recall=recall,
@@ -52,7 +56,9 @@ def _symmetric_canonical_edge(edge: Edge) -> Edge:
     return (src, tgt, rel)
 
 
-def direct_edge_prf(gold_edges: Iterable[EdgeLike], pred_edges: Iterable[EdgeLike]) -> PRFResult:
+def direct_edge_prf(
+    gold_edges: Iterable[EdgeLike], pred_edges: Iterable[EdgeLike]
+) -> PRFResult:
     gold_set = {_symmetric_canonical_edge(e) for e in canonical_edge_set(gold_edges)}
     pred_set = {_symmetric_canonical_edge(e) for e in canonical_edge_set(pred_edges)}
     correct = len(gold_set & pred_set)
@@ -150,7 +156,9 @@ def normalise_pred_labels(
     return normalised_events, normalised_edges, normalised_steps
 
 
-def _ordering_pairs(allowed_events: List[str], edges: Iterable[EdgeLike]) -> Set[OrderingPair]:
+def _ordering_pairs(
+    allowed_events: List[str], edges: Iterable[EdgeLike]
+) -> Set[OrderingPair]:
     graph = TemporalGraph()
     graph.add_events(allowed_events)
     graph.add_edges(edges)

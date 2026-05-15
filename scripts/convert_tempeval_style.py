@@ -20,8 +20,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Convert a simplified TempEval-style JSONL dataset into canonical task JSONL."
     )
-    parser.add_argument("--input", required=True, help="Path to TempEval-style JSONL input.")
-    parser.add_argument("--output", required=True, help="Path to canonical JSONL output.")
+    parser.add_argument(
+        "--input", required=True, help="Path to TempEval-style JSONL input."
+    )
+    parser.add_argument(
+        "--output", required=True, help="Path to canonical JSONL output."
+    )
     parser.add_argument(
         "--category",
         default="tempeval_relation",

@@ -22,6 +22,44 @@ class PredictionParseError(ValueError):
         self.category = category
         self.raw_output = raw_output
 
+def _extract_first_json_object(text: str) -> str:
+    """Return the first balanced JSON object embedded in raw model text."""
+    text = text.strip()
+    if text.startswith("{") and text.endswith("}"):
+        return text
+
+    start = text.find("{")
+    if start == -1:
+        raise ValueError(f"Could not find JSON object in model output:\n{text}")
+
+    depth = 0
+    in_string = False
+    escape = False
+
+    for index in range(start, len(text)):
+        char = text[index]
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+            continue
+        if char == "{":
+            depth += 1
+            continue
+        if char == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : index + 1]
+
+    raise ValueError(f"Could not find balanced JSON object in model output:\n{text}")
+
 
 def _require_object(value: Any, *, context: str) -> Dict[str, Any]:
     if not isinstance(value, dict):
@@ -92,8 +130,7 @@ def _parse_edge_list(value: Any, *, field_name: str) -> List[Edge]:
             edges.append(_to_edge(item))
         except ValueError as exc:
             raise PredictionParseError(
-                f"Invalid edge in '{field_name}': {item!r}. {exc}"
-                ,
+                f"Invalid edge in '{field_name}': {item!r}. {exc}",
                 category="invalid_edge_support",
             ) from exc
     return edges
@@ -110,7 +147,9 @@ def _parse_reasoning_steps(value: Any) -> List[ReasoningStep]:
     for idx, item in enumerate(value):
         step_obj = _require_object(item, context=f"reasoning step at index {idx}")
 
-        step_id = _coerce_step_id(_get_first_present(step_obj, ["step_id", "step"]), index=idx)
+        step_id = _coerce_step_id(
+            _get_first_present(step_obj, ["step_id", "step"]), index=idx
+        )
         text = _coerce_step_text(step_obj, index=idx)
         supports = _parse_edge_list(
             _get_first_present(step_obj, ["supports", "support", "evidence"]) or [],
@@ -162,14 +201,20 @@ def _repair_json_text(raw_text: str) -> str:
             continue
 
         if char == '"':
-            if previous_significant in value_enders and previous_significant not in "{[,:":
+            if (
+                previous_significant in value_enders
+                and previous_significant not in "{[,:"
+            ):
                 result_chars.append(",")
             result_chars.append(char)
             in_string = True
             continue
 
         if char in token_starters - {'"'}:
-            if previous_significant in value_enders and previous_significant not in "{[,:":
+            if (
+                previous_significant in value_enders
+                and previous_significant not in "{[,:"
+            ):
                 result_chars.append(",")
             result_chars.append(char)
             previous_significant = char

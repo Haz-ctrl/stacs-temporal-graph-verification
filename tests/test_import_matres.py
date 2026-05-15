@@ -1,4 +1,5 @@
 """Tests for scripts/import_matres.py."""
+
 from __future__ import annotations
 
 import subprocess
@@ -33,6 +34,11 @@ Gamma <EVENT eid="e3" class="OCCURRENCE">matched</EVENT> later.
     )
 
 
+# ---------------------------------------------------------------------------
+# Relation mapping
+# ---------------------------------------------------------------------------
+
+
 def test_map_matres_relation_to_supported_labels() -> None:
     assert map_matres_relation("BEFORE") == "BEFORE"
     assert map_matres_relation("after") == "AFTER"
@@ -41,11 +47,15 @@ def test_map_matres_relation_to_supported_labels() -> None:
     assert map_matres_relation("INCLUDES") is None
 
 
+# ---------------------------------------------------------------------------
+# MATRES loading and task building
+# ---------------------------------------------------------------------------
+
+
 def test_load_matres_relations_normalises_numeric_eiid(tmp_path: Path) -> None:
     matres_path = tmp_path / "timebank.txt"
     matres_path.write_text(
-        "DOC1\tstarted\tended\t1\t2\tBEFORE\n"
-        "DOC1\tended\tmatched\tei2\tei3\tEQUAL\n",
+        "DOC1\tstarted\tended\t1\t2\tBEFORE\nDOC1\tended\tmatched\tei2\tei3\tEQUAL\n",
         encoding="utf-8",
     )
 
@@ -57,7 +67,9 @@ def test_load_matres_relations_normalises_numeric_eiid(tmp_path: Path) -> None:
     assert stats["raw_relation_counts"] == {"BEFORE": 1, "EQUAL": 1}
 
 
-def test_build_matres_tasks_balances_labels_and_preserves_unknown(tmp_path: Path) -> None:
+def test_build_matres_tasks_balances_labels_and_preserves_unknown(
+    tmp_path: Path,
+) -> None:
     timeml_root = tmp_path / "timeml"
     timeml_root.mkdir()
     _write_timeml(timeml_root / "DOC1.tml", doc_id="DOC1")
@@ -90,11 +102,20 @@ def test_build_matres_tasks_balances_labels_and_preserves_unknown(tmp_path: Path
         "SIMULTANEOUS": 1,
         "UNKNOWN": 1,
     }
-    unknown_task = next(task for task in tasks if task["gold_relations"][0][2] == "UNKNOWN")
+    unknown_task = next(
+        task for task in tasks if task["gold_relations"][0][2] == "UNKNOWN"
+    )
     assert unknown_task["metadata"]["original_relation"] == "VAGUE"
-    assert "Use one of: BEFORE, AFTER, SIMULTANEOUS, UNKNOWN." in unknown_task["question"]
+    assert (
+        "Use one of: BEFORE, AFTER, SIMULTANEOUS, UNKNOWN." in unknown_task["question"]
+    )
     assert unknown_task["events"][0] in unknown_task["question"]
     assert unknown_task["events"][1] in unknown_task["question"]
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 
 
 def test_cli_help() -> None:

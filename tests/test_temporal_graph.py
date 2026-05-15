@@ -10,8 +10,15 @@ from src.temporal_graph import (
 )
 
 
+# ---------------------------------------------------------------------------
+# Relation and edge canonicalisation
+# ---------------------------------------------------------------------------
+
+
 def test_allowed_relations_contains_expected_labels() -> None:
-    assert ALLOWED_RELATIONS == frozenset({"BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"})
+    assert ALLOWED_RELATIONS == frozenset(
+        {"BEFORE", "AFTER", "SIMULTANEOUS", "UNKNOWN"}
+    )
 
 
 def test_canonicalise_relation_normalises_case_and_whitespace() -> None:
@@ -59,6 +66,11 @@ def test_to_edge_rejects_empty_source() -> None:
 def test_to_edge_rejects_empty_target() -> None:
     with pytest.raises(ValueError, match="target"):
         _to_edge(("A", "   ", "BEFORE"))
+
+
+# ---------------------------------------------------------------------------
+# Graph construction and edge access
+# ---------------------------------------------------------------------------
 
 
 def test_add_event_adds_node() -> None:
@@ -128,6 +140,11 @@ def test_relations_set_returns_canonical_edge_set() -> None:
         ("A", "B", "BEFORE"),
         ("B", "C", "AFTER"),
     }
+
+
+# ---------------------------------------------------------------------------
+# Ordering closure
+# ---------------------------------------------------------------------------
 
 
 def test_is_acyclic_true_for_chain() -> None:
@@ -227,6 +244,11 @@ def test_pairs_for_relation_returns_only_requested_relation_pairs() -> None:
     }
 
 
+# ---------------------------------------------------------------------------
+# Contradictions and inconsistencies
+# ---------------------------------------------------------------------------
+
+
 def test_has_direct_contradiction_false_when_none_present() -> None:
     graph = TemporalGraph()
     graph.add_edges([("A", "B", "BEFORE"), ("B", "C", "BEFORE")])
@@ -289,6 +311,11 @@ def test_temporal_inconsistencies_rejects_non_before_relation() -> None:
 
     with pytest.raises(ValueError, match="supports BEFORE only"):
         graph.temporal_inconsistencies("AFTER")
+
+
+# ---------------------------------------------------------------------------
+# Node grounding
+# ---------------------------------------------------------------------------
 
 
 def test_unknown_nodes_returns_sorted_unknown_nodes() -> None:

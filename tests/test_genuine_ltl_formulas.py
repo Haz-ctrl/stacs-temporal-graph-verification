@@ -22,10 +22,19 @@ def _formula_types(result) -> set[str]:
     return {violation.type for violation in result.formula_violations}
 
 
+# ---------------------------------------------------------------------------
+# Unsupported final commitments
+# ---------------------------------------------------------------------------
+
+
 def test_unsupported_final_commitment_fires_when_no_step_supports_edge() -> None:
     result = _verify(
         [("a", "b", "BEFORE")],
-        [ReasoningStep(step_id=1, text="No temporal support.", supports=[], confidence=None)],
+        [
+            ReasoningStep(
+                step_id=1, text="No temporal support.", supports=[], confidence=None
+            )
+        ],
     )
 
     assert "ltl_unsupported_final_commitment" in _formula_types(result)
@@ -50,10 +59,19 @@ def test_unsupported_final_commitment_clear_when_step_supports_edge() -> None:
 def test_unknown_edges_exempt_from_unsupported_commitment() -> None:
     result = _verify(
         [("a", "b", "UNKNOWN")],
-        [ReasoningStep(step_id=1, text="Unknown relation.", supports=[], confidence=None)],
+        [
+            ReasoningStep(
+                step_id=1, text="Unknown relation.", supports=[], confidence=None
+            )
+        ],
     )
 
     assert "ltl_unsupported_final_commitment" not in _formula_types(result)
+
+
+# ---------------------------------------------------------------------------
+# Trace inversion
+# ---------------------------------------------------------------------------
 
 
 def test_trace_inversion_fires_when_opposing_supports_in_trace() -> None:

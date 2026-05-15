@@ -26,7 +26,9 @@ def load_jsonl(path: str | Path) -> List[Dict[str, Any]]:
                 raise ValueError(f"Invalid JSON on line {i} of {path}: {err}") from err
 
             if not isinstance(obj, dict):
-                raise ValueError(f"Expected JSON object on line {i} of {path}, got {type(obj).__name__}.")
+                raise ValueError(
+                    f"Expected JSON object on line {i} of {path}, got {type(obj).__name__}."
+                )
             items.append(obj)
 
     return items
@@ -47,14 +49,20 @@ def parse_temporal_task(obj: Dict[str, Any]) -> TemporalTask:
         raise ValueError("Task field 'id' must be a non-empty string.")
     if not isinstance(question_raw, str):
         raise ValueError(f"Task {task_id_raw}: field 'question' must be a string.")
-    if not isinstance(events_raw, list) or not all(isinstance(event, str) for event in events_raw):
-        raise ValueError(f"Task {task_id_raw}: field 'events' must be a list of strings.")
+    if not isinstance(events_raw, list) or not all(
+        isinstance(event, str) for event in events_raw
+    ):
+        raise ValueError(
+            f"Task {task_id_raw}: field 'events' must be a list of strings."
+        )
     if not isinstance(gold_raw, list):
         raise ValueError(f"Task {task_id_raw}: field 'gold_relations' must be a list.")
     if not isinstance(expected_valid_raw, bool):
         raise ValueError(f"Task {task_id_raw}: field 'expected_valid' must be a bool.")
     if not isinstance(expected_consistent_raw, bool):
-        raise ValueError(f"Task {task_id_raw}: field 'expected_consistent' must be a bool.")
+        raise ValueError(
+            f"Task {task_id_raw}: field 'expected_consistent' must be a bool."
+        )
 
     gold_edges: List[Edge] = [_to_edge(edge) for edge in gold_raw]
 

@@ -27,9 +27,11 @@ ollama list       # should show installed models
 Pull a model before use:
 
 ```bash
-ollama pull qwen2.5:7b
 ollama pull deepseek-r1:7b
-ollama pull llama3.2:3b
+ollama pull qwen3.5:9b
+ollama pull llama3.1:8b
+ollama pull mistral:7b
+ollama pull gemma3:12b
 ```
 
 ---
@@ -57,7 +59,7 @@ summarise_runs.py  ──►  outputs/analysis/<group>/
     │
     ▼
 generate_analysis_plots.py  ──►  outputs/analysis/supplementary_plots/
-    └── (10 dissertation figures)
+    └── (11 dissertation figures)
 ```
 
 ---
@@ -70,7 +72,7 @@ generate_analysis_plots.py  ──►  outputs/analysis/supplementary_plots/
 python -m scripts.validate_dataset --data data/temporal_reasoning_eval.jsonl
 ```
 
-150 tasks: 40 linear_chain, 40 transitive_reasoning, 20 long_chain, 30 ambiguous, 20 contradiction.
+250 tasks: 60 linear_chain, 50 transitive_reasoning, 30 long_chain, 60 ambiguous, 50 contradiction.
 
 ### TempEval-3 slice
 
@@ -168,7 +170,7 @@ python -m scripts.validate_dataset --data data/temporal_reasoning_eval_v2.jsonl
 
 ```bash
 python -m scripts.run_llm_baseline \
-  --model qwen2.5:7b \
+  --model qwen3.5:9b \
   --data data/temporal_reasoning_eval.jsonl \
   --pred-source llm \
   --seed 42 \
@@ -220,10 +222,10 @@ A manifest is a JSON list of model configs:
 ```json
 [
   {
-    "model": "qwen2.5:7b",
-    "label": "Qwen 2.5 7B",
+    "model": "qwen3.5:9b",
+    "label": "Qwen 3.5 9B",
     "family": "qwen",
-    "size": "7b",
+    "size": "9b",
     "reasoning_tuned": false,
     "group": "baseline",
     "notes": ""
@@ -427,25 +429,6 @@ The explorer shows:
 3. Create a dedicated output root: `--output-root outputs/runs/<new_group>`
 4. Run the sweep with `--data <path>`
 5. Point `summarise_runs.py` at the new output root
-
----
-
-## MAVEN-ERE Submission Workflow
-
-For benchmark test submission generation:
-
-1. Convert raw test documents into pairwise inference tasks.
-2. Run `scripts.run_llm_baseline` on the converted test JSONL.
-3. Pack the resulting `predictions.jsonl` into CodaLab format.
-
-```bash
-python -m scripts.build_maven_ere_submission \
-  --test-docs data/raw/MAVEN_ERE/test.jsonl \
-  --predictions outputs/runs/<run_id>/predictions.jsonl \
-  --output-jsonl outputs/submissions/maven_ere/test_prediction.jsonl \
-  --output-zip outputs/submissions/maven_ere/submission.zip \
-  --simultaneous-label SIMULTANEOUS
-```
 
 ---
 

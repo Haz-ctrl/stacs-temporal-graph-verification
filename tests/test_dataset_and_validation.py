@@ -11,6 +11,11 @@ from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import validate_tasks
 
 
+# ---------------------------------------------------------------------------
+# Dataset parsing
+# ---------------------------------------------------------------------------
+
+
 def test_parse_temporal_task_rejects_boolean_coercion() -> None:
     task = {
         "id": "t001",
@@ -27,7 +32,14 @@ def test_parse_temporal_task_rejects_boolean_coercion() -> None:
     except ValueError as exc:
         assert "expected_valid" in str(exc)
     else:
-        raise AssertionError("parse_temporal_task should reject non-bool expected_valid")
+        raise AssertionError(
+            "parse_temporal_task should reject non-bool expected_valid"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Dataset validation profiles
+# ---------------------------------------------------------------------------
 
 
 def test_sample_tasks_validate_cleanly() -> None:
@@ -40,7 +52,9 @@ def test_sample_tasks_validate_cleanly() -> None:
 def test_generic_validation_accepts_diagnostic_relations() -> None:
     tasks = load_jsonl("data/diagnostic_eval.jsonl")
 
-    report = validate_tasks(tasks, strict=False, require_expected_fields=False, profile="generic")
+    report = validate_tasks(
+        tasks, strict=False, require_expected_fields=False, profile="generic"
+    )
 
     assert report.num_errors == 0
 
@@ -65,6 +79,11 @@ def test_generic_validation_does_not_warn_on_external_categories() -> None:
 
     assert report.num_errors == 0
     assert report.num_warnings == 0
+
+
+# ---------------------------------------------------------------------------
+# TempEval adapters
+# ---------------------------------------------------------------------------
 
 
 def test_tempeval_style_record_converts_to_canonical_task() -> None:
@@ -113,5 +132,7 @@ Beta <EVENT eid="e2" sent_idx="1">left</EVENT> later.</TEXT>
     assert bundle.stats["event_event_tlinks"] == 2
     assert bundle.stats["converted_tasks"] == 1
     assert bundle.tasks[0]["id"] == "te3_test_doc_001_l1"
-    assert bundle.tasks[0]["gold_relations"] == [["arrived [ei1]", "left [ei2]", "BEFORE"]]
+    assert bundle.tasks[0]["gold_relations"] == [
+        ["arrived [ei1]", "left [ei2]", "BEFORE"]
+    ]
     assert "arrived [ei1]" in bundle.tasks[0]["question"]

@@ -8,6 +8,11 @@ from src.taxonomy import (
 )
 
 
+# ---------------------------------------------------------------------------
+# Category mapping
+# ---------------------------------------------------------------------------
+
+
 def test_violation_to_category_contains_expected_mappings() -> None:
     assert VIOLATION_TO_CATEGORY["cycle"] == "structural"
     assert VIOLATION_TO_CATEGORY["hallucinated_node"] == "grounding"
@@ -29,15 +34,62 @@ def test_map_violation_to_category_unknown_type_maps_to_other() -> None:
     assert map_violation_to_category("some_future_violation") == "other"
 
 
+# ---------------------------------------------------------------------------
+# Violation summaries
+# ---------------------------------------------------------------------------
+
+
 def test_summarise_violations_counts_by_type_and_category() -> None:
     violations = [
-        Violation(type="cycle", message="cycle", layer="intrinsic_temporal", constraint="acyclicity", details={}),
-        Violation(type="contradiction", message="contradiction", layer="intrinsic_temporal", constraint="antisymmetry", details={}),
-        Violation(type="hallucinated_node", message="hallucinated", layer="grounding", constraint="no_hallucinated_nodes", details={}),
-        Violation(type="duplicate_edge", message="duplicate", layer="format", constraint="duplicate_edge", details={}),
-        Violation(type="unsupported_reasoning_step", message="unsupported", layer="trace", constraint="reasoning_support", details={}),
-        Violation(type="unsupported_reasoning_reference", message="unsupported", layer="grounding", constraint="reasoning_grounding", details={}),
-        Violation(type="some_future_violation", message="unknown", layer="other", constraint="future", details={}),
+        Violation(
+            type="cycle",
+            message="cycle",
+            layer="intrinsic_temporal",
+            constraint="acyclicity",
+            details={},
+        ),
+        Violation(
+            type="contradiction",
+            message="contradiction",
+            layer="intrinsic_temporal",
+            constraint="antisymmetry",
+            details={},
+        ),
+        Violation(
+            type="hallucinated_node",
+            message="hallucinated",
+            layer="grounding",
+            constraint="no_hallucinated_nodes",
+            details={},
+        ),
+        Violation(
+            type="duplicate_edge",
+            message="duplicate",
+            layer="format",
+            constraint="duplicate_edge",
+            details={},
+        ),
+        Violation(
+            type="unsupported_reasoning_step",
+            message="unsupported",
+            layer="trace",
+            constraint="reasoning_support",
+            details={},
+        ),
+        Violation(
+            type="unsupported_reasoning_reference",
+            message="unsupported",
+            layer="grounding",
+            constraint="reasoning_grounding",
+            details={},
+        ),
+        Violation(
+            type="some_future_violation",
+            message="unknown",
+            layer="other",
+            constraint="future",
+            details={},
+        ),
     ]
 
     summary = summarise_violations(violations)

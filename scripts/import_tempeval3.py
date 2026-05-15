@@ -55,7 +55,9 @@ def main() -> None:
         if not split_root.is_dir():
             raise ValueError(f"Split directory not found: {split_root}")
         for path in sorted(split_root.rglob("*.tml")):
-            bundle = convert_tempeval3_tml_file(path, split=split, category=args.category)
+            bundle = convert_tempeval3_tml_file(
+                path, split=split, category=args.category
+            )
             tasks.extend(bundle.tasks)
             split_stats.append(bundle.stats)
             for task in bundle.tasks:
@@ -70,7 +72,9 @@ def main() -> None:
             "relation_counts": dict(sorted(relation_counts.items())),
             "documents": split_stats,
         }
-        Path(args.stats_out).write_text(json.dumps(stats_payload, indent=2), encoding="utf-8")
+        Path(args.stats_out).write_text(
+            json.dumps(stats_payload, indent=2), encoding="utf-8"
+        )
     print(f"Converted {len(tasks)} tasks -> {args.output}")
 
 

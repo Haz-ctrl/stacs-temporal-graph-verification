@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from src.run_summary import _aggregate_prf_from_rows, _closure_coverage, _committed_closure_prf
+from src.run_summary import (
+    _aggregate_prf_from_rows,
+    _closure_coverage,
+    _committed_closure_prf,
+)
 
 
 def _make_row(

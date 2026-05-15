@@ -1,11 +1,15 @@
 """Tests for run directory naming with model labels."""
 
-from pathlib import Path
+from __future__ import annotations
+
 from unittest.mock import patch
 
-import pytest
-
 from scripts.run_llm_baseline import allocate_run_dir, utc_stamp
+
+
+# ---------------------------------------------------------------------------
+# allocate_run_dir
+# ---------------------------------------------------------------------------
 
 
 class TestAllocateRunDir:
@@ -26,8 +30,7 @@ class TestAllocateRunDir:
 
         expected_prefix = model_name
         assert run_id.startswith(f"{expected_prefix}_"), (
-            f"Expected run_id to start with '{expected_prefix}_, "
-            f"but got '{run_id}'"
+            f"Expected run_id to start with '{expected_prefix}_, but got '{run_id}'"
         )
         assert run_dir == tmp_path / run_id
         assert run_dir.exists()
@@ -86,12 +89,12 @@ class TestAllocateRunDir:
     def test_appends_sequence_on_collision(self, tmp_path):
         """Should append _01 suffix when directory already exists."""
         model_name = "llama-2-7b"
-        
+
         # First allocation
         run_id1, run_dir1 = allocate_run_dir(tmp_path, model_label=model_name)
-        
+
         # Second allocation with same timestamp (mocked)
-        with patch('scripts.run_llm_baseline.utc_stamp', return_value=utc_stamp()):
+        with patch("scripts.run_llm_baseline.utc_stamp", return_value=utc_stamp()):
             run_id2, run_dir2 = allocate_run_dir(tmp_path, model_label=model_name)
 
         assert run_id2 != run_id1
@@ -109,17 +112,18 @@ class TestAllocateRunDir:
         expected_first_dir = tmp_path / f"{model_name}_{fake_stamp}"
         expected_first_dir.mkdir()
 
-        with patch('scripts.run_llm_baseline.utc_stamp', return_value=fake_stamp):
+        with patch("scripts.run_llm_baseline.utc_stamp", return_value=fake_stamp):
             run_id2, run_dir2 = allocate_run_dir(tmp_path, model_label=model_name)
 
         assert run_id2.endswith("_01")
         assert run_id2.startswith("test-model_")
+        assert run_dir2.exists()
 
     def test_empty_model_label_same_as_no_label(self, tmp_path):
         """Empty string model label should produce a bare timestamp run ID."""
         fake_stamp = "2024-01-01_000000UTC"
 
-        with patch('scripts.run_llm_baseline.utc_stamp', return_value=fake_stamp):
+        with patch("scripts.run_llm_baseline.utc_stamp", return_value=fake_stamp):
             run_id, run_dir = allocate_run_dir(tmp_path, model_label="")
 
         assert run_id == fake_stamp
@@ -129,15 +133,15 @@ class TestAllocateRunDir:
         """Should preserve hyphens and underscores in model names."""
         model_name = "llama-2-7b-instruct"
         run_id, run_dir = allocate_run_dir(tmp_path, model_label=model_name)
-        
+
         assert "llama-2-7b-instruct" in run_id
         assert run_dir.exists()
-        
+
     def test_handles_ollama_model_format(self, tmp_path):
         """Should handle typical Ollama model format like 'deepseek-r1:7b'."""
         model_name = "deepseek-r1:7b"
         run_id, run_dir = allocate_run_dir(tmp_path, model_label=model_name)
-        
+
         assert "deepseek-r1-7b" in run_id
         assert ":" not in run_id
         assert run_dir.exists()

@@ -14,6 +14,7 @@ Usage:
         --maven-ere-analysis outputs/analysis/maven_ere_full \
         --out outputs/analysis/supplementary_plots
 """
+
 from __future__ import annotations
 
 import argparse
@@ -69,14 +70,17 @@ def _load_manifest(base_dir: Path) -> Dict[str, Dict[str, Any]]:
     return {}
 
 
-def _find_run_dirs(base_dir: Path, *, predictions_filename: str = "predictions.jsonl") -> List[Path]:
+def _find_run_dirs(
+    base_dir: Path, *, predictions_filename: str = "predictions.jsonl"
+) -> List[Path]:
     """Find run directories containing the requested prediction JSONL file."""
     if not base_dir.is_dir():
         return []
     if (base_dir / predictions_filename).exists():
         return [base_dir]
     return sorted(
-        child for child in base_dir.iterdir()
+        child
+        for child in base_dir.iterdir()
         if child.is_dir() and (child / predictions_filename).exists()
     )
 
@@ -136,11 +140,13 @@ def plot_violation_type_model_heatmap(
 ) -> None:
     """Heatmap of affected_task_rate for each (violation_type, model) pair."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     failure_rows = [
-        r for r in summary.get("failure_breakdown", [])
+        r
+        for r in summary.get("failure_breakdown", [])
         if r.get("failure_scope") in ("verification", "ltl_formula")
     ]
     if not failure_rows:
@@ -152,8 +158,11 @@ def plot_violation_type_model_heatmap(
     matrix = [
         [
             next(
-                (r["affected_task_rate"] for r in failure_rows
-                 if r["failure_type"] == vt and r["model_label"] == m),
+                (
+                    r["affected_task_rate"]
+                    for r in failure_rows
+                    if r["failure_type"] == vt and r["model_label"] == m
+                ),
                 0.0,
             )
             for m in models
@@ -175,8 +184,15 @@ def plot_violation_type_model_heatmap(
 
     for i, row in enumerate(matrix):
         for j, val in enumerate(row):
-            ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=7,
-                    color="white" if val > 0.5 else "black")
+            ax.text(
+                j,
+                i,
+                f"{val:.2f}",
+                ha="center",
+                va="center",
+                fontsize=7,
+                color="white" if val > 0.5 else "black",
+            )
 
     fig.tight_layout()
     out_path = out_dir / "violation_type_model_heatmap.png"
@@ -196,6 +212,7 @@ def plot_verifier_screening_signal(
 ) -> None:
     """Precision/recall/specificity of is_valid=False as a screening signal."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -203,26 +220,28 @@ def plot_verifier_screening_signal(
     precisions, recalls, specificities = [], [], []
 
     for model in models:
-        gold_preds = [
-            p for p in predictions_by_model[model] if p.get("gold_relations")
-        ]
+        gold_preds = [p for p in predictions_by_model[model] if p.get("gold_relations")]
         tp = sum(
-            1 for p in gold_preds
+            1
+            for p in gold_preds
             if not p.get("verification", {}).get("is_valid", True)
             and p.get("score", {}).get("direct", {}).get("correct", 0) == 0
         )
         fp = sum(
-            1 for p in gold_preds
+            1
+            for p in gold_preds
             if not p.get("verification", {}).get("is_valid", True)
             and p.get("score", {}).get("direct", {}).get("correct", 0) > 0
         )
         fn = sum(
-            1 for p in gold_preds
+            1
+            for p in gold_preds
             if p.get("verification", {}).get("is_valid", True)
             and p.get("score", {}).get("direct", {}).get("correct", 0) == 0
         )
         tn = sum(
-            1 for p in gold_preds
+            1
+            for p in gold_preds
             if p.get("verification", {}).get("is_valid", True)
             and p.get("score", {}).get("direct", {}).get("correct", 0) > 0
         )
@@ -233,9 +252,19 @@ def plot_verifier_screening_signal(
     fig, ax = plt.subplots(figsize=(max(8, len(models) * 2.2), 5))
     width = 0.25
     pos = list(range(len(models)))
-    ax.bar([p - width for p in pos], precisions, width, label="Precision (invalid→incorrect)")
+    ax.bar(
+        [p - width for p in pos],
+        precisions,
+        width,
+        label="Precision (invalid→incorrect)",
+    )
     ax.bar(pos, recalls, width, label="Recall (incorrect→invalid)")
-    ax.bar([p + width for p in pos], specificities, width, label="Specificity (valid→correct)")
+    ax.bar(
+        [p + width for p in pos],
+        specificities,
+        width,
+        label="Specificity (valid→correct)",
+    )
     ax.set_xticks(pos)
     ax.set_xticklabels(models, rotation=25, ha="right")
     ax.set_ylabel("Rate")
@@ -260,6 +289,7 @@ def plot_direct_vs_closure_f1_by_category(
 ) -> None:
     """Three-panel comparison of direct vs closure F1 for key fidelity categories."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -271,9 +301,15 @@ def plot_direct_vs_closure_f1_by_category(
     width = 0.35
 
     for ax, cat in zip(axes, categories):
-        cat_data = {r["model_label"]: r for r in category_rows if r.get("category") == cat}
-        direct_vals = [float(cat_data.get(m, {}).get("direct_f1") or 0.0) for m in models]
-        closure_vals = [float(cat_data.get(m, {}).get("closure_f1") or 0.0) for m in models]
+        cat_data = {
+            r["model_label"]: r for r in category_rows if r.get("category") == cat
+        }
+        direct_vals = [
+            float(cat_data.get(m, {}).get("direct_f1") or 0.0) for m in models
+        ]
+        closure_vals = [
+            float(cat_data.get(m, {}).get("closure_f1") or 0.0) for m in models
+        ]
         pos = list(range(len(models)))
         ax.bar([p - width / 2 for p in pos], direct_vals, width, label="Direct F1")
         ax.bar([p + width / 2 for p in pos], closure_vals, width, label="Closure F1")
@@ -303,6 +339,7 @@ def plot_cross_dataset_comparison(
 ) -> None:
     """Side-by-side direct and closure F1 across evaluation datasets."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -310,17 +347,11 @@ def plot_cross_dataset_comparison(
         return {r["model_label"]: float(r.get(key) or 0.0) for r in rows}
 
     summary_rows = {
-        dataset.label: dataset.summary.get("summary", [])
-        for dataset in datasets
+        dataset.label: dataset.summary.get("summary", []) for dataset in datasets
     }
-    models = sorted({
-        r["model_label"]
-        for rows in summary_rows.values()
-        for r in rows
-    })
+    models = sorted({r["model_label"] for rows in summary_rows.values() for r in rows})
     direct_by_dataset = {
-        label: _idx(rows, "fidelity_direct_f1")
-        for label, rows in summary_rows.items()
+        label: _idx(rows, "fidelity_direct_f1") for label, rows in summary_rows.items()
     }
     closure_by_dataset = {
         label: _idx(rows, "fidelity_closure_f1_full")
@@ -330,10 +361,7 @@ def plot_cross_dataset_comparison(
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
     width = min(0.25, 0.8 / max(1, len(datasets)))
     pos = list(range(len(models)))
-    offsets = [
-        (i - (len(datasets) - 1) / 2) * width
-        for i in range(len(datasets))
-    ]
+    offsets = [(i - (len(datasets) - 1) / 2) * width for i in range(len(datasets))]
 
     for ax, title, metric_by_dataset in [
         (ax1, "Direct F1", direct_by_dataset),
@@ -373,6 +401,7 @@ def plot_first_violation_step_distribution(
 ) -> None:
     """Density-normalised histogram of first_violation_step per model."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -416,11 +445,18 @@ def plot_model_category_performance_matrix(
 ) -> None:
     """Heatmap of per-model per-category performance using category-appropriate metrics."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     category_rows = summary.get("category_breakdown", [])
-    categories = ["linear_chain", "transitive_reasoning", "long_chain", "ambiguous", "contradiction"]
+    categories = [
+        "linear_chain",
+        "transitive_reasoning",
+        "long_chain",
+        "ambiguous",
+        "contradiction",
+    ]
     models = sorted({r["model_label"] for r in category_rows})
 
     # Metric selection per category
@@ -438,7 +474,11 @@ def plot_model_category_performance_matrix(
         row_vals: List[float] = []
         for model in models:
             cat_row = next(
-                (r for r in category_rows if r.get("category") == cat and r["model_label"] == model),
+                (
+                    r
+                    for r in category_rows
+                    if r.get("category") == cat and r["model_label"] == model
+                ),
                 {},
             )
             val = _cell_metric(cat, cat_row)
@@ -482,14 +522,21 @@ def plot_ambiguity_and_contradiction(
 ) -> None:
     """Stacked bar for ambiguity behaviour and bar for contradiction detection rate."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     summary_rows = summary.get("summary", [])
     models = [r["model_label"] for r in summary_rows]
-    abstention = [float(r.get("ambiguity_abstention_rate") or 0.0) for r in summary_rows]
-    overcommit = [float(r.get("ambiguity_overcommitment_rate") or 0.0) for r in summary_rows]
-    contradiction = [float(r.get("contradiction_detection_rate") or 0.0) for r in summary_rows]
+    abstention = [
+        float(r.get("ambiguity_abstention_rate") or 0.0) for r in summary_rows
+    ]
+    overcommit = [
+        float(r.get("ambiguity_overcommitment_rate") or 0.0) for r in summary_rows
+    ]
+    contradiction = [
+        float(r.get("contradiction_detection_rate") or 0.0) for r in summary_rows
+    ]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -536,6 +583,7 @@ def plot_rq3_spearman_heatmap(
 ) -> None:
     """Spearman ρ heatmap of verifier signals vs task correctness (RQ3)."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -577,9 +625,12 @@ def plot_rq3_spearman_heatmap(
         row_sig: List[bool] = []
         for sig in signal_names:
             match = next(
-                (r for r in rows
-                 if f"{r['model_label']} / {r['dataset']}" == row_label
-                 and r["signal"] == sig),
+                (
+                    r
+                    for r in rows
+                    if f"{r['model_label']} / {r['dataset']}" == row_label
+                    and r["signal"] == sig
+                ),
                 None,
             )
             rho = float(match["spearman_rho"]) if match else float("nan")
@@ -628,6 +679,7 @@ def plot_accuracy_by_verifier_verdict(
 ) -> None:
     """Paired bars of direct-edge accuracy split by is_valid verdict per model."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -636,14 +688,20 @@ def plot_accuracy_by_verifier_verdict(
 
     for model in models:
         gold_preds = [p for p in predictions_by_model[model] if p.get("gold_relations")]
-        valid_preds = [p for p in gold_preds if p.get("verification", {}).get("is_valid")]
-        invalid_preds = [p for p in gold_preds if not p.get("verification", {}).get("is_valid")]
+        valid_preds = [
+            p for p in gold_preds if p.get("verification", {}).get("is_valid")
+        ]
+        invalid_preds = [
+            p for p in gold_preds if not p.get("verification", {}).get("is_valid")
+        ]
 
         def _acc(lst: List[Dict[str, Any]]) -> float:
             if not lst:
                 return 0.0
             return sum(
-                1 for p in lst if p.get("score", {}).get("direct", {}).get("correct", 0) > 0
+                1
+                for p in lst
+                if p.get("score", {}).get("direct", {}).get("correct", 0) > 0
             ) / len(lst)
 
         valid_accs.append(_acc(valid_preds))
@@ -654,17 +712,39 @@ def plot_accuracy_by_verifier_verdict(
     fig, ax = plt.subplots(figsize=(max(8, len(models) * 2.2), 5))
     width = 0.35
     pos = list(range(len(models)))
-    bars1 = ax.bar([p - width / 2 for p in pos], valid_accs, width,
-                   label="is_valid=True", color="#59A14F")
-    bars2 = ax.bar([p + width / 2 for p in pos], invalid_accs, width,
-                   label="is_valid=False", color="#E15759")
+    bars1 = ax.bar(
+        [p - width / 2 for p in pos],
+        valid_accs,
+        width,
+        label="is_valid=True",
+        color="#59A14F",
+    )
+    bars2 = ax.bar(
+        [p + width / 2 for p in pos],
+        invalid_accs,
+        width,
+        label="is_valid=False",
+        color="#E15759",
+    )
 
     for bar, count in zip(bars1, valid_counts):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
-                f"n={count}", ha="center", va="bottom", fontsize=7)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.02,
+            f"n={count}",
+            ha="center",
+            va="bottom",
+            fontsize=7,
+        )
     for bar, count in zip(bars2, invalid_counts):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
-                f"n={count}", ha="center", va="bottom", fontsize=7)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.02,
+            f"n={count}",
+            ha="center",
+            va="bottom",
+            fontsize=7,
+        )
 
     ax.set_xticks(pos)
     ax.set_xticklabels(models, rotation=25, ha="right")
@@ -690,6 +770,7 @@ def plot_failure_scope_contribution(
 ) -> None:
     """Stacked bar of cumulative affected_task_rate per failure scope per model."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -707,8 +788,11 @@ def plot_failure_scope_contribution(
 
     stacks: Dict[str, List[float]] = {
         scope: [
-            sum(r.get("affected_task_rate", 0.0) for r in failure_rows
-                if r["model_label"] == m and r["failure_scope"] == scope)
+            sum(
+                r.get("affected_task_rate", 0.0)
+                for r in failure_rows
+                if r["model_label"] == m and r["failure_scope"] == scope
+            )
             for m in models
         ]
         for scope in scope_order
@@ -743,6 +827,7 @@ def plot_genuine_ltl_violation_incidence(
 ) -> None:
     """Grouped bars for genuine and invariant-corroborating LTL rates."""
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -753,10 +838,11 @@ def plot_genuine_ltl_violation_incidence(
     plots_dir.mkdir(parents=True, exist_ok=True)
 
     models = [str(row.get("model_label", "unknown")) for row in summary_df]
-    genuine = [float(row.get("ltl_genuine_violation_rate") or 0.0) for row in summary_df]
+    genuine = [
+        float(row.get("ltl_genuine_violation_rate") or 0.0) for row in summary_df
+    ]
     corroborating = [
-        float(row.get("ltl_invariant_corroboration_rate") or 0.0)
-        for row in summary_df
+        float(row.get("ltl_invariant_corroboration_rate") or 0.0) for row in summary_df
     ]
 
     fig, ax = plt.subplots(figsize=(max(8, len(models) * 2.0), 5))

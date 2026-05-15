@@ -10,30 +10,52 @@ from src.pairwise_eval import (
 )
 
 
+# ---------------------------------------------------------------------------
+# Pairwise label derivation
+# ---------------------------------------------------------------------------
+
+
 def test_derive_pairwise_label_maps_before_after_and_unknown() -> None:
-    assert derive_pairwise_label(
-        events=["A", "B"],
-        pred_events=["A", "B"],
-        pred_edges=[["A", "B", "BEFORE"]],
-    ) == "BEFORE"
-    assert derive_pairwise_label(
-        events=["A", "B"],
-        pred_events=["A", "B"],
-        pred_edges=[["A", "B", "AFTER"]],
-    ) == "AFTER"
-    assert derive_pairwise_label(
-        events=["A", "B"],
-        pred_events=["A", "B"],
-        pred_edges=[],
-    ) == "UNKNOWN"
+    assert (
+        derive_pairwise_label(
+            events=["A", "B"],
+            pred_events=["A", "B"],
+            pred_edges=[["A", "B", "BEFORE"]],
+        )
+        == "BEFORE"
+    )
+    assert (
+        derive_pairwise_label(
+            events=["A", "B"],
+            pred_events=["A", "B"],
+            pred_edges=[["A", "B", "AFTER"]],
+        )
+        == "AFTER"
+    )
+    assert (
+        derive_pairwise_label(
+            events=["A", "B"],
+            pred_events=["A", "B"],
+            pred_edges=[],
+        )
+        == "UNKNOWN"
+    )
 
 
 def test_derive_pairwise_label_marks_contradictory_graph_unmappable() -> None:
-    assert derive_pairwise_label(
-        events=["A", "B"],
-        pred_events=["A", "B"],
-        pred_edges=[["A", "B", "BEFORE"], ["B", "A", "BEFORE"]],
-    ) == UNMAPPABLE_LABEL
+    assert (
+        derive_pairwise_label(
+            events=["A", "B"],
+            pred_events=["A", "B"],
+            pred_edges=[["A", "B", "BEFORE"], ["B", "A", "BEFORE"]],
+        )
+        == UNMAPPABLE_LABEL
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pairwise reporting
+# ---------------------------------------------------------------------------
 
 
 def test_pairwise_metrics_and_slices() -> None:
@@ -69,6 +91,8 @@ def test_pairwise_metrics_and_slices() -> None:
 
     slice_rows = verification_slices(instances)
     valid_slice = next(row for row in slice_rows if row["slice"] == "verifier_valid")
-    invalid_slice = next(row for row in slice_rows if row["slice"] == "verifier_invalid")
+    invalid_slice = next(
+        row for row in slice_rows if row["slice"] == "verifier_invalid"
+    )
     assert valid_slice["label_accuracy"] == 1.0
     assert invalid_slice["label_accuracy"] == 0.0

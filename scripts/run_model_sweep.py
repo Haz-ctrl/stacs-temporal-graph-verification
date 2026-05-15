@@ -28,14 +28,31 @@ def _default_analysis_out(output_root: Path) -> Path:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a sequential Ollama-backed model sweep.")
-    parser.add_argument("--manifest", required=True, help="Path to model sweep manifest JSON.")
-    parser.add_argument("--data", default="data/temporal_reasoning_eval.jsonl", help="Dataset path.")
+    parser = argparse.ArgumentParser(
+        description="Run a sequential Ollama-backed model sweep."
+    )
+    parser.add_argument(
+        "--manifest", required=True, help="Path to model sweep manifest JSON."
+    )
+    parser.add_argument(
+        "--data", default="data/temporal_reasoning_eval.jsonl", help="Dataset path."
+    )
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
-    parser.add_argument("--temperature", type=float, default=0.0, help="Decoding temperature.")
-    parser.add_argument("--log-raw", action="store_true", help="Log raw outputs in run artefacts.")
-    parser.add_argument("--max-tasks", type=int, default=0, help="Limit tasks per run (0 = full dataset).")
-    parser.add_argument("--base-url", default="http://localhost:11434", help="Default Ollama base URL.")
+    parser.add_argument(
+        "--temperature", type=float, default=0.0, help="Decoding temperature."
+    )
+    parser.add_argument(
+        "--log-raw", action="store_true", help="Log raw outputs in run artefacts."
+    )
+    parser.add_argument(
+        "--max-tasks",
+        type=int,
+        default=0,
+        help="Limit tasks per run (0 = full dataset).",
+    )
+    parser.add_argument(
+        "--base-url", default="http://localhost:11434", help="Default Ollama base URL."
+    )
     parser.add_argument(
         "--timeout-s",
         type=int,
@@ -92,7 +109,9 @@ def main() -> None:
         entry_max_tasks = int(entry.get("max_tasks", args.max_tasks))
         entry_timeout_s = int(entry.get("timeout_s", args.timeout_s))
         entry_max_retries = int(entry.get("max_retries", args.max_retries))
-        entry_retry_backoff_s = float(entry.get("retry_backoff_s", args.retry_backoff_s))
+        entry_retry_backoff_s = float(
+            entry.get("retry_backoff_s", args.retry_backoff_s)
+        )
 
         try:
             result = run_baseline(
@@ -182,16 +201,24 @@ def main() -> None:
         if item.get("status") == "completed" and item.get("run_dir")
     ]
     summariseable_run_dirs = [
-        run_dir for run_dir in completed_run_dirs
-        if (run_dir / "report.json").exists() and (run_dir / "predictions.jsonl").exists()
+        run_dir
+        for run_dir in completed_run_dirs
+        if (run_dir / "report.json").exists()
+        and (run_dir / "predictions.jsonl").exists()
     ]
     if args.skip_analysis:
         return
     if not summariseable_run_dirs:
-        print("Skipped analysis: no completed runs with report.json and predictions.jsonl.")
+        print(
+            "Skipped analysis: no completed runs with report.json and predictions.jsonl."
+        )
         return
 
-    analysis_out = Path(args.analysis_out) if args.analysis_out else _default_analysis_out(output_root)
+    analysis_out = (
+        Path(args.analysis_out)
+        if args.analysis_out
+        else _default_analysis_out(output_root)
+    )
     summarise_runs(
         summariseable_run_dirs,
         out_dir=analysis_out,

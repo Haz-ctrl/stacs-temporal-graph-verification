@@ -100,7 +100,11 @@ class TemporalGraph:
 
     def pairs_for_relation(self, relation: str = "BEFORE") -> Set[Tuple[str, str]]:
         rel = canonicalise_relation(relation)
-        return {(source, target) for (source, target, edge_rel) in self._edges if edge_rel == rel}
+        return {
+            (source, target)
+            for (source, target, edge_rel) in self._edges
+            if edge_rel == rel
+        }
 
     def _simultaneous_sets(self) -> Tuple[_DisjointSet, Dict[str, List[str]]]:
         ds = _DisjointSet(self._nodes)
@@ -189,14 +193,16 @@ class TemporalGraph:
                 if not cycle:
                     continue
                 cycles.append([groups[node][0] for node in cycle])
-        except Exception:
+        except nx.NetworkXException:
             return []
         return cycles
 
     def has_direct_contradiction(self, relation: Relation = "BEFORE") -> bool:
         return len(self.direct_contradictions(relation)) > 0
 
-    def direct_contradictions(self, relation: Relation = "BEFORE") -> List[Tuple[str, str]]:
+    def direct_contradictions(
+        self, relation: Relation = "BEFORE"
+    ) -> List[Tuple[str, str]]:
         rel = TemporalRelation.canonicalise(relation)
         if rel is not TemporalRelation.BEFORE:
             raise ValueError("direct_contradictions currently supports BEFORE only.")
@@ -205,7 +211,9 @@ class TemporalGraph:
         pairs = self.direct_order_pairs()
         for source, target in pairs:
             if (target, source) in pairs:
-                contradictions.add((source, target) if source <= target else (target, source))
+                contradictions.add(
+                    (source, target) if source <= target else (target, source)
+                )
         return sorted(contradictions)
 
     def simultaneous_order_conflicts(self) -> List[Tuple[str, str]]:
@@ -213,10 +221,14 @@ class TemporalGraph:
         conflicts: Set[Tuple[str, str]] = set()
         for source, target in self.direct_order_pairs():
             if ds.find(source) == ds.find(target):
-                conflicts.add((source, target) if source <= target else (target, source))
+                conflicts.add(
+                    (source, target) if source <= target else (target, source)
+                )
         return sorted(conflicts)
 
-    def temporal_inconsistencies(self, relation: Relation = "BEFORE") -> List[Tuple[str, str]]:
+    def temporal_inconsistencies(
+        self, relation: Relation = "BEFORE"
+    ) -> List[Tuple[str, str]]:
         rel = TemporalRelation.canonicalise(relation)
         if rel is not TemporalRelation.BEFORE:
             raise ValueError("temporal_inconsistencies currently supports BEFORE only.")
@@ -225,7 +237,9 @@ class TemporalGraph:
         closure = self.ordering_pairs()
         for source, target in closure:
             if (target, source) in closure:
-                inconsistencies.add((source, target) if source <= target else (target, source))
+                inconsistencies.add(
+                    (source, target) if source <= target else (target, source)
+                )
         return sorted(inconsistencies)
 
     def unknown_nodes(self, allowed_events: Iterable[str]) -> List[str]:

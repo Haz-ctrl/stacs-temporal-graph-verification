@@ -4,9 +4,25 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional, Protocol, Sequence, Set, Tuple
 
-from src.ltl import Atom, Eventually, FormulaEvaluation, Globally, LTLEvaluator, Not, Or, formula_to_dict, formula_to_string
+from src.ltl import (
+    Atom,
+    Eventually,
+    FormulaEvaluation,
+    Globally,
+    LTLEvaluator,
+    Not,
+    Or,
+    formula_to_dict,
+    formula_to_string,
+)
 from src.results import Counterexample, VerificationResult, Violation
-from src.specs import BaseInvariant, FormulaSpec, InvariantSpec, SpecContext, TemporalSpecification
+from src.specs import (
+    BaseInvariant,
+    FormulaSpec,
+    InvariantSpec,
+    SpecContext,
+    TemporalSpecification,
+)
 from src.temporal_graph import EdgeLike, TemporalGraph, _to_edge
 from src.trace import TemporalTrace, build_temporal_trace
 
@@ -25,8 +41,7 @@ class Constraint(Protocol):
         allowed_events: Optional[Sequence[str]] = None,
         pred_edges: Optional[Iterable[EdgeLike]] = None,
         reasoning_steps: Optional[Sequence[Any]] = None,
-    ) -> List[Violation]:
-        ...
+    ) -> List[Violation]: ...
 
 
 def _build_context(
@@ -143,7 +158,9 @@ class NoDirectContradictionsConstraint(BaseInvariant):
                 type="contradiction",
                 message="Temporal graph contains directly contradictory ordering relations.",
                 details={"pairs": contradictions},
-                notes=["Contradictory direct order pair detected after AFTER normalisation."],
+                notes=[
+                    "Contradictory direct order pair detected after AFTER normalisation."
+                ],
             )
         ]
 
@@ -194,7 +211,9 @@ class SimultaneityConsistencyConstraint(BaseInvariant):
                 type="simultaneous_order_conflict",
                 message="A SIMULTANEOUS group also contains an ordering relation.",
                 details={"pairs": conflicts},
-                notes=["Ordering inside a simultaneous equivalence class is inconsistent."],
+                notes=[
+                    "Ordering inside a simultaneous equivalence class is inconsistent."
+                ],
             )
         ]
 
@@ -289,7 +308,9 @@ class NoHallucinatedNodesConstraint(BaseInvariant):
 
     def evaluate(self, context: SpecContext) -> List[Violation]:
         if context.allowed_events is None:
-            raise ValueError("NoHallucinatedNodesConstraint requires allowed_events to be provided.")
+            raise ValueError(
+                "NoHallucinatedNodesConstraint requires allowed_events to be provided."
+            )
         unknown = context.graph.unknown_nodes(context.allowed_events)
         if not unknown:
             return []
@@ -499,7 +520,9 @@ class Verifier:
     constraints: List[Constraint]
     specification: TemporalSpecification
 
-    def _state_graph(self, *, allowed_events: Optional[Sequence[str]], edges: Sequence[Edge3]) -> TemporalGraph:
+    def _state_graph(
+        self, *, allowed_events: Optional[Sequence[str]], edges: Sequence[Edge3]
+    ) -> TemporalGraph:
         graph = TemporalGraph()
         if allowed_events is not None:
             graph.add_events(allowed_events)
@@ -517,12 +540,19 @@ class Verifier:
         violation_types_by_state: List[Set[str]] = []
         for state in trace.states:
             if state.is_final_state:
-                graph = self._state_graph(allowed_events=allowed_events, edges=pred_edges)
+                graph = self._state_graph(
+                    allowed_events=allowed_events, edges=pred_edges
+                )
                 state_reasoning_steps = reasoning_steps
             else:
-                graph = self._state_graph(allowed_events=allowed_events, edges=state.active_edges)
+                graph = self._state_graph(
+                    allowed_events=allowed_events, edges=state.active_edges
+                )
                 state_reasoning_steps = tuple(
-                    step for step in reasoning_steps if getattr(step, "step_id", None) is not None and getattr(step, "step_id") <= (state.step_id or -1)
+                    step
+                    for step in reasoning_steps
+                    if getattr(step, "step_id", None) is not None
+                    and getattr(step, "step_id") <= (state.step_id or -1)
                 )
 
             violations: Set[str] = set()
@@ -592,7 +622,9 @@ class Verifier:
                             else formula_to_string(formula_spec.formula)
                         ),
                     },
-                    counterexample=None if context.trace is None else Counterexample(
+                    counterexample=None
+                    if context.trace is None
+                    else Counterexample(
                         step_ids=[failure_step],
                         notes=notes,
                     ),
@@ -601,7 +633,7 @@ class Verifier:
 
         return formula_violations, first_violation_step
 
-    def _task_specific_formulas(
+    def task_specific_formulas(
         self,
         pred_edges: Tuple[Edge3, ...],
         reasoning_steps_tuple: Tuple[Any, ...],
@@ -700,7 +732,7 @@ class Verifier:
             reasoning_steps=reasoning_steps_tuple,
             trace=trace,
         )
-        task_specific_formulas = self._task_specific_formulas(
+        task_specific_formulas = self.task_specific_formulas(
             pred_edges_tuple,
             reasoning_steps_tuple,
         )
@@ -712,12 +744,15 @@ class Verifier:
         all_violations = violations + formula_violations
         violation_counts = dict(Counter(violation.type for violation in violations))
         layer_counts = dict(Counter(violation.layer for violation in all_violations))
-        formula_violation_counts = dict(Counter(violation.type for violation in formula_violations))
+        formula_violation_counts = dict(
+            Counter(violation.type for violation in formula_violations)
+        )
         first_invariant_step = min(
             (
                 violation.counterexample.step_ids[0]
                 for violation in violations
-                if violation.counterexample is not None and violation.counterexample.step_ids
+                if violation.counterexample is not None
+                and violation.counterexample.step_ids
             ),
             default=None,
         )
@@ -729,10 +764,19 @@ class Verifier:
             ),
             default=None,
         )
-        spec_sources = dict(Counter(violation.spec_source for violation in all_violations))
-        trace_only_violation_types = {"unsupported_reasoning_step", "unsupported_reasoning_reference"}
-        has_trace_violation = any(violation.type in trace_only_violation_types for violation in violations)
-        has_graph_violation = any(violation.type not in trace_only_violation_types for violation in violations)
+        spec_sources = dict(
+            Counter(violation.spec_source for violation in all_violations)
+        )
+        trace_only_violation_types = {
+            "unsupported_reasoning_step",
+            "unsupported_reasoning_reference",
+        }
+        has_trace_violation = any(
+            violation.type in trace_only_violation_types for violation in violations
+        )
+        has_graph_violation = any(
+            violation.type not in trace_only_violation_types for violation in violations
+        )
         graph_valid = not has_graph_violation and len(formula_violations) == 0
         trace_grounded = not has_trace_violation
         return VerificationResult(
@@ -792,4 +836,6 @@ def default_temporal_specification() -> TemporalSpecification:
 
 def default_verifier() -> Verifier:
     specification = default_temporal_specification()
-    return Verifier(constraints=list(specification.invariants), specification=specification)
+    return Verifier(
+        constraints=list(specification.invariants), specification=specification
+    )

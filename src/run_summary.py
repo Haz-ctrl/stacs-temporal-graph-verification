@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import shutil
 from statistics import mean
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 
 import matplotlib
 
@@ -105,7 +105,9 @@ def _load_manifest(path: str | Path | None) -> Dict[str, Dict[str, Any]]:
         return {str(run_id): dict(meta) for run_id, meta in raw["runs"].items()}
     if isinstance(raw, dict):
         return {str(run_id): dict(meta) for run_id, meta in raw.items()}
-    raise ValueError("Run manifest must be an object or an object containing a 'runs' mapping.")
+    raise ValueError(
+        "Run manifest must be an object or an object containing a 'runs' mapping."
+    )
 
 
 def _auto_manifest_path(run_dirs: Sequence[str | Path]) -> Optional[Path]:
@@ -113,7 +115,9 @@ def _auto_manifest_path(run_dirs: Sequence[str | Path]) -> Optional[Path]:
     if not resolved_run_dirs:
         return None
     try:
-        common_root = Path(os.path.commonpath([str(run_dir.parent) for run_dir in resolved_run_dirs]))
+        common_root = Path(
+            os.path.commonpath([str(run_dir.parent) for run_dir in resolved_run_dirs])
+        )
     except ValueError:
         return None
     manifest_path = common_root / "run_manifest.json"
@@ -130,7 +134,9 @@ def _difficulty_bucket(*, num_events: int, gold_relation_count: int) -> str:
     return "high_complexity"
 
 
-def _aggregate_prf_from_rows(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Dict[str, float]:
+def _aggregate_prf_from_rows(
+    rows: Sequence[Dict[str, Any]], *, metric_key: str
+) -> Dict[str, float]:
     correct = 0
     pred_total = 0
     gold_total = 0
@@ -141,7 +147,9 @@ def _aggregate_prf_from_rows(rows: Sequence[Dict[str, Any]], *, metric_key: str)
         gold_total += int(score.get("gold_total", 0))
     precision = (correct / pred_total) if pred_total else 0.0
     recall = (correct / gold_total) if gold_total else 0.0
-    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    f1 = (
+        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    )
     return {
         "precision": precision,
         "recall": recall,
@@ -152,7 +160,9 @@ def _aggregate_prf_from_rows(rows: Sequence[Dict[str, Any]], *, metric_key: str)
     }
 
 
-def _metric_totals_from_failure(failure: Mapping[str, Any], *, metric_key: str) -> Optional[Dict[str, int]]:
+def _metric_totals_from_failure(
+    failure: Mapping[str, Any], *, metric_key: str
+) -> Optional[Dict[str, int]]:
     score = failure.get("score_as_empty_prediction")
     if isinstance(score, Mapping):
         metric = score.get(metric_key)
@@ -204,7 +214,9 @@ def _aggregate_prf_end_to_end(
 
     precision = (correct / pred_total) if pred_total else 0.0
     recall = (correct / gold_total) if gold_total else 0.0
-    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    f1 = (
+        (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+    )
     return (
         {
             "precision": precision,
@@ -281,7 +293,9 @@ def _row_verification(row: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(row.get("verification"), dict):
         return row["verification"]
     prediction = row.get("prediction")
-    if isinstance(prediction, dict) and isinstance(prediction.get("verification"), dict):
+    if isinstance(prediction, dict) and isinstance(
+        prediction.get("verification"), dict
+    ):
         return prediction["verification"]
     return {}
 
@@ -289,19 +303,28 @@ def _row_verification(row: Dict[str, Any]) -> Dict[str, Any]:
 def _trace_grounded_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
+
     def is_grounded(row: Dict[str, Any]) -> bool:
         verification = _row_verification(row)
         if "trace_grounded" in verification:
             return bool(verification.get("trace_grounded"))
-        violation_types = {item.get("type") for item in verification.get("violations", [])}
-        return not bool({"unsupported_reasoning_step", "unsupported_reasoning_reference"} & violation_types)
+        violation_types = {
+            item.get("type") for item in verification.get("violations", [])
+        }
+        return not bool(
+            {"unsupported_reasoning_step", "unsupported_reasoning_reference"}
+            & violation_types
+        )
+
     return sum(1 for row in rows if is_grounded(row)) / len(rows)
 
 
 def _closure_preservation_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
-    return sum(1 for row in rows if row.get("score", {}).get("preserves_ordering_closure")) / len(rows)
+    return sum(
+        1 for row in rows if row.get("score", {}).get("preserves_ordering_closure")
+    ) / len(rows)
 
 
 def _abstention_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
@@ -313,16 +336,22 @@ def _abstention_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
 def _overcommitment_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
-    return sum(1 for row in rows if row.get("score", {}).get("has_overcommitment")) / len(rows)
+    return sum(
+        1 for row in rows if row.get("score", {}).get("has_overcommitment")
+    ) / len(rows)
 
 
 def _invalidity_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     if not rows:
         return None
-    return sum(1 for row in rows if not _row_verification(row).get("is_valid")) / len(rows)
+    return sum(1 for row in rows if not _row_verification(row).get("is_valid")) / len(
+        rows
+    )
 
 
-def _formula_type_rate(rows: Sequence[Dict[str, Any]], formula_types: set[str]) -> Optional[float]:
+def _formula_type_rate(
+    rows: Sequence[Dict[str, Any]], formula_types: set[str]
+) -> Optional[float]:
     if not rows:
         return None
     affected = 0
@@ -338,7 +367,9 @@ def _formula_type_rate(rows: Sequence[Dict[str, Any]], formula_types: set[str]) 
     return affected / len(rows)
 
 
-def _validity_expectation_alignment_rate(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
+def _validity_expectation_alignment_rate(
+    rows: Sequence[Dict[str, Any]],
+) -> Optional[float]:
     if not rows:
         return None
     aligned = 0
@@ -366,7 +397,9 @@ def _average_first_violation_step(rows: Sequence[Dict[str, Any]]) -> Optional[fl
 def _contradiction_detected(row: Dict[str, Any]) -> bool:
     verification = _row_verification(row)
     violation_types = {item.get("type") for item in verification.get("violations", [])}
-    formula_types = {item.get("type") for item in verification.get("formula_violations", [])}
+    formula_types = {
+        item.get("type") for item in verification.get("formula_violations", [])
+    }
     return bool(
         {"contradiction", "cycle", "temporal_inconsistency"} & violation_types
         or {"ltl_contradiction", "ltl_temporal_inconsistency"} & formula_types
@@ -379,7 +412,9 @@ def _contradiction_detection_rate(rows: Sequence[Dict[str, Any]]) -> Optional[fl
     return sum(1 for row in rows if _contradiction_detected(row)) / len(rows)
 
 
-def _metric_or_none(rows: Sequence[Dict[str, Any]], *, metric_key: str) -> Optional[float]:
+def _metric_or_none(
+    rows: Sequence[Dict[str, Any]], *, metric_key: str
+) -> Optional[float]:
     if not rows:
         return None
     aggregate = _aggregate_prf_from_rows(rows, metric_key=metric_key)
@@ -392,13 +427,15 @@ def _closure_coverage(rows: Sequence[Dict[str, Any]]) -> Optional[float]:
     # Among gold-bearing tasks (those where the gold ordering produces at least one pair),
     # what fraction did the model make a non-UNKNOWN ordering commitment for?
     gold_bearing = [
-        r for r in rows
+        r
+        for r in rows
         if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
     ]
     if not gold_bearing:
         return None
     committed = sum(
-        1 for r in gold_bearing
+        1
+        for r in gold_bearing
         if r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
     )
     return committed / len(gold_bearing)
@@ -408,7 +445,8 @@ def _committed_closure_prf(rows: Sequence[Dict[str, Any]]) -> Dict[str, float]:
     # Micro-average PRF restricted to tasks where BOTH gold and pred produce ordering pairs.
     # This is the "conditional on commitment" variant of closure F1.
     committed = [
-        r for r in rows
+        r
+        for r in rows
         if r.get("score", {}).get("closure", {}).get("gold_total", 0) > 0
         and r.get("score", {}).get("closure", {}).get("pred_total", 0) > 0
     ]
@@ -419,17 +457,17 @@ def _has_non_null_metric(rows: Sequence[Dict[str, Any]], key: str) -> bool:
     return any(row.get(key) is not None for row in rows)
 
 
-def _has_meaningful_rate(rows: Sequence[Dict[str, Any]], key: str) -> bool:
-    return any(row.get(key) not in (None, 0, 0.0) for row in rows)
-
-
 def load_runs(
     run_dirs: Sequence[str | Path],
     *,
     manifest_path: str | Path | None = None,
     predictions_filename: str = "predictions.jsonl",
 ) -> List[LoadedRun]:
-    resolved_manifest_path = Path(manifest_path) if manifest_path is not None else _auto_manifest_path(run_dirs)
+    resolved_manifest_path = (
+        Path(manifest_path)
+        if manifest_path is not None
+        else _auto_manifest_path(run_dirs)
+    )
     manifest = _load_manifest(resolved_manifest_path)
     loaded: List[LoadedRun] = []
     for run_dir_like in run_dirs:
@@ -455,18 +493,22 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
     combined_entries = _combine_task_entries(run)
     expected_valid_parsed_rows = _expected_valid_parsed_rows(parsed_rows)
     expected_valid_gold_bearing_rows = [
-        row for row in expected_valid_parsed_rows
+        row
+        for row in expected_valid_parsed_rows
         if len(row.get("gold_relations", [])) > 0
     ]
     ambiguous_rows = [row for row in parsed_rows if row.get("category") == "ambiguous"]
-    contradiction_rows = [row for row in parsed_rows if row.get("category") == "contradiction"]
-    contradiction_entries = [row for row in combined_entries if row.get("category") == "contradiction"]
+    contradiction_rows = [
+        row for row in parsed_rows if row.get("category") == "contradiction"
+    ]
+    contradiction_entries = [
+        row for row in combined_entries if row.get("category") == "contradiction"
+    ]
 
     direct = _aggregate_prf_from_rows(expected_valid_parsed_rows, metric_key="direct")
     closure = _aggregate_prf_from_rows(expected_valid_parsed_rows, metric_key="closure")
     expected_valid_entries = [
-        entry for entry in combined_entries
-        if entry.get("expected_valid", True)
+        entry for entry in combined_entries if entry.get("expected_valid", True)
     ]
     direct_e2e, direct_e2e_complete = _aggregate_prf_end_to_end(
         expected_valid_entries,
@@ -480,22 +522,29 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
     num_failures = int(report.get("num_failures", max(num_tasks - len(parsed_rows), 0)))
     parse_success_rate = len(parsed_rows) / max(num_tasks, 1)
     conditional_validity_rate = (
-        sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / len(parsed_rows)
-        if parsed_rows else None
+        sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid"))
+        / len(parsed_rows)
+        if parsed_rows
+        else None
     )
     conditional_trace_grounding_rate = _trace_grounded_rate(parsed_rows)
-    validity_rate = (
-        sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / max(num_tasks, 1)
-    )
+    validity_rate = sum(
+        1 for row in parsed_rows if row.get("verification", {}).get("is_valid")
+    ) / max(num_tasks, 1)
     parse_ci_low, parse_ci_high = _bootstrap_ci(
         combined_entries,
-        metric_fn=lambda sample: sum(1 for item in sample if item["parsed"]) / len(sample),
+        metric_fn=lambda sample: (
+            sum(1 for item in sample if item["parsed"]) / len(sample)
+        ),
     )
     conditional_ci_low, conditional_ci_high = _bootstrap_ci(
         expected_valid_parsed_rows,
-        metric_fn=lambda sample: sum(
-            1 for row in sample if row.get("verification", {}).get("is_valid")
-        ) / len(sample) if sample else None,
+        metric_fn=lambda sample: (
+            sum(1 for row in sample if row.get("verification", {}).get("is_valid"))
+            / len(sample)
+            if sample
+            else None
+        ),
     )
     direct_ci_low, direct_ci_high = _bootstrap_ci(
         expected_valid_parsed_rows,
@@ -505,8 +554,12 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         expected_valid_parsed_rows,
         metric_fn=lambda sample: _metric_or_none(sample, metric_key="closure"),
     )
-    fidelity_direct = _aggregate_prf_from_rows(expected_valid_gold_bearing_rows, metric_key="direct")
-    fidelity_closure = _aggregate_prf_from_rows(expected_valid_gold_bearing_rows, metric_key="closure")
+    fidelity_direct = _aggregate_prf_from_rows(
+        expected_valid_gold_bearing_rows, metric_key="direct"
+    )
+    fidelity_closure = _aggregate_prf_from_rows(
+        expected_valid_gold_bearing_rows, metric_key="closure"
+    )
     fidelity_direct_ci_low, fidelity_direct_ci_high = _bootstrap_ci(
         expected_valid_gold_bearing_rows,
         metric_fn=lambda sample: _metric_or_none(sample, metric_key="direct"),
@@ -521,7 +574,9 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "model_label": run.label,
         "model": report["model_metadata"].get("model", ""),
         "family": run.manifest_meta.get("family", ""),
-        "size_bucket": run.manifest_meta.get("size_bucket", run.manifest_meta.get("size", "")),
+        "size_bucket": run.manifest_meta.get(
+            "size_bucket", run.manifest_meta.get("size", "")
+        ),
         "reasoning_tuned": run.manifest_meta.get("reasoning_tuned", ""),
         "group": run.manifest_meta.get("group", ""),
         "dataset_version": report["dataset"]["dataset_version"],
@@ -535,15 +590,22 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "parse_success_ci_low": parse_ci_low,
         "parse_success_ci_high": parse_ci_high,
         "transport_failure_rate": (
-            sum(int(value) for value in report.get("transport_failure_counts", {}).values())
+            sum(
+                int(value)
+                for value in report.get("transport_failure_counts", {}).values()
+            )
             / max(num_tasks, 1)
         ),
         "conditional_validity_rate": conditional_validity_rate,
         "conditional_validity_ci_low": conditional_ci_low,
         "conditional_validity_ci_high": conditional_ci_high,
         "conditional_trace_grounding_rate": conditional_trace_grounding_rate,
-        "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(parsed_rows),
-        "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(combined_entries),
+        "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(
+            parsed_rows
+        ),
+        "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(
+            combined_entries
+        ),
         "validity_rate": validity_rate,
         "parsed_expected_valid_tasks": len(expected_valid_parsed_rows),
         "parsed_gold_bearing_tasks": len(expected_valid_gold_bearing_rows),
@@ -562,7 +624,9 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "closure_f1_ci_low": closure_ci_low,
         "closure_f1_ci_high": closure_ci_high,
         "closure_minus_direct_f1": closure["f1"] - direct["f1"],
-        "closure_e2e_precision": closure_e2e["precision"] if closure_e2e_complete else None,
+        "closure_e2e_precision": closure_e2e["precision"]
+        if closure_e2e_complete
+        else None,
         "closure_e2e_recall": closure_e2e["recall"] if closure_e2e_complete else None,
         "closure_e2e_f1": closure_e2e["f1"] if closure_e2e_complete else None,
         "closure_e2e_complete": closure_e2e_complete,
@@ -579,16 +643,28 @@ def _run_row(run: LoadedRun) -> Dict[str, Any]:
         "fidelity_closure_f1_ci_high": fidelity_closure_ci_high,
         "fidelity_closure_gap": fidelity_closure["f1"] - fidelity_direct["f1"],
         "closure_coverage": _closure_coverage(expected_valid_gold_bearing_rows),
-        "fidelity_closure_f1_committed": _committed_closure_prf(expected_valid_gold_bearing_rows)["f1"],
+        "fidelity_closure_f1_committed": _committed_closure_prf(
+            expected_valid_gold_bearing_rows
+        )["f1"],
         "fidelity_closure_f1_full": fidelity_closure["f1"],
-        "closure_preservation_rate": _closure_preservation_rate(expected_valid_parsed_rows),
+        "closure_preservation_rate": _closure_preservation_rate(
+            expected_valid_parsed_rows
+        ),
         "ambiguity_abstention_rate": _abstention_rate(ambiguous_rows),
         "ambiguity_overcommitment_rate": _overcommitment_rate(ambiguous_rows),
-        "contradiction_detection_rate": _contradiction_detection_rate(contradiction_rows),
-        "contradiction_detection_rate_e2e": _contradiction_detection_rate(contradiction_entries),
+        "contradiction_detection_rate": _contradiction_detection_rate(
+            contradiction_rows
+        ),
+        "contradiction_detection_rate_e2e": _contradiction_detection_rate(
+            contradiction_entries
+        ),
         "contradiction_invalidity_rate": _invalidity_rate(contradiction_rows),
-        "ltl_genuine_violation_rate": _formula_type_rate(parsed_rows, GENUINE_LTL_TYPES),
-        "ltl_invariant_corroboration_rate": _formula_type_rate(parsed_rows, CORROBORATING_LTL_TYPES),
+        "ltl_genuine_violation_rate": _formula_type_rate(
+            parsed_rows, GENUINE_LTL_TYPES
+        ),
+        "ltl_invariant_corroboration_rate": _formula_type_rate(
+            parsed_rows, CORROBORATING_LTL_TYPES
+        ),
         "avg_first_violation_step": _average_first_violation_step(parsed_rows),
         "screening_warning": num_tasks <= 25,
     }
@@ -642,8 +718,7 @@ def _group_tasks_by_dimension(
         ]
         expected_valid_rows = _expected_valid_parsed_rows(parsed_rows)
         gold_bearing_rows = [
-            row for row in expected_valid_rows
-            if len(row.get("gold_relations", [])) > 0
+            row for row in expected_valid_rows if len(row.get("gold_relations", [])) > 0
         ]
         rows.append(
             {
@@ -661,19 +736,33 @@ def _group_tasks_by_dimension(
                     else 0.0
                 ),
                 "conditional_validity_rate": (
-                    sum(1 for row in parsed_rows if row.get("verification", {}).get("is_valid")) / len(parsed_rows)
-                    if parsed_rows else None
+                    sum(
+                        1
+                        for row in parsed_rows
+                        if row.get("verification", {}).get("is_valid")
+                    )
+                    / len(parsed_rows)
+                    if parsed_rows
+                    else None
                 ),
-                "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(parsed_rows),
-                "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(combined_rows),
+                "validity_expectation_alignment_rate": _validity_expectation_alignment_rate(
+                    parsed_rows
+                ),
+                "validity_expectation_alignment_rate_e2e": _validity_expectation_alignment_rate(
+                    combined_rows
+                ),
                 "invalidity_rate": _invalidity_rate(parsed_rows),
                 "trace_grounding_rate": _trace_grounded_rate(parsed_rows),
                 "direct_f1": _metric_or_none(gold_bearing_rows, metric_key="direct"),
                 "closure_f1": _metric_or_none(gold_bearing_rows, metric_key="closure"),
-                "closure_preservation_rate": _closure_preservation_rate(expected_valid_rows),
+                "closure_preservation_rate": _closure_preservation_rate(
+                    expected_valid_rows
+                ),
                 "abstention_rate": _abstention_rate(parsed_rows),
                 "overcommitment_rate": _overcommitment_rate(parsed_rows),
-                "contradiction_detection_rate": _contradiction_detection_rate(parsed_rows),
+                "contradiction_detection_rate": _contradiction_detection_rate(
+                    parsed_rows
+                ),
                 "avg_first_violation_step": _average_first_violation_step(parsed_rows),
                 "analysis_focus": (
                     "consistency"
@@ -741,9 +830,12 @@ def _parse_failure_sections(run: LoadedRun, *, limit: int = 2) -> List[str]:
     return sections
 
 
-def _verification_counterexample_sections(run: LoadedRun, *, limit: int = 3) -> List[str]:
+def _verification_counterexample_sections(
+    run: LoadedRun, *, limit: int = 3
+) -> List[str]:
     candidate_rows = [
-        row for row in run.predictions
+        row
+        for row in run.predictions
         if (not row.get("verification", {}).get("is_valid"))
         or row.get("verification", {}).get("formula_violations")
     ]
@@ -763,8 +855,12 @@ def _verification_counterexample_sections(run: LoadedRun, *, limit: int = 3) -> 
             continue
         seen_categories.add(category)
         verification = row.get("verification", {})
-        violation_types = [item.get("type", "") for item in verification.get("violations", [])]
-        formula_types = [item.get("type", "") for item in verification.get("formula_violations", [])]
+        violation_types = [
+            item.get("type", "") for item in verification.get("violations", [])
+        ]
+        formula_types = [
+            item.get("type", "") for item in verification.get("formula_violations", [])
+        ]
         sections.append(
             "\n".join(
                 [
@@ -832,7 +928,9 @@ def _plot_grouped_bars(
     positions = list(range(len(labels)))
     width = 0.8 / max(len(series), 1)
     for index, (name, values) in enumerate(series.items()):
-        offsets = [position + (index - (len(series) - 1) / 2) * width for position in positions]
+        offsets = [
+            position + (index - (len(series) - 1) / 2) * width for position in positions
+        ]
         ax.bar(offsets, values, width=width, label=name)
     ax.set_xticks(positions)
     ax.set_xticklabels(labels, rotation=25)
@@ -899,7 +997,9 @@ def _plot_stacked_bars(
     plt.close(fig)
 
 
-def _plot_average_first_violation_step(path: Path, summary_rows: Sequence[Dict[str, Any]]) -> None:
+def _plot_average_first_violation_step(
+    path: Path, summary_rows: Sequence[Dict[str, Any]]
+) -> None:
     labels = [row["model_label"] for row in summary_rows]
     raw_values = [row["avg_first_violation_step"] for row in summary_rows]
     values = [float(value) if value is not None else math.nan for value in raw_values]
@@ -928,11 +1028,16 @@ def _plot_average_first_violation_step(path: Path, summary_rows: Sequence[Dict[s
     plt.close(fig)
 
 
-def _plot_validity_expectation_alignment(path: Path, summary_rows: Sequence[Dict[str, Any]]) -> None:
+def _plot_validity_expectation_alignment(
+    path: Path, summary_rows: Sequence[Dict[str, Any]]
+) -> None:
     _plot_bar(
         path,
         labels=[row["model_label"] for row in summary_rows],
-        values=[float(row["validity_expectation_alignment_rate_e2e"] or 0.0) for row in summary_rows],
+        values=[
+            float(row["validity_expectation_alignment_rate_e2e"] or 0.0)
+            for row in summary_rows
+        ],
         title="Validity-Expectation Alignment",
         ylabel="End-to-end alignment rate",
         is_rate=True,
@@ -951,7 +1056,9 @@ def _generate_plots(
     plots_dir.mkdir(parents=True, exist_ok=True)
     labels = [row["model_label"] for row in summary_rows]
     has_ambiguity = any(row.get("category") == "ambiguous" for row in category_rows)
-    has_contradiction = any(row.get("category") == "contradiction" for row in category_rows)
+    has_contradiction = any(
+        row.get("category") == "contradiction" for row in category_rows
+    )
     _plot_bar(
         plots_dir / "parse_success_rate.png",
         labels=labels,
@@ -971,7 +1078,10 @@ def _generate_plots(
     _plot_bar(
         plots_dir / "conditional_trace_grounding_rate.png",
         labels=labels,
-        values=[float(row["conditional_trace_grounding_rate"] or 0.0) for row in summary_rows],
+        values=[
+            float(row["conditional_trace_grounding_rate"] or 0.0)
+            for row in summary_rows
+        ],
         title="Conditional Trace Grounding Rate by Model",
         ylabel="Rate",
         is_rate=True,
@@ -1005,7 +1115,10 @@ def _generate_plots(
         values=[float(row["fidelity_closure_gap"]) for row in summary_rows],
         title="Closure Minus Direct F1 (Gold-bearing Tasks)",
         ylabel="F1 gap",
-        ylim=(0.0, max(float(row["fidelity_closure_gap"]) for row in summary_rows) + 0.05),
+        ylim=(
+            0.0,
+            max(float(row["fidelity_closure_gap"]) for row in summary_rows) + 0.05,
+        ),
     )
     _plot_scatter(
         plots_dir / "parse_success_vs_closure_scatter.png",
@@ -1016,14 +1129,15 @@ def _generate_plots(
         xlabel="Parse success rate",
         ylabel="Closure F1",
     )
-    _plot_average_first_violation_step(plots_dir / "average_first_violation_step.png", summary_rows)
+    _plot_average_first_violation_step(
+        plots_dir / "average_first_violation_step.png", summary_rows
+    )
     _plot_grouped_bars(
         plots_dir / "genuine_ltl_incidence.png",
         labels=labels,
         series={
             "Genuine LTL (F/G trace-level)": [
-                float(row["ltl_genuine_violation_rate"] or 0.0)
-                for row in summary_rows
+                float(row["ltl_genuine_violation_rate"] or 0.0) for row in summary_rows
             ],
             "Invariant-corroborating LTL": [
                 float(row["ltl_invariant_corroboration_rate"] or 0.0)
@@ -1035,11 +1149,16 @@ def _generate_plots(
         is_rate=True,
     )
 
-    if has_contradiction and _has_non_null_metric(summary_rows, "contradiction_detection_rate"):
+    if has_contradiction and _has_non_null_metric(
+        summary_rows, "contradiction_detection_rate"
+    ):
         _plot_bar(
             plots_dir / "contradiction_detection_rate.png",
             labels=labels,
-            values=[float(row["contradiction_detection_rate"] or 0.0) for row in summary_rows],
+            values=[
+                float(row["contradiction_detection_rate"] or 0.0)
+                for row in summary_rows
+            ],
             title="Contradiction Detection Rate (Parsed Contradiction Tasks)",
             ylabel="Rate",
             is_rate=True,
@@ -1052,8 +1171,14 @@ def _generate_plots(
             plots_dir / "ambiguity_behaviour.png",
             labels=labels,
             series={
-                "abstention_rate": [float(row["ambiguity_abstention_rate"] or 0.0) for row in summary_rows],
-                "overcommitment_rate": [float(row["ambiguity_overcommitment_rate"] or 0.0) for row in summary_rows],
+                "abstention_rate": [
+                    float(row["ambiguity_abstention_rate"] or 0.0)
+                    for row in summary_rows
+                ],
+                "overcommitment_rate": [
+                    float(row["ambiguity_overcommitment_rate"] or 0.0)
+                    for row in summary_rows
+                ],
             },
             title="Ambiguity Behaviour (Parsed Ambiguous Tasks)",
             ylabel="Rate",
@@ -1065,8 +1190,15 @@ def _generate_plots(
     if len(category_names) > 1:
         parse_series: Dict[str, List[float]] = {}
         for label in labels:
-            label_rows = {row["category"]: row for row in category_parse_rows if row["model_label"] == label}
-            parse_series[label] = [float(label_rows.get(category, {}).get("parse_success_rate", 0.0)) for category in category_names]
+            label_rows = {
+                row["category"]: row
+                for row in category_parse_rows
+                if row["model_label"] == label
+            }
+            parse_series[label] = [
+                float(label_rows.get(category, {}).get("parse_success_rate", 0.0))
+                for category in category_names
+            ]
         _plot_grouped_bars(
             plots_dir / "category_parse_success.png",
             labels=category_names,
@@ -1088,7 +1220,11 @@ def _generate_plots(
     if len(fidelity_categories) > 1:
         series: Dict[str, List[float]] = {}
         for label in labels:
-            label_rows = {row["category"]: row for row in category_rows if row["model_label"] == label}
+            label_rows = {
+                row["category"]: row
+                for row in category_rows
+                if row["model_label"] == label
+            }
             series[label] = [
                 float(label_rows.get(category, {}).get("closure_f1") or 0.0)
                 for category in fidelity_categories
@@ -1131,7 +1267,11 @@ def _generate_plots(
         )
 
     for scope, filename, title in [
-        ("verification", "verification_task_incidence.png", "Invariant Failure Task Incidence"),
+        (
+            "verification",
+            "verification_task_incidence.png",
+            "Invariant Failure Task Incidence",
+        ),
         ("ltl_formula", "ltl_task_incidence.png", "LTL Failure Task Incidence"),
     ]:
         failure_types = sorted(
@@ -1168,7 +1308,9 @@ def _generate_plots(
             )
 
 
-def _markdown_table(rows: Sequence[Dict[str, Any]], *, columns: Sequence[str]) -> List[str]:
+def _markdown_table(
+    rows: Sequence[Dict[str, Any]], *, columns: Sequence[str]
+) -> List[str]:
     header = "| " + " | ".join(columns) + " |"
     separator = "| " + " | ".join("---" for _ in columns) + " |"
     body = []
@@ -1192,7 +1334,9 @@ def _narrative_report(
     if not summary_rows:
         return "# Temporal Verification Evaluation Summary\n\nNo runs analysed.\n"
 
-    category_names = sorted({str(row["category"]) for row in category_rows if row.get("category")})
+    category_names = sorted(
+        {str(row["category"]) for row in category_rows if row.get("category")}
+    )
     has_ambiguity = "ambiguous" in category_names
     has_contradiction = "contradiction" in category_names
     is_single_category = len(category_names) == 1
@@ -1203,7 +1347,9 @@ def _narrative_report(
         key=lambda row: float(row["validity_expectation_alignment_rate_e2e"] or 0.0),
     )
     largest_gap = max(summary_rows, key=lambda row: float(row["fidelity_closure_gap"]))
-    worst_transport = max(summary_rows, key=lambda row: float(row["transport_failure_rate"]))
+    worst_transport = max(
+        summary_rows, key=lambda row: float(row["transport_failure_rate"])
+    )
     screening_mode = any(bool(row["screening_warning"]) for row in summary_rows)
 
     report_lines = [
@@ -1219,13 +1365,18 @@ def _narrative_report(
         "",
     ]
     if has_ambiguity:
-        best_ambiguity = max(summary_rows, key=lambda row: float(row["ambiguity_abstention_rate"] or 0.0))
+        best_ambiguity = max(
+            summary_rows, key=lambda row: float(row["ambiguity_abstention_rate"] or 0.0)
+        )
         report_lines.insert(
             6,
             f"- Best ambiguity abstention: `{best_ambiguity['model_label']}` at `{float(best_ambiguity['ambiguity_abstention_rate'] or 0.0):.3f}`",
         )
     if has_contradiction:
-        best_contradiction = max(summary_rows, key=lambda row: float(row["contradiction_detection_rate"] or 0.0))
+        best_contradiction = max(
+            summary_rows,
+            key=lambda row: float(row["contradiction_detection_rate"] or 0.0),
+        )
         insert_at = 7 if has_ambiguity else 6
         report_lines.insert(
             insert_at,
@@ -1320,7 +1471,8 @@ def _narrative_report(
     # detection demonstrates why intrinsic-only scoring is insufficient.
     if has_contradiction:
         paradox_models = [
-            row["model_label"] for row in summary_rows
+            row["model_label"]
+            for row in summary_rows
             if float(row.get("conditional_validity_rate") or 0.0) >= 0.99
             and float(row.get("contradiction_detection_rate") or 0.0) == 0.0
         ]
@@ -1333,9 +1485,11 @@ def _narrative_report(
                 f"validity and task correctness must be evaluated together."
             )
     category_focus_rows = [
-        row for row in category_rows
+        row
+        for row in category_rows
         if (
-            row.get("category") in {"ambiguous", "contradiction", "linear_chain", "transitive_reasoning"}
+            row.get("category")
+            in {"ambiguous", "contradiction", "linear_chain", "transitive_reasoning"}
             or is_single_category
         )
     ]
@@ -1378,12 +1532,16 @@ def _narrative_report(
     )
     if has_ambiguity:
         report_lines.insert(
-            report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
+            report_lines.index(
+                "- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."
+            ),
             "- `ambiguity_behaviour.png`: abstention discipline versus overcommitment.",
         )
     if has_contradiction:
         report_lines.insert(
-            report_lines.index("- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."),
+            report_lines.index(
+                "- `verification_task_incidence.png`: task-level prevalence of invariant failure modes."
+            ),
             "- `contradiction_detection_rate.png`: conditional consistency-focused performance on parsed contradiction tasks.",
         )
     if correlation_prose_blocks:
@@ -1416,8 +1574,16 @@ def summarise_runs(
         predictions_filename=predictions_filename,
     )
     summary_rows = [_run_row(run) for run in runs]
-    category_rows = [row for run in runs for row in _group_tasks_by_dimension(run, dimension="category")]
-    difficulty_rows = [row for run in runs for row in _group_tasks_by_dimension(run, dimension="difficulty")]
+    category_rows = [
+        row
+        for run in runs
+        for row in _group_tasks_by_dimension(run, dimension="category")
+    ]
+    difficulty_rows = [
+        row
+        for run in runs
+        for row in _group_tasks_by_dimension(run, dimension="difficulty")
+    ]
     failure_rows = [row for run in runs for row in _failure_rows(run)]
 
     out_path = Path(out_dir)
@@ -1448,7 +1614,9 @@ def summarise_runs(
                 counterexample_text.append("")
             counterexample_text.extend(verification_sections)
             counterexample_text.append("")
-    (out_path / "counterexamples.md").write_text("\n".join(counterexample_text), encoding="utf-8")
+    (out_path / "counterexamples.md").write_text(
+        "\n".join(counterexample_text), encoding="utf-8"
+    )
 
     # Per-run axis correlation artefacts (CSV + heatmap PNG)
     correlation_prose_blocks: List[str] = []
@@ -1456,8 +1624,12 @@ def summarise_runs(
         flags = extract_flags(run.predictions, run.report.get("failures", []))
         corr_result = compute_axis_correlation(flags)
         run_slug = run.label.replace(" ", "_").replace("/", "-")
-        save_axis_correlation_csv(corr_result, out_path / f"axis_correlation_{run_slug}.csv")
-        plot_axis_correlation(corr_result, out_path / f"axis_correlation_{run_slug}.png")
+        save_axis_correlation_csv(
+            corr_result, out_path / f"axis_correlation_{run_slug}.csv"
+        )
+        plot_axis_correlation(
+            corr_result, out_path / f"axis_correlation_{run_slug}.png"
+        )
         prose = axis_correlation_prose(corr_result)
         if prose:
             correlation_prose_blocks.append(f"**{run.label}**: {prose}")

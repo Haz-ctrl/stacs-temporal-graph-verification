@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
-import json
-import time
+
 import requests
 
 
@@ -14,57 +14,30 @@ DEFAULT_OLLAMA_CONNECT_TIMEOUT_S = 15
 
 
 class OllamaTransportError(RuntimeError):
+    """Raised when Ollama cannot return a usable generation response."""
+
     def __init__(self, message: str, *, category: str) -> None:
         super().__init__(message)
         self.category = category
 
 
-def _extract_first_json_object(text: str) -> str:
-    text = text.strip()
-    if text.startswith("{") and text.endswith("}"):
-        return text
-
-    start = text.find("{")
-    if start == -1:
-        raise ValueError(f"Could not find JSON object in model output:\n{text}")
-
-    depth = 0
-    in_string = False
-    escape = False
-
-    for index in range(start, len(text)):
-        char = text[index]
-        if in_string:
-            if escape:
-                escape = False
-            elif char == "\\":
-                escape = True
-            elif char == '"':
-                in_string = False
-            continue
-
-        if char == '"':
-            in_string = True
-            continue
-        if char == "{":
-            depth += 1
-            continue
-        if char == "}":
-            depth -= 1
-            if depth == 0:
-                return text[start : index + 1]
-
-    raise ValueError(f"Could not find balanced JSON object in model output:\n{text}")
-
-
 @dataclass
 class OllamaClient:
+    """Minimal retrying client for Ollama's `/api/generate` endpoint."""
+
     base_url: str = "http://localhost:11434"
     timeout_s: int = DEFAULT_OLLAMA_TIMEOUT_S
     max_retries: int = DEFAULT_OLLAMA_MAX_RETRIES
     retry_backoff_s: float = DEFAULT_OLLAMA_RETRY_BACKOFF_S
 
-    def generate(self, model: str, prompt: str, *, temperature: float = 0.0, seed: Optional[int] = 42) -> str:
+    def generate(
+        self,
+        model: str,
+        prompt: str,
+        *,
+        temperature: float = 0.0,
+        seed: Optional[int] = 42,
+    ) -> str:
         payload: Dict[str, Any] = {
             "model": model,
             "prompt": prompt,
@@ -128,5 +101,5 @@ class OllamaClient:
             )
             r.raise_for_status()
             return r.json()
-        except Exception:
+        except (requests.exceptions.RequestException, ValueError):
             return {"error": "could_not_fetch_tags"}

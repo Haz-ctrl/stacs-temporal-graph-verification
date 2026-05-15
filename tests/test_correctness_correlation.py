@@ -1,4 +1,5 @@
 """Tests for src/analysis/correctness_correlation.py."""
+
 from __future__ import annotations
 
 import json
@@ -7,7 +8,6 @@ import warnings
 from pathlib import Path
 
 from src.analysis.correctness_correlation import (
-    CorrelationResult,
     _extract_correctness,
     _extract_verifier_signals,
     _pointbiserial_safe,
@@ -22,7 +22,9 @@ from src.analysis.correctness_correlation import (
 # ---------------------------------------------------------------------------
 
 
-def _make_record(*, correct: int = 0, gold_relations=None, is_valid: bool = True) -> dict:
+def _make_record(
+    *, correct: int = 0, gold_relations=None, is_valid: bool = True
+) -> dict:
     if gold_relations is None:
         gold_relations = [["A", "B", "BEFORE"]]
     return {
@@ -208,7 +210,9 @@ def _write_jsonl(path: Path, records: list) -> None:
             handle.write(json.dumps(rec) + "\n")
 
 
-def _make_prediction_record(*, task_id: str, correct: int, is_valid: bool, violation_count: int = 0) -> dict:
+def _make_prediction_record(
+    *, task_id: str, correct: int, is_valid: bool, violation_count: int = 0
+) -> dict:
     return {
         "id": task_id,
         "gold_relations": [["A", "B", "BEFORE"]],

@@ -10,9 +10,13 @@ from src.dataset_validation import validate_tasks
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Validate a temporal reasoning JSONL dataset.")
+    ap = argparse.ArgumentParser(
+        description="Validate a temporal reasoning JSONL dataset."
+    )
     ap.add_argument("--data", required=True, help="Path to JSONL dataset.")
-    ap.add_argument("--strict", action="store_true", help="Treat warnings as errors for key checks.")
+    ap.add_argument(
+        "--strict", action="store_true", help="Treat warnings as errors for key checks."
+    )
     ap.add_argument(
         "--require-expected-fields",
         action="store_true",
@@ -24,7 +28,9 @@ def main() -> None:
         default="generic",
         help="Validation profile: generic schema checks or canonical synthetic benchmark checks.",
     )
-    ap.add_argument("--out", default="", help="Optional path to write a validation report JSON.")
+    ap.add_argument(
+        "--out", default="", help="Optional path to write a validation report JSON."
+    )
     args = ap.parse_args()
 
     tasks: List[Dict[str, Any]] = load_jsonl(args.data)

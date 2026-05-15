@@ -4,6 +4,11 @@ from src.schemas import ReasoningStep
 from src.trace import TemporalState, TemporalTrace, build_temporal_trace
 
 
+# ---------------------------------------------------------------------------
+# Trace construction
+# ---------------------------------------------------------------------------
+
+
 def test_build_temporal_trace_creates_step_states_and_final_state() -> None:
     trace = build_temporal_trace(
         allowed_events=["A", "B", "C"],
@@ -55,7 +60,14 @@ def test_build_temporal_trace_creates_step_states_and_final_state() -> None:
     )
 
 
-def test_temporal_trace_predicates_cover_relations_support_mentions_and_violations() -> None:
+# ---------------------------------------------------------------------------
+# Trace predicates
+# ---------------------------------------------------------------------------
+
+
+def test_temporal_trace_predicates_cover_relations_support_mentions_and_violations() -> (
+    None
+):
     base_trace = TemporalTrace(
         states=(
             TemporalState(
@@ -93,6 +105,9 @@ def test_temporal_trace_predicates_cover_relations_support_mentions_and_violatio
     assert base_trace.predicate_holds(0, "supports", ("A", "B", "BEFORE")) is True
     assert base_trace.predicate_holds(0, "mentions_event", ("A",)) is True
     assert base_trace.predicate_holds(1, "has_violation", ("contradiction",)) is True
-    assert base_trace.predicate_holds(1, "introduced_violation", ("hallucinated_node",)) is True
+    assert (
+        base_trace.predicate_holds(1, "introduced_violation", ("hallucinated_node",))
+        is True
+    )
     assert base_trace.predicate_holds(1, "is_final_state", ()) is True
     assert base_trace.predicate_holds(0, "has_violation", ("contradiction",)) is False

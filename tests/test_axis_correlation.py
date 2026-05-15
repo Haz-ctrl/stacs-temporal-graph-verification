@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 
 from src.analysis.axis_correlation import (
-    AxisCorrelationResult,
     _pearson,
     axis_correlation_prose,
     compute_axis_correlation,
@@ -132,13 +131,17 @@ def test_extract_flags_parsed_row() -> None:
     ]
     flags = extract_flags(predictions, [])
 
-    assert flags == [{"parse_success": True, "verifier_valid": True, "trace_grounded": False}]
+    assert flags == [
+        {"parse_success": True, "verifier_valid": True, "trace_grounded": False}
+    ]
 
 
 def test_extract_flags_failure_row_all_false() -> None:
     flags = extract_flags([], [{"id": "fail_001"}])
 
-    assert flags == [{"parse_success": False, "verifier_valid": False, "trace_grounded": False}]
+    assert flags == [
+        {"parse_success": False, "verifier_valid": False, "trace_grounded": False}
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -150,7 +153,12 @@ def test_prose_reports_collinear_pair() -> None:
     flags = _make_flags(
         parse_success=[True, True, True, True],
         verifier_valid=[True, True, False, False],
-        trace_grounded=[True, True, False, False],  # fully correlated with verifier_valid
+        trace_grounded=[
+            True,
+            True,
+            False,
+            False,
+        ],  # fully correlated with verifier_valid
     )
     result = compute_axis_correlation(flags)
     prose = axis_correlation_prose(result)

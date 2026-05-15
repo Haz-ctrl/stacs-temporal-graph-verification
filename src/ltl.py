@@ -8,7 +8,7 @@ from src.trace import TemporalTrace
 
 
 class Formula:
-    pass
+    """Base marker type for the supported LTL formula AST."""
 
 
 @dataclass(frozen=True)
@@ -69,13 +69,25 @@ class FormulaEvaluation:
 
 def formula_to_dict(formula: Formula) -> Dict[str, object]:
     if isinstance(formula, Atom):
-        return {"op": "atom", "predicate": formula.predicate, "args": list(formula.args)}
+        return {
+            "op": "atom",
+            "predicate": formula.predicate,
+            "args": list(formula.args),
+        }
     if isinstance(formula, Not):
         return {"op": "not", "arg": formula_to_dict(formula.operand)}
     if isinstance(formula, And):
-        return {"op": "and", "left": formula_to_dict(formula.left), "right": formula_to_dict(formula.right)}
+        return {
+            "op": "and",
+            "left": formula_to_dict(formula.left),
+            "right": formula_to_dict(formula.right),
+        }
     if isinstance(formula, Or):
-        return {"op": "or", "left": formula_to_dict(formula.left), "right": formula_to_dict(formula.right)}
+        return {
+            "op": "or",
+            "left": formula_to_dict(formula.left),
+            "right": formula_to_dict(formula.right),
+        }
     if isinstance(formula, Next):
         return {"op": "x", "arg": formula_to_dict(formula.operand)}
     if isinstance(formula, Eventually):
@@ -83,7 +95,11 @@ def formula_to_dict(formula: Formula) -> Dict[str, object]:
     if isinstance(formula, Globally):
         return {"op": "g", "arg": formula_to_dict(formula.operand)}
     if isinstance(formula, Until):
-        return {"op": "u", "left": formula_to_dict(formula.left), "right": formula_to_dict(formula.right)}
+        return {
+            "op": "u",
+            "left": formula_to_dict(formula.left),
+            "right": formula_to_dict(formula.right),
+        }
     raise TypeError(f"Unsupported formula type: {type(formula).__name__}")
 
 
@@ -95,9 +111,13 @@ def formula_to_string(formula: Formula) -> str:
     if isinstance(formula, Not):
         return f"!({formula_to_string(formula.operand)})"
     if isinstance(formula, And):
-        return f"({formula_to_string(formula.left)} & {formula_to_string(formula.right)})"
+        return (
+            f"({formula_to_string(formula.left)} & {formula_to_string(formula.right)})"
+        )
     if isinstance(formula, Or):
-        return f"({formula_to_string(formula.left)} | {formula_to_string(formula.right)})"
+        return (
+            f"({formula_to_string(formula.left)} | {formula_to_string(formula.right)})"
+        )
     if isinstance(formula, Next):
         return f"X({formula_to_string(formula.operand)})"
     if isinstance(formula, Eventually):
@@ -105,7 +125,9 @@ def formula_to_string(formula: Formula) -> str:
     if isinstance(formula, Globally):
         return f"G({formula_to_string(formula.operand)})"
     if isinstance(formula, Until):
-        return f"({formula_to_string(formula.left)} U {formula_to_string(formula.right)})"
+        return (
+            f"({formula_to_string(formula.left)} U {formula_to_string(formula.right)})"
+        )
     raise TypeError(f"Unsupported formula type: {type(formula).__name__}")
 
 
@@ -129,13 +151,21 @@ class LTLEvaluator:
             if isinstance(node, Next):
                 return index + 1 < len(self.trace) and holds(node.operand, index + 1)
             if isinstance(node, Eventually):
-                return any(holds(node.operand, later) for later in range(index, len(self.trace)))
+                return any(
+                    holds(node.operand, later)
+                    for later in range(index, len(self.trace))
+                )
             if isinstance(node, Globally):
-                return all(holds(node.operand, later) for later in range(index, len(self.trace)))
+                return all(
+                    holds(node.operand, later)
+                    for later in range(index, len(self.trace))
+                )
             if isinstance(node, Until):
                 for later in range(index, len(self.trace)):
                     if holds(node.right, later):
-                        if all(holds(node.left, middle) for middle in range(index, later)):
+                        if all(
+                            holds(node.left, middle) for middle in range(index, later)
+                        ):
                             return True
                 return False
             raise TypeError(f"Unsupported formula type: {type(node).__name__}")
@@ -148,12 +178,17 @@ class LTLEvaluator:
                 return FormulaFailure(failing_formula=node, first_failure_step=index)
 
             if isinstance(node, Not):
-                return FormulaFailure(failing_formula=node.operand, first_failure_step=index)
+                return FormulaFailure(
+                    failing_formula=node.operand, first_failure_step=index
+                )
 
             if isinstance(node, And):
                 failures = [
                     failure
-                    for failure in (explain(node.left, index), explain(node.right, index))
+                    for failure in (
+                        explain(node.left, index),
+                        explain(node.right, index),
+                    )
                     if failure is not None
                 ]
                 return min(failures, key=lambda failure: failure.first_failure_step)
@@ -161,14 +196,19 @@ class LTLEvaluator:
             if isinstance(node, Or):
                 failures = [
                     failure
-                    for failure in (explain(node.left, index), explain(node.right, index))
+                    for failure in (
+                        explain(node.left, index),
+                        explain(node.right, index),
+                    )
                     if failure is not None
                 ]
                 return min(failures, key=lambda failure: failure.first_failure_step)
 
             if isinstance(node, Next):
                 if index + 1 >= len(self.trace):
-                    return FormulaFailure(failing_formula=node, first_failure_step=index)
+                    return FormulaFailure(
+                        failing_formula=node, first_failure_step=index
+                    )
                 return explain(node.operand, index + 1)
 
             if isinstance(node, Eventually):
@@ -188,7 +228,9 @@ class LTLEvaluator:
             if isinstance(node, Until):
                 for later in range(index, len(self.trace)):
                     if holds(node.right, later):
-                        if all(holds(node.left, middle) for middle in range(index, later)):
+                        if all(
+                            holds(node.left, middle) for middle in range(index, later)
+                        ):
                             return None
                     if later < len(self.trace) and not holds(node.left, later):
                         return explain(node.left, later)

@@ -3,8 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-from src.ollama_client import OllamaClient, _extract_first_json_object
-from src.prediction_schema import ParsedPrediction, PredictionParseError, parse_model_prediction_json
+from src.ollama_client import OllamaClient
+from src.prediction_schema import (
+    ParsedPrediction,
+    PredictionParseError,
+    _extract_first_json_object,
+    parse_model_prediction_json,
+)
 from src.schemas import TemporalTask
 
 

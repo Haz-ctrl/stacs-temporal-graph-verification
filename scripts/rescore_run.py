@@ -53,7 +53,9 @@ def _verification_to_json(
     pred_edges: tuple[Edge, ...],
     reasoning_steps: tuple[ReasoningStep, ...],
 ) -> Dict[str, Any]:
-    task_specific_formulas = verifier._task_specific_formulas(pred_edges, reasoning_steps)
+    task_specific_formulas = verifier.task_specific_formulas(
+        pred_edges, reasoning_steps
+    )
     return {
         "specification_name": verifier.specification.name,
         "is_valid": verification.is_valid,
@@ -61,17 +63,24 @@ def _verification_to_json(
         "trace_grounded": verification.trace_grounded,
         "violations": [asdict(violation) for violation in verification.violations],
         "ltl_passed": len(verification.formula_violations) == 0,
-        "formula_violations": [asdict(violation) for violation in verification.formula_violations],
+        "formula_violations": [
+            asdict(violation) for violation in verification.formula_violations
+        ],
         "violation_counts": verification.violation_counts,
         "formula_violation_counts": verification.formula_violation_counts,
         "layer_counts": verification.layer_counts,
         "first_violation_step": verification.first_violation_step,
         "spec_sources": verification.spec_sources,
         "active_specification": {
-            "invariants": [invariant.name for invariant in verifier.specification.invariants],
+            "invariants": [
+                invariant.name for invariant in verifier.specification.invariants
+            ],
             "formulas": [
                 formula.serialise()
-                for formula in [*verifier.specification.formulas, *task_specific_formulas]
+                for formula in [
+                    *verifier.specification.formulas,
+                    *task_specific_formulas,
+                ]
             ],
         },
     }
@@ -87,7 +96,9 @@ def _is_parse_failure(record: Dict[str, Any]) -> bool:
     return False
 
 
-def rescore_predictions(predictions_path: Path, output_path: Path) -> tuple[int, int, int]:
+def rescore_predictions(
+    predictions_path: Path, output_path: Path
+) -> tuple[int, int, int]:
     verifier = default_verifier()
     records = _read_jsonl(predictions_path)
     rescored_records: List[Dict[str, Any]] = []
@@ -140,8 +151,12 @@ def rescore_predictions(predictions_path: Path, output_path: Path) -> tuple[int,
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Re-run current verifier on an existing predictions.jsonl.")
-    parser.add_argument("--predictions", required=True, help="Path to predictions.jsonl.")
+    parser = argparse.ArgumentParser(
+        description="Re-run current verifier on an existing predictions.jsonl."
+    )
+    parser.add_argument(
+        "--predictions", required=True, help="Path to predictions.jsonl."
+    )
     parser.add_argument(
         "--output",
         default="",
@@ -150,7 +165,11 @@ def main() -> None:
     args = parser.parse_args()
 
     predictions_path = Path(args.predictions)
-    output_path = Path(args.output) if args.output else predictions_path.with_name("predictions_rescored.jsonl")
+    output_path = (
+        Path(args.output)
+        if args.output
+        else predictions_path.with_name("predictions_rescored.jsonl")
+    )
     rescored, skipped, changed = rescore_predictions(predictions_path, output_path)
     print(f"Records rescored: {rescored}")
     print(f"Parse failures skipped: {skipped}")

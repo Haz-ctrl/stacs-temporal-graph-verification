@@ -51,7 +51,6 @@ stacs-temporal-graph-verification/
 │   ├── import_tempeval3.py        # Convert TempEval-3 TimeML files → canonical JSONL
 │   ├── run_llm_baseline.py        # Run a single model on a dataset
 │   ├── run_model_sweep.py         # Run multiple models sequentially from a manifest
-│   ├── build_maven_ere_submission.py # Convert pairwise predictions → MAVEN-ERE submission.zip
 │   ├── summarise_runs.py          # Aggregate run dirs → CSVs, plots, and report.md
 │   └── validate_dataset.py        # Validate a JSONL dataset before running
 ├── src/
@@ -235,10 +234,8 @@ Interval relations such as `INCLUDES` or `IS_INCLUDED` are intentionally exclude
 
 To rebuild the checked-in MAVEN-ERE validation slice from the raw benchmark:
 
-<!--
-TODO add link to MAVEN_ERE zip file on Drive/Github
--->
-1. Download MAVEN-ERE.zip 
+1. Download `MAVEN-ERE.zip` from the official [THU-KEG MAVEN-ERE repository](https://github.com/THU-KEG/MAVEN-ERE) using the [Tsinghua Cloud mirror](https://cloud.tsinghua.edu.cn/f/a7d1db6c44ea458bb6f0/).
+2. Extract it so the raw files are under `data/raw/MAVEN_ERE/`.
 
 ```bash
 python -m scripts.import_maven_ere \

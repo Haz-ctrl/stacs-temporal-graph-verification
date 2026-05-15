@@ -70,7 +70,9 @@ class TemporalTrace:
 
         return False
 
-    def with_violations(self, violation_types_by_state: Sequence[Iterable[str]]) -> "TemporalTrace":
+    def with_violations(
+        self, violation_types_by_state: Sequence[Iterable[str]]
+    ) -> "TemporalTrace":
         states: List[TemporalState] = []
         seen: set[str] = set()
         for state, violation_types in zip(self.states, violation_types_by_state):
@@ -143,7 +145,13 @@ def build_temporal_trace(
             support_edges=(),
             active_edges=final_edges,
             mentioned_events=tuple(
-                sorted({event for source, target, _ in final_edges for event in (source, target)})
+                sorted(
+                    {
+                        event
+                        for source, target, _ in final_edges
+                        for event in (source, target)
+                    }
+                )
             ),
         )
     )

@@ -8,6 +8,7 @@ the more interpretable coefficient for the binary-only subset.
 
 Saves per-run CSV and heatmap PNG alongside the existing analysis artefacts.
 """
+
 from __future__ import annotations
 
 import csv
@@ -110,9 +111,7 @@ def axis_correlation_prose(result: AxisCorrelationResult) -> str:
     Reports collinear pairs, strongest, and weakest correlations.
     """
     valid_pairs = [
-        (abs(v), a, b, v)
-        for (a, b), v in result.pearson.items()
-        if not math.isnan(v)
+        (abs(v), a, b, v) for (a, b), v in result.pearson.items() if not math.isnan(v)
     ]
     if not valid_pairs:
         return ""
@@ -122,9 +121,7 @@ def axis_correlation_prose(result: AxisCorrelationResult) -> str:
 
     collinear = [(a, b, v) for _, a, b, v in valid_pairs if abs(v) > 0.9]
     if collinear:
-        names = ", ".join(
-            f"`{a}`–`{b}` (ρ = {v:.2f})" for a, b, v in collinear
-        )
+        names = ", ".join(f"`{a}`–`{b}` (ρ = {v:.2f})" for a, b, v in collinear)
         lines.append(
             f"Collinear axis pairs (|ρ| > 0.90): {names}. "
             "These axes provide largely redundant signal and should not be "
@@ -198,8 +195,15 @@ def plot_axis_correlation(result: AxisCorrelationResult, path: Path) -> None:
         for j in range(n_axes):
             val = matrix[i][j]
             label = f"{val:.2f}" if not math.isnan(val) else "n/a"
-            ax.text(j, i, label, ha="center", va="center", fontsize=8,
-                    color="black" if abs(val) < 0.6 else "white")
+            ax.text(
+                j,
+                i,
+                label,
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="black" if abs(val) < 0.6 else "white",
+            )
 
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)

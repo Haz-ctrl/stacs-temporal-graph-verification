@@ -19,6 +19,7 @@ Signals measured per task:
 Correctness: binary — 1 if score.direct.correct > 0, else 0. Tasks with no
 gold_relations are excluded from all computations.
 """
+
 from __future__ import annotations
 
 import json
@@ -186,7 +187,9 @@ def analyse_run(
     for name, description, is_binary in _SIGNALS:
         xs = signal_values[name]
         rho, sp = _spearman_safe(xs, correctness_values)
-        pairs_clean = [(x, y) for x, y in zip(xs, correctness_values) if not math.isnan(x)]
+        pairs_clean = [
+            (x, y) for x, y in zip(xs, correctness_values) if not math.isnan(x)
+        ]
         n = len(pairs_clean)
         if is_binary:
             pbr, pbp = _pointbiserial_safe(xs, correctness_values)

@@ -7,6 +7,11 @@ from pathlib import Path
 from scripts import run_model_sweep
 
 
+# ---------------------------------------------------------------------------
+# Successful sweeps
+# ---------------------------------------------------------------------------
+
+
 def test_run_model_sweep_writes_manifest_and_index(
     tmp_path: Path,
     monkeypatch,
@@ -63,14 +68,23 @@ def test_run_model_sweep_writes_manifest_and_index(
 
     run_model_sweep.main()
 
-    run_manifest = json.loads((tmp_path / "runs" / "run_manifest.json").read_text(encoding="utf-8"))
-    sweep_index = json.loads((tmp_path / "runs" / "sweep_index.json").read_text(encoding="utf-8"))
+    run_manifest = json.loads(
+        (tmp_path / "runs" / "run_manifest.json").read_text(encoding="utf-8")
+    )
+    sweep_index = json.loads(
+        (tmp_path / "runs" / "sweep_index.json").read_text(encoding="utf-8")
+    )
 
     assert sorted(run_manifest["runs"].keys()) == ["run_1", "run_2"]
     assert run_manifest["runs"]["run_1"]["model_label"] == "Model A"
     assert sweep_index["runs"][1]["label"] == "Model B"
     assert sweep_index["runs"][0]["status"] == "completed"
     assert sweep_index["failures"] == []
+
+
+# ---------------------------------------------------------------------------
+# Failure handling
+# ---------------------------------------------------------------------------
 
 
 def test_run_model_sweep_continues_on_error(
@@ -116,8 +130,12 @@ def test_run_model_sweep_continues_on_error(
 
     run_model_sweep.main()
 
-    run_manifest = json.loads((tmp_path / "runs" / "run_manifest.json").read_text(encoding="utf-8"))
-    sweep_index = json.loads((tmp_path / "runs" / "sweep_index.json").read_text(encoding="utf-8"))
+    run_manifest = json.loads(
+        (tmp_path / "runs" / "run_manifest.json").read_text(encoding="utf-8")
+    )
+    sweep_index = json.loads(
+        (tmp_path / "runs" / "sweep_index.json").read_text(encoding="utf-8")
+    )
 
     assert run_manifest["failures"][0]["model"] == "model-a"
     assert run_manifest["runs"]["run_2"]["status"] == "completed"

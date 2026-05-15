@@ -12,7 +12,12 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple
 from src.constraints import default_verifier
 from src.dataset import load_jsonl, parse_temporal_task
 from src.dataset_validation import ValidationReport, validate_tasks
-from src.evaluation import aggregate_prf, normalise_pred_labels, score_prediction, task_score_to_json
+from src.evaluation import (
+    aggregate_prf,
+    normalise_pred_labels,
+    score_prediction,
+    task_score_to_json,
+)
 from src.ollama_client import (
     DEFAULT_OLLAMA_MAX_RETRIES,
     DEFAULT_OLLAMA_RETRY_BACKOFF_S,
@@ -73,11 +78,18 @@ def write_json(path: Path, obj: Any) -> None:
     path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
 
 
-def allocate_run_dir(output_root: str | Path, model_label: str = "") -> tuple[str, Path]:
+def allocate_run_dir(
+    output_root: str | Path, model_label: str = ""
+) -> tuple[str, Path]:
     root = Path(output_root)
     base_run_id = utc_stamp()
     if model_label:
-        sanitized_label = model_label.replace("/", "-").replace(":", "-").replace(".", "-").replace(" ", "_")
+        sanitized_label = (
+            model_label.replace("/", "-")
+            .replace(":", "-")
+            .replace(".", "-")
+            .replace(" ", "_")
+        )
         candidate_id = f"{sanitized_label}_{base_run_id}"
     else:
         candidate_id = base_run_id
@@ -101,7 +113,7 @@ def git_revision() -> str:
             text=True,
         )
         return proc.stdout.strip()
-    except Exception:
+    except (FileNotFoundError, subprocess.SubprocessError):
         return "unknown"
 
 
@@ -122,7 +134,9 @@ def make_noisy_preds(
                     candidates.append((allowed_events[i], allowed_events[j]))
 
         gold_pairs = {(a, b) for (a, b, _) in gold_edges}
-        spurious_candidates = [(a, b) for (a, b) in candidates if (a, b) not in gold_pairs]
+        spurious_candidates = [
+            (a, b) for (a, b) in candidates if (a, b) not in gold_pairs
+        ]
         if spurious_candidates:
             a, b = rng.choice(spurious_candidates)
             pred.append((a, b, "BEFORE"))
@@ -194,7 +208,9 @@ def _model_metadata(
     }
 
 
-def _dataset_metadata(tasks: List[TemporalTask], data_path: str | Path) -> DatasetMetadata:
+def _dataset_metadata(
+    tasks: List[TemporalTask], data_path: str | Path
+) -> DatasetMetadata:
     expected_valid_tasks = sum(1 for task in tasks if task.expected_valid)
     expected_invalid_tasks = len(tasks) - expected_valid_tasks
     return DatasetMetadata(
@@ -234,7 +250,9 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                 if issue.severity == "error":
                     print(f"- [error] {issue.task_id} {issue.code}: {issue.message}")
             raise SystemExit(1)
-        print(f"✅ Dataset validation passed: errors=0 warnings={validation_report.num_warnings}")
+        print(
+            f"✅ Dataset validation passed: errors=0 warnings={validation_report.num_warnings}"
+        )
 
     tasks: List[TemporalTask] = [parse_temporal_task(obj) for obj in raw_tasks]
 
@@ -361,7 +379,9 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
 
                 task_taxonomy_categories: List[str] = []
                 for violation in verification.violations:
-                    violation_counts[violation.type] = violation_counts.get(violation.type, 0) + 1
+                    violation_counts[violation.type] = (
+                        violation_counts.get(violation.type, 0) + 1
+                    )
                     category = map_violation_to_category(violation.type)
                     taxonomy_counts[category] = taxonomy_counts.get(category, 0) + 1
                     task_taxonomy_categories.append(category)
@@ -421,17 +441,28 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                         "is_valid": verification.is_valid,
                         "graph_valid": verification.graph_valid,
                         "trace_grounded": verification.trace_grounded,
-                        "violations": [asdict(violation) for violation in verification.violations],
+                        "violations": [
+                            asdict(violation) for violation in verification.violations
+                        ],
                         "ltl_passed": len(verification.formula_violations) == 0,
-                        "formula_violations": [asdict(violation) for violation in verification.formula_violations],
+                        "formula_violations": [
+                            asdict(violation)
+                            for violation in verification.formula_violations
+                        ],
                         "violation_counts": verification.violation_counts,
                         "formula_violation_counts": verification.formula_violation_counts,
                         "layer_counts": verification.layer_counts,
                         "first_violation_step": verification.first_violation_step,
                         "spec_sources": verification.spec_sources,
                         "active_specification": {
-                            "invariants": [invariant.name for invariant in verifier.specification.invariants],
-                            "formulas": [formula.serialise() for formula in verifier.specification.formulas],
+                            "invariants": [
+                                invariant.name
+                                for invariant in verifier.specification.invariants
+                            ],
+                            "formulas": [
+                                formula.serialise()
+                                for formula in verifier.specification.formulas
+                            ],
                         },
                     },
                     "score": task_score_to_json(task_score),
@@ -450,9 +481,13 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
             except Exception as exc:
                 category = _failure_category(exc)
                 if category.startswith("transport_"):
-                    transport_failure_counts[category] = transport_failure_counts.get(category, 0) + 1
+                    transport_failure_counts[category] = (
+                        transport_failure_counts.get(category, 0) + 1
+                    )
                 else:
-                    parse_failure_counts[category] = parse_failure_counts.get(category, 0) + 1
+                    parse_failure_counts[category] = (
+                        parse_failure_counts.get(category, 0) + 1
+                    )
                 empty_prediction_score = score_prediction(
                     allowed_events=task.events,
                     gold_edges=task.gold_relations,
@@ -467,15 +502,25 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
                     "gold_relations": edges_to_jsonl(task.gold_relations),
                     "expected_valid": task.expected_valid,
                     "error": repr(exc),
-                    "score_as_empty_prediction": task_score_to_json(empty_prediction_score),
+                    "score_as_empty_prediction": task_score_to_json(
+                        empty_prediction_score
+                    ),
                 }
-                if config.log_raw and isinstance(exc, PredictionParseError) and exc.raw_output is not None:
+                if (
+                    config.log_raw
+                    and isinstance(exc, PredictionParseError)
+                    and exc.raw_output is not None
+                ):
                     failure_record["raw_output"] = exc.raw_output
                 failures.append(failure_record)
                 print(f"[{task.id}] ERROR: {exc!r}")
 
-    direct_summary = asdict(aggregate_prf(direct_correct_total, direct_pred_total, direct_gold_total))
-    closure_summary = asdict(aggregate_prf(closure_correct_total, closure_pred_total, closure_gold_total))
+    direct_summary = asdict(
+        aggregate_prf(direct_correct_total, direct_pred_total, direct_gold_total)
+    )
+    closure_summary = asdict(
+        aggregate_prf(closure_correct_total, closure_pred_total, closure_gold_total)
+    )
     parse_success_count = len(tasks) - len(failures)
 
     report = RunReport(
@@ -493,9 +538,7 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
         repair_hit_rate=(repair_hit_count / len(tasks)) if tasks else 0.0,
         parse_success_rate=(parse_success_count / len(tasks)) if tasks else 0.0,
         conditional_validity_rate=(
-            valid_count / parse_success_count
-            if parse_success_count > 0
-            else None
+            valid_count / parse_success_count if parse_success_count > 0 else None
         ),
         conditional_trace_grounding_rate=(
             trace_grounded_count / parse_success_count
@@ -517,12 +560,14 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
             "num_gold_empty_tasks": gold_empty_task_count,
             "num_overcommit_tasks": overcommit_task_count,
             "num_overcommit_edges": overcommit_edge_count,
-            "task_overcommit_rate": (
-                overcommit_task_count / gold_empty_task_count
-            ) if gold_empty_task_count else 0.0,
+            "task_overcommit_rate": (overcommit_task_count / gold_empty_task_count)
+            if gold_empty_task_count
+            else 0.0,
             "avg_overcommit_edges_per_gold_empty_task": (
                 overcommit_edge_count / gold_empty_task_count
-            ) if gold_empty_task_count else 0.0,
+            )
+            if gold_empty_task_count
+            else 0.0,
         },
         metrics_expected_valid_only={
             "direct": direct_summary,
@@ -548,26 +593,45 @@ def run_baseline(config: BaselineRunConfig) -> BaselineRunResult:
 
 
 def parse_args() -> BaselineRunConfig:
-    ap = argparse.ArgumentParser(description="Run temporal graph baseline and save reproducible outputs.")
+    ap = argparse.ArgumentParser(
+        description="Run temporal graph baseline and save reproducible outputs."
+    )
     ap.add_argument(
         "--data",
         default="data/temporal_reasoning_eval.jsonl",
         help="Path to JSONL dataset.",
     )
     ap.add_argument("--model", default="deepseek-r1:7b", help="Ollama model tag.")
-    ap.add_argument("--base-url", default="http://localhost:11434", help="Ollama server base URL.")
-    ap.add_argument("--temperature", type=float, default=0.0, help="Decoding temperature.")
+    ap.add_argument(
+        "--base-url", default="http://localhost:11434", help="Ollama server base URL."
+    )
+    ap.add_argument(
+        "--temperature", type=float, default=0.0, help="Decoding temperature."
+    )
     ap.add_argument("--seed", type=int, default=42, help="Random seed.")
-    ap.add_argument("--max-tasks", type=int, default=0, help="Limit tasks for quick tests (0 = all).")
+    ap.add_argument(
+        "--max-tasks",
+        type=int,
+        default=0,
+        help="Limit tasks for quick tests (0 = all).",
+    )
     ap.add_argument(
         "--pred-source",
         choices=["llm", "gold", "empty", "noisy"],
         default="llm",
         help="Where to source predictions.",
     )
-    ap.add_argument("--log-raw", action="store_true", help="Log raw model output in predictions.jsonl.")
-    ap.add_argument("--validate-data", action="store_true", help="Validate dataset before running.")
-    ap.add_argument("--strict-data", action="store_true", help="Use stricter dataset validation.")
+    ap.add_argument(
+        "--log-raw",
+        action="store_true",
+        help="Log raw model output in predictions.jsonl.",
+    )
+    ap.add_argument(
+        "--validate-data", action="store_true", help="Validate dataset before running."
+    )
+    ap.add_argument(
+        "--strict-data", action="store_true", help="Use stricter dataset validation."
+    )
     ap.add_argument(
         "--timeout-s",
         type=int,

@@ -64,7 +64,9 @@ def _parse_events(raw_events: Any) -> List[TempEvalEvent]:
     return events
 
 
-def _parse_relations(raw_relations: Any, event_ids: Iterable[str]) -> List[TempEvalRelation]:
+def _parse_relations(
+    raw_relations: Any, event_ids: Iterable[str]
+) -> List[TempEvalRelation]:
     if not isinstance(raw_relations, list):
         raise ValueError("'relations' must be a list.")
     allowed_ids = set(event_ids)
@@ -72,16 +74,24 @@ def _parse_relations(raw_relations: Any, event_ids: Iterable[str]) -> List[TempE
     for idx, raw_relation in enumerate(raw_relations):
         if not isinstance(raw_relation, dict):
             raise ValueError(f"Relation at index {idx} must be an object.")
-        source = _require_string(raw_relation.get("source"), field_name=f"relations[{idx}].source")
-        target = _require_string(raw_relation.get("target"), field_name=f"relations[{idx}].target")
+        source = _require_string(
+            raw_relation.get("source"), field_name=f"relations[{idx}].source"
+        )
+        target = _require_string(
+            raw_relation.get("target"), field_name=f"relations[{idx}].target"
+        )
         relation = TemporalRelation.canonicalise(
-            _require_string(raw_relation.get("relation"), field_name=f"relations[{idx}].relation")
+            _require_string(
+                raw_relation.get("relation"), field_name=f"relations[{idx}].relation"
+            )
         ).value
         if source not in allowed_ids or target not in allowed_ids:
             raise ValueError(
                 f"Relation at index {idx} references unknown event ids: {(source, target)!r}"
             )
-        relations.append(TempEvalRelation(source=source, target=target, relation=relation))
+        relations.append(
+            TempEvalRelation(source=source, target=target, relation=relation)
+        )
     return relations
 
 
@@ -155,7 +165,9 @@ def convert_tempeval3_tml_file(
         sent_idx_raw = node.attrib.get("sent_idx")
         sent_idx = int(sent_idx_raw) if sent_idx_raw is not None else None
         events_by_id[eid] = {
-            "text": _require_string("".join(node.itertext()), field_name=f"EVENT[{eid}]"),
+            "text": _require_string(
+                "".join(node.itertext()), field_name=f"EVENT[{eid}]"
+            ),
             "sent_idx": sent_idx,
         }
 
@@ -191,7 +203,9 @@ def convert_tempeval3_tml_file(
 
         source = instances_by_id[source_id]
         target = instances_by_id[target_id]
-        relation_raw = _require_string(tlink.attrib.get("relType"), field_name="TLINK.relType")
+        relation_raw = _require_string(
+            tlink.attrib.get("relType"), field_name="TLINK.relType"
+        )
         relation = coarsen_tempeval3_relation(relation_raw)
         if relation is None:
             stats["skipped_unmapped_relations"] += 1
@@ -203,7 +217,9 @@ def convert_tempeval3_tml_file(
 
         source_label = f"{source['text']} [{source_id}]"
         target_label = f"{target['text']} [{target_id}]"
-        sent_indices = [idx for idx in (source["sent_idx"], target["sent_idx"]) if idx is not None]
+        sent_indices = [
+            idx for idx in (source["sent_idx"], target["sent_idx"]) if idx is not None
+        ]
         if sent_indices and sentences:
             start = max(0, min(sent_indices))
             end = min(len(sentences) - 1, max(sent_indices))

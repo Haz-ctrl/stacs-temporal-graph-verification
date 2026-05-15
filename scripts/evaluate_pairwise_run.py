@@ -26,7 +26,9 @@ def _load_predictions(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def _write_csv(path: Path, rows: List[Dict[str, Any]], *, fieldnames: List[str]) -> None:
+def _write_csv(
+    path: Path, rows: List[Dict[str, Any]], *, fieldnames: List[str]
+) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -57,7 +59,9 @@ def _plot_confusion_matrix(path: Path, rows: List[Dict[str, Any]]) -> None:
 
 def _plot_verification_accuracy(path: Path, rows: List[Dict[str, Any]]) -> None:
     labels = [str(row["slice"]) for row in rows if row["slice"] != "all_tasks"]
-    values = [float(row["label_accuracy"]) for row in rows if row["slice"] != "all_tasks"]
+    values = [
+        float(row["label_accuracy"]) for row in rows if row["slice"] != "all_tasks"
+    ]
 
     fig, ax = plt.subplots(figsize=(8, 4))
     bars = ax.bar(labels, values, color="#4C78A8")
@@ -66,16 +70,31 @@ def _plot_verification_accuracy(path: Path, rows: List[Dict[str, Any]]) -> None:
     ax.set_title("Pairwise Label Accuracy by Verification Slice")
     ax.tick_params(axis="x", rotation=25)
     for bar, value in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, value + 0.02, f"{value:.0%}", ha="center", va="bottom", fontsize=8)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            value + 0.02,
+            f"{value:.0%}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export pairwise classification audits for a completed run.")
-    parser.add_argument("--run", required=True, help="Run directory containing predictions.jsonl and report.json.")
-    parser.add_argument("--out", required=True, help="Output directory for audit CSVs and plots.")
+    parser = argparse.ArgumentParser(
+        description="Export pairwise classification audits for a completed run."
+    )
+    parser.add_argument(
+        "--run",
+        required=True,
+        help="Run directory containing predictions.jsonl and report.json.",
+    )
+    parser.add_argument(
+        "--out", required=True, help="Output directory for audit CSVs and plots."
+    )
     args = parser.parse_args()
 
     run_dir = Path(args.run)
@@ -106,9 +125,13 @@ def main() -> None:
                 "closure_f1": float(dict(score.get("closure", {})).get("f1", 0.0)),
                 "first_violation_step": verification.get("first_violation_step"),
                 "num_violations": len(list(verification.get("violations", []))),
-                "num_formula_violations": len(list(verification.get("formula_violations", []))),
+                "num_formula_violations": len(
+                    list(verification.get("formula_violations", []))
+                ),
                 "question": row.get("question", ""),
-                "gold_relations": json.dumps(row.get("gold_relations", []), ensure_ascii=True),
+                "gold_relations": json.dumps(
+                    row.get("gold_relations", []), ensure_ascii=True
+                ),
                 "pred_edges": json.dumps(row.get("pred_edges", []), ensure_ascii=True),
                 "answer": row.get("answer", ""),
             }
@@ -131,7 +154,15 @@ def main() -> None:
     _write_csv(
         out_dir / "pairwise_label_metrics.csv",
         metrics_rows,
-        fieldnames=["label", "precision", "recall", "f1", "correct", "pred_total", "gold_total"],
+        fieldnames=[
+            "label",
+            "precision",
+            "recall",
+            "f1",
+            "correct",
+            "pred_total",
+            "gold_total",
+        ],
     )
     _write_csv(
         out_dir / "verification_accuracy_slices.csv",
@@ -140,7 +171,9 @@ def main() -> None:
     )
 
     _plot_confusion_matrix(out_dir / "pairwise_confusion_matrix.png", confusion_rows)
-    _plot_verification_accuracy(out_dir / "verification_accuracy_slices.png", slice_rows)
+    _plot_verification_accuracy(
+        out_dir / "verification_accuracy_slices.png", slice_rows
+    )
 
     print(f"Exported pairwise audit for {len(instances)} tasks -> {out_dir}")
 

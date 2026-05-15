@@ -25,6 +25,11 @@ def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
+# ---------------------------------------------------------------------------
+# Non-LLM prediction sources
+# ---------------------------------------------------------------------------
+
+
 def test_run_baseline_gold_mode_integration(tmp_path: Path) -> None:
     dataset_path = tmp_path / "eval.jsonl"
     _write_jsonl(
@@ -182,11 +187,18 @@ def test_run_baseline_noisy_mode_integration(tmp_path: Path) -> None:
     assert amb_record["score"]["has_overcommitment"] is True
 
 
+# ---------------------------------------------------------------------------
+# Successful LLM prediction flow
+# ---------------------------------------------------------------------------
+
+
 class FakeOllamaClient:
     def __init__(self, base_url: str, **_: object) -> None:
         self.base_url = base_url
 
-    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+    def generate(
+        self, model: str, prompt: str, temperature: float, seed: int | None
+    ) -> str:
         return """
         {
           "answer": "A happened before B.",
@@ -206,7 +218,9 @@ class FakeOllamaClient:
         return ["fake-model:latest"]
 
 
-def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_run_baseline_llm_mode_uses_structured_predictor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import scripts.run_llm_baseline as baseline_module
 
     monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClient)
@@ -264,6 +278,11 @@ def test_run_baseline_llm_mode_uses_structured_predictor(tmp_path: Path, monkeyp
     assert record["verification"]["formula_violations"] == []
 
 
+# ---------------------------------------------------------------------------
+# LLM parse failure handling
+# ---------------------------------------------------------------------------
+
+
 class FakeOllamaClientWithParseIssues:
     def __init__(self, base_url: str, **_: object) -> None:
         self.base_url = base_url
@@ -300,7 +319,9 @@ class FakeOllamaClientWithParseIssues:
             """,
         ]
 
-    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+    def generate(
+        self, model: str, prompt: str, temperature: float, seed: int | None
+    ) -> str:
         return self._responses.pop(0)
 
     def tags_snapshot(self) -> list[str]:
@@ -313,7 +334,9 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
 ) -> None:
     import scripts.run_llm_baseline as baseline_module
 
-    monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClientWithParseIssues)
+    monkeypatch.setattr(
+        baseline_module, "OllamaClient", FakeOllamaClientWithParseIssues
+    )
 
     dataset_path = tmp_path / "eval.jsonl"
     _write_jsonl(
@@ -388,15 +411,24 @@ def test_run_baseline_reports_parse_failure_taxonomy_and_conditional_validity(
         "invalid_edge_support",
         "schema_violation",
     ]
-    assert all(failure["task_category"] == "linear_chain" for failure in report.failures)
+    assert all(
+        failure["task_category"] == "linear_chain" for failure in report.failures
+    )
     assert all("raw_output" in failure for failure in report.failures)
+
+
+# ---------------------------------------------------------------------------
+# LLM transport failure handling
+# ---------------------------------------------------------------------------
 
 
 class FakeOllamaClientWithTransportTimeout:
     def __init__(self, base_url: str, **_: object) -> None:
         self.base_url = base_url
 
-    def generate(self, model: str, prompt: str, temperature: float, seed: int | None) -> str:
+    def generate(
+        self, model: str, prompt: str, temperature: float, seed: int | None
+    ) -> str:
         from src.ollama_client import OllamaTransportError
 
         raise OllamaTransportError("timed out", category="transport_timeout")
@@ -411,7 +443,9 @@ def test_run_baseline_separates_transport_failures(
 ) -> None:
     import scripts.run_llm_baseline as baseline_module
 
-    monkeypatch.setattr(baseline_module, "OllamaClient", FakeOllamaClientWithTransportTimeout)
+    monkeypatch.setattr(
+        baseline_module, "OllamaClient", FakeOllamaClientWithTransportTimeout
+    )
 
     dataset_path = tmp_path / "eval.jsonl"
     _write_jsonl(

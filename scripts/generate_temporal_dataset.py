@@ -5,7 +5,7 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Literal, Optional, Sequence, Tuple, TypedDict
+from typing import Dict, Iterable, List, Literal, Sequence, Tuple, TypedDict
 
 Relation = Literal["BEFORE"]
 Category = Literal[
@@ -74,18 +74,50 @@ VERBS: List[str] = [
 ]
 
 NAMES: List[str] = [
-    "Ava", "Mia", "Sam", "Priya", "Leo", "Nora", "Kai", "Lina", "Omar", "Zara",
-    "Noah", "Ivy", "Ethan", "Sofia", "Hana", "Ben", "Amir", "Ruby", "Jon", "Sara",
+    "Ava",
+    "Mia",
+    "Sam",
+    "Priya",
+    "Leo",
+    "Nora",
+    "Kai",
+    "Lina",
+    "Omar",
+    "Zara",
+    "Noah",
+    "Ivy",
+    "Ethan",
+    "Sofia",
+    "Hana",
+    "Ben",
+    "Amir",
+    "Ruby",
+    "Jon",
+    "Sara",
 ]
 
 PLACES: List[str] = [
-    "at home", "at the office", "at the station", "in the kitchen", "in the library",
-    "in the lab", "at the café", "in the garden", "in the hallway", "in the classroom",
+    "at home",
+    "at the office",
+    "at the station",
+    "in the kitchen",
+    "in the library",
+    "in the lab",
+    "at the café",
+    "in the garden",
+    "in the hallway",
+    "in the classroom",
 ]
 
 # Natural language connectors to vary surface forms a bit
 CONNECTORS: List[str] = [
-    "Before that,", "After that,", "Then,", "Next,", "Later,", "Afterwards,", "Immediately after,",
+    "Before that,",
+    "After that,",
+    "Then,",
+    "Next,",
+    "Later,",
+    "Afterwards,",
+    "Immediately after,",
 ]
 
 
@@ -106,7 +138,11 @@ def _unique_events(rng: random.Random, k: int) -> List[str]:
     Produce k distinct event strings of the form "<Name> <verb> <place>".
     """
     # sample without replacement where possible
-    verbs = rng.sample(VERBS, k=k) if k <= len(VERBS) else [rng.choice(VERBS) for _ in range(k)]
+    verbs = (
+        rng.sample(VERBS, k=k)
+        if k <= len(VERBS)
+        else [rng.choice(VERBS) for _ in range(k)]
+    )
     names = [rng.choice(NAMES) for _ in range(k)]
     places = [rng.choice(PLACES) for _ in range(k)]
 
@@ -116,7 +152,7 @@ def _unique_events(rng: random.Random, k: int) -> List[str]:
         e = f"{names[i]} {verbs[i]} {places[i]}"
         # ensure uniqueness even if random collisions happen
         if e in seen:
-            e = f"{names[i]} {verbs[i]} {places[i]} (step {i+1})"
+            e = f"{names[i]} {verbs[i]} {places[i]} (step {i + 1})"
         seen.add(e)
         events.append(e)
     return events
@@ -173,7 +209,7 @@ def _linear_chain_task(rng: random.Random, idx: int) -> Task:
         "events": events,
         "gold_relations": [_json_edge(e) for e in edges],
         "expected_consistent": True,
-        "expected_valid": True
+        "expected_valid": True,
     }
 
 
@@ -187,7 +223,7 @@ def _transitive_reasoning_task(rng: random.Random, idx: int) -> Task:
     # Narrative: explicitly state only consecutive steps, not the implied ones
     parts: List[str] = []
     for i in range(len(events) - 1):
-        parts.append(f"{events[i]} happened before {events[i+1]}.")
+        parts.append(f"{events[i]} happened before {events[i + 1]}.")
     question = " ".join(parts)
 
     return {
@@ -216,7 +252,7 @@ def _ambiguous_task(rng: random.Random, idx: int) -> Task:
         "events": events,
         "gold_relations": [],
         "expected_consistent": True,
-        "expected_valid": True
+        "expected_valid": True,
     }
 
 
@@ -236,7 +272,7 @@ def _contradiction_task(rng: random.Random, idx: int) -> Task:
         "events": list(events),
         "gold_relations": [_json_edge(e) for e in edges],
         "expected_consistent": False,
-        "expected_valid": False
+        "expected_valid": False,
     }
 
 
@@ -289,14 +325,39 @@ def generate_dataset(cfg: Config) -> List[Task]:
 
 
 def parse_args() -> Config:
-    ap = argparse.ArgumentParser(description="Generate a temporal reasoning JSONL dataset (150-200 tasks).")
-    ap.add_argument("--out", default="data/temporal_reasoning_eval.jsonl", help="Output JSONL path.")
-    ap.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
-    ap.add_argument("--n-linear", type=int, default=60, help="Number of linear chain tasks.")
-    ap.add_argument("--n-transitive", type=int, default=50, help="Number of transitive reasoning tasks.")
-    ap.add_argument("--n-ambiguous", type=int, default=60, help="Number of ambiguous/underspecified tasks.")
-    ap.add_argument("--n-contradiction", type=int, default=50, help="Number of contradiction tasks.")
-    ap.add_argument("--n-long", type=int, default=30, help="Number of long chain tasks (5-7 events).")
+    ap = argparse.ArgumentParser(
+        description="Generate a temporal reasoning JSONL dataset (150-200 tasks)."
+    )
+    ap.add_argument(
+        "--out", default="data/temporal_reasoning_eval.jsonl", help="Output JSONL path."
+    )
+    ap.add_argument(
+        "--seed", type=int, default=42, help="Random seed for reproducibility."
+    )
+    ap.add_argument(
+        "--n-linear", type=int, default=60, help="Number of linear chain tasks."
+    )
+    ap.add_argument(
+        "--n-transitive",
+        type=int,
+        default=50,
+        help="Number of transitive reasoning tasks.",
+    )
+    ap.add_argument(
+        "--n-ambiguous",
+        type=int,
+        default=60,
+        help="Number of ambiguous/underspecified tasks.",
+    )
+    ap.add_argument(
+        "--n-contradiction", type=int, default=50, help="Number of contradiction tasks."
+    )
+    ap.add_argument(
+        "--n-long",
+        type=int,
+        default=30,
+        help="Number of long chain tasks (5-7 events).",
+    )
     args = ap.parse_args()
 
     return Config(

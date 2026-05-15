@@ -21,6 +21,7 @@ By default we keep only relations already supported by the verifier and skip
 interval relations. `OVERLAP` can optionally be coarsened into
 `SIMULTANEOUS` when a larger but noisier slice is desired.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,14 +33,21 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 SUPPORTED_TEMPORAL_LABELS = {"BEFORE", "SIMULTANEOUS"}
-ALL_TEMPORAL_LABELS = ("BEFORE", "OVERLAP", "CONTAINS", "SIMULTANEOUS", "ENDS-ON", "BEGINS-ON")
+ALL_TEMPORAL_LABELS = (
+    "BEFORE",
+    "OVERLAP",
+    "CONTAINS",
+    "SIMULTANEOUS",
+    "ENDS-ON",
+    "BEGINS-ON",
+)
 
 # Default target relation counts for stratified sampling.
 # SIMULTANEOUS is the scarce class; BEFORE is capped relative to it.
 # None means "take all available".
 DEFAULT_TARGET_COUNTS: Dict[str, Optional[int]] = {
-    "SIMULTANEOUS": None,   # keep every EVENT-EVENT SIMULTANEOUS pair
-    "BEFORE": None,         # capped via --before-multiplier relative to SIMULTANEOUS
+    "SIMULTANEOUS": None,  # keep every EVENT-EVENT SIMULTANEOUS pair
+    "BEFORE": None,  # capped via --before-multiplier relative to SIMULTANEOUS
 }
 
 
@@ -60,13 +68,17 @@ def _load_jsonl(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def _choose_sentence_window(sent_a: int, sent_b: int, *, radius: int, max_index: int) -> Tuple[int, int]:
+def _choose_sentence_window(
+    sent_a: int, sent_b: int, *, radius: int, max_index: int
+) -> Tuple[int, int]:
     start = max(0, min(sent_a, sent_b) - radius)
     end = min(max_index, max(sent_a, sent_b) + radius)
     return start, end
 
 
-def _surface_text_from_tokens(sentence_tokens: Sequence[str], offset: Sequence[int], fallback: str) -> str:
+def _surface_text_from_tokens(
+    sentence_tokens: Sequence[str], offset: Sequence[int], fallback: str
+) -> str:
     if len(offset) != 2:
         return fallback
     start, end = int(offset[0]), int(offset[1])
@@ -154,7 +166,9 @@ def _label_for_anchor(record: Dict[str, Any], anchor: Dict[str, Any]) -> str:
     tokens = list(record.get("tokens", []))
     fallback = str(anchor.get("text", "")).strip() or str(anchor["node_id"])
     if 0 <= sent_id < len(tokens):
-        surface = _surface_text_from_tokens(tokens[sent_id], anchor.get("offset", []), fallback)
+        surface = _surface_text_from_tokens(
+            tokens[sent_id], anchor.get("offset", []), fallback
+        )
     else:
         surface = fallback
     return f"{surface} [{anchor['mention_id']}]"
@@ -348,8 +362,8 @@ def convert_maven_ere_temporal_split(
     rng.shuffle(pools["SIMULTANEOUS"])
     rng.shuffle(pools["BEFORE"])
 
-    sim_pool  = pools["SIMULTANEOUS"]
-    bef_pool  = pools["BEFORE"]
+    sim_pool = pools["SIMULTANEOUS"]
+    bef_pool = pools["BEFORE"]
 
     n_sim = len(sim_pool)
 
@@ -371,11 +385,17 @@ def convert_maven_ere_temporal_split(
 
     # ── Phase 3: build task records ───────────────────────────────────────────
     tasks: List[Dict[str, Any]] = []
-    kept_relation_counts: Counter = Counter()
+    kept_relation_counts: Counter[str] = Counter()
 
-    for pair_index, (record, src_id, tgt_id, original_relation) in enumerate(sampled_pairs):
+    for pair_index, (record, src_id, tgt_id, original_relation) in enumerate(
+        sampled_pairs
+    ):
         grouped_mentions = _group_mentions_by_node(record)
         mapped = _map_relation(original_relation, coarsen_overlap=coarsen_overlap)
+        if mapped is None:
+            raise ValueError(
+                f"Sampled relation {original_relation!r} cannot be mapped."
+            )
         source_anchor, target_anchor = _choose_anchor_pair(
             grouped_mentions[src_id],
             grouped_mentions[tgt_id],
@@ -395,11 +415,11 @@ def convert_maven_ere_temporal_split(
                 context_radius=context_radius,
             )
         )
-        kept_relation_counts[mapped] += 1  # type: ignore[arg-type]
+        kept_relation_counts[mapped] += 1
 
     total = len(tasks)
     label_fracs = {
-        k: f"{v}/{total} ({v/total*100:.1f}%)" if total else "0"
+        k: f"{v}/{total} ({v / total * 100:.1f}%)" if total else "0"
         for k, v in sorted(kept_relation_counts.items())
     }
 
@@ -463,7 +483,9 @@ def convert_maven_ere_test_candidates(
         "input_path": str(path),
         "num_documents": len(docs),
         "num_tasks": 0,
-        "pair_mode": "all" if sentence_window < 0 else f"sentence_window_{sentence_window}",
+        "pair_mode": "all"
+        if sentence_window < 0
+        else f"sentence_window_{sentence_window}",
         "include_timex": include_timex,
     }
     pair_index = 0
@@ -474,7 +496,11 @@ def convert_maven_ere_test_candidates(
             for right in mentions:
                 if left["mention_id"] == right["mention_id"]:
                     continue
-                if sentence_window >= 0 and abs(int(left["sent_id"]) - int(right["sent_id"])) > sentence_window:
+                if (
+                    sentence_window >= 0
+                    and abs(int(left["sent_id"]) - int(right["sent_id"]))
+                    > sentence_window
+                ):
                     continue
                 pair_index += 1
                 tasks.append(
@@ -515,7 +541,9 @@ def main() -> None:
         help="Dataset split represented by the input file.",
     )
     parser.add_argument("--output", required=True, help="Output canonical JSONL path.")
-    parser.add_argument("--stats-out", default="", help="Optional JSON path for conversion statistics.")
+    parser.add_argument(
+        "--stats-out", default="", help="Optional JSON path for conversion statistics."
+    )
     parser.add_argument(
         "--category",
         default="maven_ere_temporal",
@@ -559,8 +587,15 @@ def main() -> None:
         default=-1,
         help="For test conversion only: keep candidate pairs within this sentence distance. Use -1 for all pairs.",
     )
-    parser.add_argument("--max-tasks", type=int, default=0, help="Hard cap on output tasks applied after stratified sampling.")
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for stratified sampling.")
+    parser.add_argument(
+        "--max-tasks",
+        type=int,
+        default=0,
+        help="Hard cap on output tasks applied after stratified sampling.",
+    )
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for stratified sampling."
+    )
     args = parser.parse_args()
 
     input_path = Path(args.input)

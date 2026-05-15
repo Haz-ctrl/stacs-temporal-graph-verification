@@ -22,9 +22,15 @@ class PairwiseInstance:
     trace_grounded: bool
 
 
-def _explicit_unknown_pair(pred_edges: Iterable[Sequence[str]], source: str, target: str) -> bool:
+def _explicit_unknown_pair(
+    pred_edges: Iterable[Sequence[str]], source: str, target: str
+) -> bool:
     for left, right, relation in pred_edges:
-        if str(left) == source and str(right) == target and canonicalise_relation(str(relation)) == "UNKNOWN":
+        if (
+            str(left) == source
+            and str(right) == target
+            and canonicalise_relation(str(relation)) == "UNKNOWN"
+        ):
             return True
     return False
 
@@ -65,7 +71,9 @@ def pairwise_instance_from_record(record: Mapping[str, Any]) -> PairwiseInstance
     gold_relations = list(record.get("gold_relations", []))
     events = list(record.get("events", []))
     if len(events) != 2:
-        raise ValueError(f"Task {record.get('id')} is not pairwise: expected 2 events, found {len(events)}")
+        raise ValueError(
+            f"Task {record.get('id')} is not pairwise: expected 2 events, found {len(events)}"
+        )
     if len(gold_relations) != 1:
         raise ValueError(
             f"Task {record.get('id')} is not single-label pairwise: expected 1 gold relation, found {len(gold_relations)}"
@@ -98,14 +106,17 @@ def confusion_matrix(instances: Sequence[PairwiseInstance]) -> List[Dict[str, in
             row[predicted_label] = sum(
                 1
                 for instance in instances
-                if instance.gold_label == gold_label and instance.predicted_label == predicted_label
+                if instance.gold_label == gold_label
+                and instance.predicted_label == predicted_label
             )
         row["total"] = sum(row[predicted_label] for predicted_label in predicted_labels)
         rows.append(row)
     return rows
 
 
-def per_label_metrics(instances: Sequence[PairwiseInstance]) -> List[Dict[str, float | int | str]]:
+def per_label_metrics(
+    instances: Sequence[PairwiseInstance],
+) -> List[Dict[str, float | int | str]]:
     rows: List[Dict[str, float | int | str]] = []
     for label in PAIRWISE_LABELS:
         correct = sum(
@@ -113,7 +124,9 @@ def per_label_metrics(instances: Sequence[PairwiseInstance]) -> List[Dict[str, f
             for instance in instances
             if instance.gold_label == label and instance.predicted_label == label
         )
-        pred_total = sum(1 for instance in instances if instance.predicted_label == label)
+        pred_total = sum(
+            1 for instance in instances if instance.predicted_label == label
+        )
         gold_total = sum(1 for instance in instances if instance.gold_label == label)
         prf = compute_prf(correct, pred_total, gold_total)
         rows.append(
@@ -130,19 +143,34 @@ def per_label_metrics(instances: Sequence[PairwiseInstance]) -> List[Dict[str, f
     return rows
 
 
-def verification_slices(instances: Sequence[PairwiseInstance]) -> List[Dict[str, float | int | str]]:
+def verification_slices(
+    instances: Sequence[PairwiseInstance],
+) -> List[Dict[str, float | int | str]]:
     slices = {
         "all_tasks": list(instances),
-        "verifier_valid": [instance for instance in instances if instance.verifier_valid],
-        "verifier_invalid": [instance for instance in instances if not instance.verifier_valid],
-        "trace_grounded": [instance for instance in instances if instance.trace_grounded],
-        "trace_ungrounded": [instance for instance in instances if not instance.trace_grounded],
+        "verifier_valid": [
+            instance for instance in instances if instance.verifier_valid
+        ],
+        "verifier_invalid": [
+            instance for instance in instances if not instance.verifier_valid
+        ],
+        "trace_grounded": [
+            instance for instance in instances if instance.trace_grounded
+        ],
+        "trace_ungrounded": [
+            instance for instance in instances if not instance.trace_grounded
+        ],
     }
     rows: List[Dict[str, float | int | str]] = []
     for name, slice_instances in slices.items():
         total = len(slice_instances)
         accuracy = (
-            sum(1 for instance in slice_instances if instance.gold_label == instance.predicted_label) / total
+            sum(
+                1
+                for instance in slice_instances
+                if instance.gold_label == instance.predicted_label
+            )
+            / total
             if total
             else 0.0
         )

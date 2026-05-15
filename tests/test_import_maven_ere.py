@@ -1,4 +1,5 @@
 """Tests for scripts/import_maven_ere.py."""
+
 from __future__ import annotations
 
 import json
@@ -19,6 +20,11 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
             handle.write(json.dumps(row) + "\n")
 
 
+# ---------------------------------------------------------------------------
+# Relation mapping
+# ---------------------------------------------------------------------------
+
+
 def test_map_relation_supported_only_by_default() -> None:
     assert _map_relation("BEFORE", coarsen_overlap=False) == "BEFORE"
     assert _map_relation("SIMULTANEOUS", coarsen_overlap=False) == "SIMULTANEOUS"
@@ -28,6 +34,11 @@ def test_map_relation_supported_only_by_default() -> None:
 
 def test_map_relation_can_coarsen_overlap() -> None:
     assert _map_relation("OVERLAP", coarsen_overlap=True) == "SIMULTANEOUS"
+
+
+# ---------------------------------------------------------------------------
+# Validation split conversion
+# ---------------------------------------------------------------------------
 
 
 def test_convert_valid_split_keeps_supported_relations(tmp_path: Path) -> None:
@@ -44,15 +55,37 @@ def test_convert_valid_split_keeps_supported_relations(tmp_path: Path) -> None:
                     {
                         "id": "EVENT_A",
                         "type": "Start",
-                        "mention": [{"id": "m1", "trigger_word": "began", "sent_id": 0, "offset": [1, 2]}],
+                        "mention": [
+                            {
+                                "id": "m1",
+                                "trigger_word": "began",
+                                "sent_id": 0,
+                                "offset": [1, 2],
+                            }
+                        ],
                     },
                     {
                         "id": "EVENT_B",
                         "type": "End",
-                        "mention": [{"id": "m2", "trigger_word": "ended", "sent_id": 1, "offset": [1, 2]}],
+                        "mention": [
+                            {
+                                "id": "m2",
+                                "trigger_word": "ended",
+                                "sent_id": 1,
+                                "offset": [1, 2],
+                            }
+                        ],
                     },
                 ],
-                "TIMEX": [{"id": "TIME_1", "mention": "today", "type": "DATE", "sent_id": 0, "offset": [0, 1]}],
+                "TIMEX": [
+                    {
+                        "id": "TIME_1",
+                        "mention": "today",
+                        "type": "DATE",
+                        "sent_id": 0,
+                        "offset": [0, 1],
+                    }
+                ],
                 "temporal_relations": {
                     "BEFORE": [["EVENT_A", "EVENT_B"], ["EVENT_B", "EVENT_A"]],
                     "CONTAINS": [["TIME_1", "EVENT_B"]],
@@ -94,12 +127,26 @@ def test_convert_valid_split_can_coarsen_overlap(tmp_path: Path) -> None:
                     {
                         "id": "EVENT_A",
                         "type": "Meet",
-                        "mention": [{"id": "m1", "trigger_word": "met", "sent_id": 0, "offset": [1, 2]}],
+                        "mention": [
+                            {
+                                "id": "m1",
+                                "trigger_word": "met",
+                                "sent_id": 0,
+                                "offset": [1, 2],
+                            }
+                        ],
                     },
                     {
                         "id": "EVENT_B",
                         "type": "Meet",
-                        "mention": [{"id": "m2", "trigger_word": "met", "sent_id": 0, "offset": [1, 2]}],
+                        "mention": [
+                            {
+                                "id": "m2",
+                                "trigger_word": "met",
+                                "sent_id": 0,
+                                "offset": [1, 2],
+                            }
+                        ],
                     },
                 ],
                 "TIMEX": [],
@@ -121,8 +168,15 @@ def test_convert_valid_split_can_coarsen_overlap(tmp_path: Path) -> None:
     )
 
     assert len(tasks) == 1
-    assert tasks[0]["gold_relations"] == [[tasks[0]["events"][0], tasks[0]["events"][1], "SIMULTANEOUS"]]
+    assert tasks[0]["gold_relations"] == [
+        [tasks[0]["events"][0], tasks[0]["events"][1], "SIMULTANEOUS"]
+    ]
     assert stats["sampled_counts"] == {"SIMULTANEOUS": 1}
+
+
+# ---------------------------------------------------------------------------
+# Test split candidate generation
+# ---------------------------------------------------------------------------
 
 
 def test_convert_test_candidates_generates_unlabeled_pairs(tmp_path: Path) -> None:
@@ -136,10 +190,32 @@ def test_convert_test_candidates_generates_unlabeled_pairs(tmp_path: Path) -> No
                 "tokens": [["A", "began", "."], ["It", "ended", "today", "."]],
                 "sentences": ["A began.", "It ended today."],
                 "event_mentions": [
-                    {"id": "m1", "trigger_word": "began", "sent_id": 0, "offset": [1, 2], "type": "Start", "type_id": 1},
-                    {"id": "m2", "trigger_word": "ended", "sent_id": 1, "offset": [1, 2], "type": "End", "type_id": 2},
+                    {
+                        "id": "m1",
+                        "trigger_word": "began",
+                        "sent_id": 0,
+                        "offset": [1, 2],
+                        "type": "Start",
+                        "type_id": 1,
+                    },
+                    {
+                        "id": "m2",
+                        "trigger_word": "ended",
+                        "sent_id": 1,
+                        "offset": [1, 2],
+                        "type": "End",
+                        "type_id": 2,
+                    },
                 ],
-                "TIMEX": [{"id": "TIME_1", "mention": "today", "type": "DATE", "sent_id": 1, "offset": [2, 3]}],
+                "TIMEX": [
+                    {
+                        "id": "TIME_1",
+                        "mention": "today",
+                        "type": "DATE",
+                        "sent_id": 1,
+                        "offset": [2, 3],
+                    }
+                ],
             }
         ],
     )
@@ -158,6 +234,11 @@ def test_convert_test_candidates_generates_unlabeled_pairs(tmp_path: Path) -> No
     assert stats["num_tasks"] == 6
     assert all(task["gold_relations"] == [] for task in tasks)
     assert all(task["metadata"]["original_relation"] == "UNLABELED" for task in tasks)
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 
 
 def test_cli_help() -> None:
